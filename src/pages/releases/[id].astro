@@ -1,0 +1,74 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const releases = await getCollection('releases');
+  return releases.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Layout title={entry.data.title}>
+  <article>
+    <span class="tag">{entry.data.library} <span class="muted">{entry.data.version}</span></span>
+    <h1>{entry.data.title}</h1>
+    <p class="explanation">{entry.data.explanation}</p>
+
+    {entry.data.breaking_changes && entry.data.breaking_changes.length > 0 && (
+      <div class="breaking">
+        <p class="breaking-title">Breaking changes</p>
+        <ul>
+          {entry.data.breaking_changes.map((change: string) => <li>{change}</li>)}
+        </ul>
+      </div>
+    )}
+
+    <div class="content">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  article {
+    padding: 32px 0;
+    max-width: 720px;
+  }
+  .tag {
+    font-size: 12px;
+    color: var(--accent);
+  }
+  .muted {
+    color: var(--text-muted);
+  }
+  h1 {
+    font-size: 26px;
+    margin: 8px 0 12px;
+  }
+  .explanation {
+    font-size: 15px;
+    color: var(--text-secondary);
+  }
+  .breaking {
+    background: #fff3f0;
+    border: 1px solid #f3c9bd;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin: 20px 0;
+  }
+  .breaking-title {
+    font-weight: 600;
+    font-size: 13px;
+    margin: 0 0 6px;
+  }
+  .content {
+    font-size: 15px;
+    margin-top: 16px;
+  }
+</style>

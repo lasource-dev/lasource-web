@@ -1,0 +1,59 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const tutoriels = (await getCollection('tutoriels')).sort(
+  (a, b) => b.data.updated.valueOf() - a.data.updated.valueOf()
+);
+---
+
+<Layout title="Tutoriels">
+  <h1>Tutoriels</h1>
+  <div class="list">
+    {tutoriels.length === 0 && <p class="empty">Aucun tutoriel publié pour le moment.</p>}
+    {tutoriels.map((t) => (
+      <a href={`/tutoriels/${t.id}`} class="row">
+        <div>
+          <span class="tag">{t.data.library}</span>
+          <p class="title">{t.data.title}</p>
+        </div>
+        <span class="muted">{t.data.duree_lecture} min</span>
+      </a>
+    ))}
+  </div>
+</Layout>
+
+<style>
+  h1 {
+    font-size: 22px;
+    margin: 32px 0 20px;
+  }
+  .list {
+    border-top: 1px solid var(--border);
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+  .tag {
+    font-size: 11px;
+    color: var(--accent);
+  }
+  .title {
+    font-size: 14px;
+    margin: 4px 0 0;
+  }
+  .muted {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .empty {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+</style>
