@@ -30,6 +30,10 @@ const baseFields = {
   tags: z.array(z.string()),
   lang: z.enum(['fr', 'en']).default('fr'),
   updated: z.date(),
+  // Statut éditorial — filet de sécurité indépendant du process Git/PR.
+  // 'draft' par défaut : un contenu ne devient visible sur le site que
+  // lorsqu'il passe explicitement à 'published', même s'il est mergé dans main.
+  status: z.enum(['draft', 'review', 'published']).default('draft'),
 };
 
 // Schéma d'un atome MCP (section 3.3 de la note stratégique)
@@ -110,6 +114,7 @@ const veille = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.date(),
+    status: z.enum(['draft', 'review', 'published']).default('draft'),
     news_items: z.array(
       z.object({
         titre: z.string(),

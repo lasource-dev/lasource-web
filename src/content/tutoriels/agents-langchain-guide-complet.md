@@ -1,4 +1,5 @@
 ---
+status: published
 title: "Créer un agent LangChain de A à Z : guide complet"
 library: langchain
 tags: [agent, tutoriel, react]

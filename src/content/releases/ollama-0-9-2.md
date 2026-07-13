@@ -1,4 +1,5 @@
 ---
+status: published
 title: "Ollama v0.9.2 — support amélioré du function calling"
 library: ollama
 version: "0.9.2"
