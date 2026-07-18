@@ -1,0 +1,110 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const comparatifs = await getCollection('comparatifs');
+  return comparatifs.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Layout title={entry.data.title} description={entry.data.recommendation}>
+  <article>
+    <div class="tags">
+      {entry.data.libraries_compared.map((lib: string) => (
+        <span class="tag">{lib}</span>
+      ))}
+    </div>
+    <h1>{entry.data.title}</h1>
+    <blockquote class="reco">{entry.data.recommendation}</blockquote>
+
+    <div class="content">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  article {
+    padding: 32px 0;
+    max-width: 720px;
+  }
+  .tags {
+    display: flex;
+    gap: 8px;
+  }
+  .tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    background: var(--accent-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 10px 0 12px;
+  }
+  .reco {
+    font-size: 15px;
+    color: var(--text-secondary);
+    border-left: 3px solid var(--accent);
+    padding: 8px 16px;
+    margin: 0 0 28px;
+    font-style: italic;
+  }
+  .content {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .content :global(h2) {
+    font-size: 20px;
+    margin: 32px 0 12px;
+  }
+  .content :global(h3) {
+    font-size: 16px;
+    margin: 24px 0 8px;
+  }
+  .content :global(pre) {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .content :global(code) {
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 0.9em;
+  }
+  .content :global(p code) {
+    background: var(--surface-alt);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 16px 0;
+  }
+  .content :global(th),
+  .content :global(td) {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  .content :global(th) {
+    background: var(--surface-alt);
+    font-weight: 600;
+  }
+</style>

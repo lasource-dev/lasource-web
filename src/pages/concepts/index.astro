@@ -1,0 +1,74 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const concepts = await getCollection('concepts');
+const published = concepts
+  .filter((c) => c.data.status === 'published' || c.data.status === 'draft')
+  .sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
+---
+
+<Layout title="Concepts" description="Fiches concept IA/ML en français — LangChain, Transformers, vLLM et plus.">
+  <section>
+    <h1>Concepts</h1>
+    <p class="subtitle">Fiches pédagogiques sur les concepts clés des frameworks IA/ML.</p>
+
+    <div class="grid">
+      {published.map((entry) => (
+        <a href={`/concepts/${entry.id}`} class="card">
+          <span class="tag">{entry.data.library}</span>
+          <h2>{entry.data.title}</h2>
+          <p>{entry.data.explanation}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  section {
+    padding: 32px 0;
+  }
+  h1 {
+    font-size: 26px;
+    margin: 0 0 4px;
+  }
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin: 0 0 32px;
+  }
+  .grid {
+    display: grid;
+    gap: 16px;
+  }
+  .card {
+    display: block;
+    text-decoration: none;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    transition: border-color 0.15s;
+  }
+  .card:hover {
+    border-color: var(--accent);
+  }
+  .tag {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .card h2 {
+    font-size: 16px;
+    margin: 6px 0 8px;
+  }
+  .card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+</style>
