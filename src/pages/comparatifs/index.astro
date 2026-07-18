@@ -3,9 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
 const comparatifs = await getCollection('comparatifs');
-const published = comparatifs
-  .filter((c) => c.data.status === 'published' || c.data.status === 'draft')
-  .sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
+const all = comparatifs.sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
+const published = all.filter((c) => c.data.status === 'published');
+const drafts = all.filter((c) => c.data.status !== 'published');
 ---
 
 <Layout title="Comparatifs" description="Comparatifs détaillés des frameworks IA/ML — LaSource.dev">
@@ -26,6 +26,25 @@ const published = comparatifs
         </a>
       ))}
     </div>
+
+    {drafts.length > 0 && (
+      <>
+        <p class="draft-section-title">Brouillons en attente de relecture</p>
+        <div class="grid">
+          {drafts.map((entry) => (
+            <a href={`/comparatifs/${entry.id}`} class="card draft">
+              <div class="tags">
+                {entry.data.libraries_compared.map((lib: string) => (
+                  <span class="tag">{lib}</span>
+                ))}
+              </div>
+              <h2>{entry.data.title}</h2>
+              <p class="reco">{entry.data.recommendation}</p>
+            </a>
+          ))}
+        </div>
+      </>
+    )}
   </section>
 </Layout>
 
@@ -82,5 +101,19 @@ const published = comparatifs
     margin: 0;
     line-height: 1.5;
     font-style: italic;
+  }
+  .card.draft {
+    border-style: dashed;
+    opacity: 0.7;
+  }
+  .card.draft:hover {
+    opacity: 1;
+  }
+  .draft-section-title {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 32px 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 </style>

@@ -14,7 +14,7 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
 
-<Layout title={entry.data.title} description={entry.data.explanation}>
+<Layout title={entry.data.title} description={entry.data.explanation} draft={entry.data.status !== 'published'}>
   <article>
     <span class="tag">{entry.data.library} {entry.data.version && <span class="muted">v{entry.data.version}</span>}</span>
     <h1>{entry.data.title}</h1>
