@@ -1,0 +1,1476 @@
+From 2b7ab49354c3428b32b97f8cf0ff608d4b048a48 Mon Sep 17 00:00:00 2001
+From: "Claude (LaSource)" <claude@lasource.dev>
+Date: Sat, 18 Jul 2026 13:49:24 +0000
+Subject: [PATCH] =?UTF-8?q?feat(content):=20Sprint=201=20=E2=80=94=204=20f?=
+ =?UTF-8?q?iches=20concepts=20+=201=20comparatif=20+=20pages=20Astro?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Contenu :
+- langchain-chains-lcel (concept LCEL, Runnable, pipe)
+- langchain-prompt-templates (ChatPromptTemplate, few-shot)
+- langchain-output-parsers (StrOutputParser, Pydantic, with_structured_output)
+- langchain-erreurs-frequentes (5 erreurs courantes, error_fix)
+- langchain-vs-llamaindex (comparatif RAG vs agents)
+
+Infrastructure :
+- Pages Astro /concepts/ et /comparatifs/ (index + [id])
+- Navigation mise à jour dans Layout.astro
+
+Status: draft — en attente de relecture et test des snippets.
+Versions cibles: LangChain 1.3.13, langchain-core 1.4.8
+---
+ .../comparatifs/langchain-vs-llamaindex.md    | 154 +++++++++-
+ src/content/concepts/langchain-chains-lcel.md | 143 ++++++++++
+ .../concepts/langchain-erreurs-frequentes.md  | 265 ++++++++++++++++++
+ .../concepts/langchain-output-parsers.md      | 183 ++++++++++++
+ .../concepts/langchain-prompt-templates.md    | 192 +++++++++++++
+ src/layouts/Layout.astro                      |   2 +
+ src/pages/comparatifs/[id].astro              | 110 ++++++++
+ src/pages/comparatifs/index.astro             |  86 ++++++
+ src/pages/concepts/[id].astro                 | 152 ++++++++++
+ src/pages/concepts/index.astro                |  74 +++++
+ 10 files changed, 1355 insertions(+), 6 deletions(-)
+ create mode 100644 src/content/concepts/langchain-chains-lcel.md
+ create mode 100644 src/content/concepts/langchain-erreurs-frequentes.md
+ create mode 100644 src/content/concepts/langchain-output-parsers.md
+ create mode 100644 src/content/concepts/langchain-prompt-templates.md
+ create mode 100644 src/pages/comparatifs/[id].astro
+ create mode 100644 src/pages/comparatifs/index.astro
+ create mode 100644 src/pages/concepts/[id].astro
+ create mode 100644 src/pages/concepts/index.astro
+
+diff --git a/src/content/comparatifs/langchain-vs-llamaindex.md b/src/content/comparatifs/langchain-vs-llamaindex.md
+index 2c15d25..f42adc8 100644
+--- a/src/content/comparatifs/langchain-vs-llamaindex.md
++++ b/src/content/comparatifs/langchain-vs-llamaindex.md
+@@ -1,11 +1,153 @@
+ ---
+-title: "LangChain vs LlamaIndex : lequel choisir pour un projet RAG ?"
++title: "LangChain vs LlamaIndex : quel framework choisir en 2026 ?"
+ library: langchain
+-libraries_compared: [langchain, llama_index]
+-tags: [rag, comparatif]
++version: "1.3.13"
++tags: [langchain, llamaindex, comparatif, rag, agent, framework]
+ lang: fr
+-updated: 2026-06-20
+-recommendation: "Pour un RAG simple et rapide à mettre en place, choisissez LlamaIndex ; pour un système multi-agents complexe, LangChain offre plus de flexibilité."
++updated: 2026-07-17
++status: draft
++libraries_compared: [langchain, llama_index]
++recommendation: "Pour un RAG simple, choisissez LlamaIndex ; pour des agents ou pipelines multi-étapes, LangChain offre plus de flexibilité ; les deux se combinent très bien."
+ ---
+ 
+-Analyse détaillée (1000-2000 mots) : architecture, écosystème, courbe d'apprentissage, performance.
++# LangChain vs LlamaIndex : quel framework choisir ?
++
++## Deux philosophies différentes
++
++LangChain et LlamaIndex sont les deux frameworks Python dominants pour construire des applications autour des LLM. Ils sont souvent présentés comme des concurrents directs, mais leurs philosophies divergent fondamentalement.
++
++**LangChain** est un framework généraliste d'orchestration LLM. Son objectif : fournir les briques pour construire n'importe quelle application LLM — chatbots, agents, pipelines de traitement, workflows multi-étapes. LCEL (LangChain Expression Language) est le ciment qui relie ces briques.
++
++**LlamaIndex** est un framework spécialisé dans l'indexation et l'interrogation de données. Son objectif initial : connecter un LLM à vos propres données (documents, bases de données, APIs). Il a depuis élargi son périmètre aux agents et aux workflows, mais le RAG reste son cœur.
++
++## Comparaison par dimension
++
++### RAG (Retrieval-Augmented Generation)
++
++C'est le terrain de prédilection de LlamaIndex. Le framework propose des abstractions dédiées — `VectorStoreIndex`, `DocumentSummaryIndex`, `KnowledgeGraphIndex` — qui encapsulent toute la chaîne : chargement des documents, découpage, embedding, indexation, et retrieval.
++
++```python
++# LlamaIndex — RAG en 5 lignes
++from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
++
++documents = SimpleDirectoryReader("./docs").load_data()
++index = VectorStoreIndex.from_documents(documents)
++query_engine = index.as_query_engine()
++response = query_engine.query("Quel est le chiffre d'affaires 2025 ?")
++```
++
++LangChain gère aussi le RAG, mais avec plus de code — vous assemblez vous-même le loader, le splitter, le vector store, le retriever, et le prompt :
++
++```python
++# LangChain — RAG équivalent
++from langchain_community.document_loaders import DirectoryLoader
++from langchain.text_splitter import RecursiveCharacterTextSplitter
++from langchain_openai import OpenAIEmbeddings, ChatOpenAI
++from langchain_community.vectorstores import Chroma
++from langchain_core.prompts import ChatPromptTemplate
++from langchain_core.runnables import RunnablePassthrough
++from langchain_core.output_parsers import StrOutputParser
++
++# Charger et découper
++loader = DirectoryLoader("./docs")
++docs = loader.load()
++splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
++splits = splitter.split_documents(docs)
++
++# Indexer
++vectorstore = Chroma.from_documents(splits, OpenAIEmbeddings())
++retriever = vectorstore.as_retriever()
++
++# Chaîne RAG
++prompt = ChatPromptTemplate.from_template(
++    "Contexte : {context}\n\nQuestion : {question}"
++)
++model = ChatOpenAI(model="gpt-4o-mini")
++
++chain = (
++    {"context": retriever, "question": RunnablePassthrough()}
++    | prompt
++    | model
++    | StrOutputParser()
++)
++response = chain.invoke("Quel est le chiffre d'affaires 2025 ?")
++```
++
++**Verdict RAG :** LlamaIndex gagne en rapidité de mise en place et en options d'indexation avancées (index hiérarchiques, graphes de connaissances). LangChain offre plus de contrôle sur chaque étape mais demande plus de code.
++
++### Agents
++
++La situation s'inverse pour les agents. LangChain propose un écosystème d'agents mature avec LangGraph (machine à états pour les agents complexes), des outils préfabriqués (recherche web, exécution de code, appels API), et une intégration profonde avec le function calling des modèles.
++
++LlamaIndex a introduit ses propres agents, mais l'écosystème est plus jeune et moins flexible pour les workflows multi-agents ou les machines à états complexes.
++
++**Verdict agents :** LangChain a l'avantage, surtout pour les agents complexes avec LangGraph.
++
++### Écosystème et intégrations
++
++Les deux frameworks supportent les principaux fournisseurs de modèles (OpenAI, Anthropic, Google, Mistral, Ollama) et les principaux vector stores (Chroma, Pinecone, Weaviate, Qdrant, pgvector).
++
++LangChain a un écosystème d'intégrations plus large grâce à `langchain-community` — plus de 700 intégrations référencées. LlamaIndex a un système de "hubs" (`llama-hub`) avec environ 300 connecteurs de données.
++
++### Courbe d'apprentissage
++
++LlamaIndex est plus accessible pour un premier projet RAG. Les abstractions de haut niveau (`VectorStoreIndex.from_documents`) cachent la complexité. On obtient un résultat fonctionnel en quelques minutes.
++
++LangChain demande de comprendre LCEL, les Runnables, la composition de chaînes. La courbe est plus raide, mais la maîtrise d'LCEL donne accès à des compositions très flexibles.
++
++### Performance et scalabilité
++
++La performance dépend davantage des choix d'infrastructure (vector store, modèle, stratégie de chunking) que du framework lui-même. Les deux ajoutent un overhead marginal.
++
++LlamaIndex propose des optimisations spécifiques au RAG (re-ranking, post-processing, filtrage de nœuds) qui peuvent améliorer la qualité des réponses sur de grands corpus.
++
++## Tableau récapitulatif
++
++| Dimension | LangChain | LlamaIndex |
++|---|---|---|
++| **Spécialité** | Orchestration LLM généraliste | Indexation et RAG |
++| **RAG** | Flexible mais verbose | Excellent, abstractions natives |
++| **Agents** | Mature, LangGraph | En développement |
++| **Intégrations** | ~700+ | ~300+ |
++| **Courbe d'apprentissage** | Moyenne à raide | Douce pour le RAG |
++| **Documentation FR** | Aucune (d'où LaSource.dev) | Aucune |
++| **Licence** | MIT | MIT |
++| **Stars GitHub** | ~141k | ~40k |
++
++## Les combiner : une option viable
++
++Les deux frameworks ne sont pas mutuellement exclusifs. Un pattern courant :
++
++- **LlamaIndex pour l'indexation** — exploiter ses abstractions d'index avancées.
++- **LangChain pour l'orchestration** — utiliser LCEL pour composer le pipeline global, intégrer le retriever LlamaIndex comme un composant de la chaîne.
++
++```python
++# Utiliser un index LlamaIndex comme retriever dans une chaîne LangChain
++from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
++
++# Indexation avec LlamaIndex
++documents = SimpleDirectoryReader("./docs").load_data()
++index = VectorStoreIndex.from_documents(documents)
++
++# Convertir en retriever compatible LangChain
++retriever = index.as_retriever()
++langchain_retriever = retriever.as_langchain_retriever()
++
++# Utiliser dans une chaîne LCEL
++chain = (
++    {"context": langchain_retriever, "question": RunnablePassthrough()}
++    | prompt
++    | model
++    | StrOutputParser()
++)
++```
++
++## Recommandation
++
++**Choisissez LlamaIndex si** votre projet est principalement du RAG — interroger des documents, construire un moteur de recherche interne, indexer une base de connaissances. Vous irez plus vite et les abstractions sont plus adaptées.
++
++**Choisissez LangChain si** votre projet est un agent, un pipeline multi-étapes, ou une application conversationnelle complexe. L'écosystème est plus large et LCEL offre plus de flexibilité pour la composition.
++
++**Choisissez les deux si** vous avez un projet RAG ambitieux avec des agents — LlamaIndex pour l'indexation, LangChain/LangGraph pour l'orchestration.
++
++**Dans tous les cas**, commencez par un prototype minimal avant de vous engager. Les deux frameworks évoluent rapidement, et le meilleur choix dépend toujours du cas d'usage concret.
+diff --git a/src/content/concepts/langchain-chains-lcel.md b/src/content/concepts/langchain-chains-lcel.md
+new file mode 100644
+index 0000000..53e80f2
+--- /dev/null
++++ b/src/content/concepts/langchain-chains-lcel.md
+@@ -0,0 +1,143 @@
++---
++title: "Chains et LCEL dans LangChain : comprendre le chaînage de composants"
++library: langchain
++version: "1.3.13"
++python_min: "3.10"
++tags: [langchain, lcel, chains, runnable, pipe]
++lang: fr
++updated: 2026-07-17
++status: draft
++category: concept
++explanation: "LCEL (LangChain Expression Language) remplace les anciennes classes Chain par une interface Runnable unifiée. L'opérateur pipe | compose les étapes, avec streaming, batch et async intégrés."
++gotcha: "Les Runnables sont immuables : composer prompt | model crée un nouvel objet, les composants originaux ne sont pas modifiés."
++see_also: [langchain-prompt-templates, langchain-output-parsers]
++---
++
++# Chains et LCEL dans LangChain
++
++## Le problème que LCEL résout
++
++Avant LCEL, LangChain proposait des classes comme `LLMChain`, `SequentialChain` ou `TransformChain` pour enchaîner des étapes. Chaque type de chaîne avait sa propre API, ses propres paramètres, et sa propre logique d'exécution. Ajouter du streaming, du batch ou de l'exécution asynchrone demandait du code spécifique à chaque chaîne.
++
++LCEL (LangChain Expression Language) remplace tout cela par une interface unique : le **Runnable**. Chaque composant LangChain — prompt, modèle, parseur, retriever — implémente l'interface `Runnable`, ce qui signifie qu'ils partagent tous les mêmes méthodes : `invoke`, `stream`, `batch`, `ainvoke`, `astream`, `abatch`.
++
++## Syntaxe de base : l'opérateur pipe
++
++LCEL utilise l'opérateur `|` (pipe) de Python pour composer des chaînes. La sortie d'un composant devient l'entrée du suivant.
++
++```python
++from langchain_core.prompts import ChatPromptTemplate
++from langchain_core.output_parsers import StrOutputParser
++from langchain_openai import ChatOpenAI
++
++# Définir les composants
++prompt = ChatPromptTemplate.from_template(
++    "Explique le concept de {concept} en 3 phrases simples."
++)
++model = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
++parser = StrOutputParser()
++
++# Composer la chaîne avec l'opérateur pipe
++chain = prompt | model | parser
++
++# Exécuter
++result = chain.invoke({"concept": "embeddings"})
++print(result)
++```
++
++Ce code crée une chaîne en trois étapes : le prompt formate la question, le modèle génère la réponse, le parseur extrait le texte brut. La même chaîne supporte automatiquement le streaming et le batch sans code supplémentaire.
++
++## Streaming natif
++
++L'un des avantages majeurs de LCEL : le streaming fonctionne d'emblée sur toute chaîne composée avec `|`.
++
++```python
++# Streaming token par token — même chaîne, méthode différente
++for chunk in chain.stream({"concept": "RAG"}):
++    print(chunk, end="", flush=True)
++```
++
++Avec les anciennes `LLMChain`, obtenir du streaming nécessitait un callback handler personnalisé. Avec LCEL, c'est un appel de méthode.
++
++## Batch : traitement par lots
++
++```python
++# Traiter plusieurs entrées en parallèle
++concepts = [
++    {"concept": "fine-tuning"},
++    {"concept": "quantization"},
++    {"concept": "prompt engineering"},
++]
++results = chain.batch(concepts, config={"max_concurrency": 3})
++```
++
++La méthode `batch` exécute les appels en parallèle avec un contrôle de concurrence. Utile pour le traitement de masse sans écrire de code asyncio.
++
++## Exécution asynchrone
++
++```python
++import asyncio
++
++async def main():
++    # Version asynchrone — même chaîne
++    result = await chain.ainvoke({"concept": "attention mechanism"})
++    print(result)
++
++    # Streaming asynchrone
++    async for chunk in chain.astream({"concept": "tokenization"}):
++        print(chunk, end="", flush=True)
++
++asyncio.run(main())
++```
++
++Chaque méthode synchrone a son équivalent asynchrone préfixé par `a`. L'interface est cohérente d'un bout à l'autre.
++
++## Composition avancée : RunnablePassthrough et RunnableParallel
++
++Pour des chaînes plus complexes, LCEL fournit des utilitaires de composition :
++
++```python
++from langchain_core.runnables import RunnablePassthrough, RunnableParallel
++
++# RunnableParallel : exécuter plusieurs branches en parallèle
++chain_avec_contexte = RunnableParallel(
++    reponse=prompt | model | parser,
++    concept_original=RunnablePassthrough()
++)
++
++result = chain_avec_contexte.invoke({"concept": "RLHF"})
++print(result["reponse"])           # L'explication générée
++print(result["concept_original"])  # {"concept": "RLHF"} — passé tel quel
++```
++
++`RunnablePassthrough` transmet l'entrée sans modification — utile quand une branche de la chaîne doit conserver l'entrée originale pendant qu'une autre la transforme.
++
++## Migration depuis les anciennes Chains
++
++Si vous avez du code existant utilisant `LLMChain` :
++
++```python
++# ❌ Ancien style (déprécié depuis LangChain 0.2)
++from langchain.chains import LLMChain
++
++chain = LLMChain(llm=model, prompt=prompt)
++result = chain.run(concept="embeddings")
++
++# ✅ Équivalent LCEL
++chain = prompt | model | parser
++result = chain.invoke({"concept": "embeddings"})
++```
++
++Les classes `LLMChain`, `SequentialChain`, `SimpleSequentialChain` et `TransformChain` sont dépréciées. Le code fonctionne encore mais n'est plus maintenu. Toute la documentation officielle LangChain utilise LCEL depuis la version 0.3.
++
++## Points d'attention
++
++**L'ordre des composants compte.** Chaque composant attend un type d'entrée spécifique. Un `ChatPromptTemplate` attend un dictionnaire, un `ChatModel` attend des messages, un `StrOutputParser` attend un `AIMessage`. Si les types ne correspondent pas, l'erreur sera explicite.
++
++**Le débogage se fait avec `chain.get_graph().print_ascii()`.** Cette méthode affiche la structure de la chaîne sous forme d'arbre ASCII — indispensable pour les chaînes complexes avec des branches parallèles.
++
++```python
++chain.get_graph().print_ascii()
++```
++
++**Les Runnables sont immuables.** Composer `prompt | model` crée un nouvel objet `RunnableSequence`. Les composants originaux ne sont pas modifiés. Vous pouvez réutiliser le même prompt dans plusieurs chaînes.
+diff --git a/src/content/concepts/langchain-erreurs-frequentes.md b/src/content/concepts/langchain-erreurs-frequentes.md
+new file mode 100644
+index 0000000..21ea9f7
+--- /dev/null
++++ b/src/content/concepts/langchain-erreurs-frequentes.md
+@@ -0,0 +1,265 @@
++---
++title: "5 erreurs fréquentes avec LangChain et comment les résoudre"
++library: langchain
++version: "1.3.13"
++python_min: "3.10"
++tags: [langchain, erreurs, debug, migration, dépannage]
++lang: fr
++updated: 2026-07-17
++status: draft
++category: error_fix
++explanation: "Les 5 erreurs les plus fréquentes : imports déplacés, types incompatibles dans LCEL, clés API manquantes, confusion invoke/run, et versions de packages incompatibles."
++gotcha: "Mettez toujours à jour tous les packages LangChain en même temps (langchain, langchain-core, langchain-community, langchain-openai) pour éviter les erreurs de sérialisation Pydantic."
++see_also: [langchain-chains-lcel]
++---
++
++# 5 erreurs fréquentes avec LangChain
++
++## 1. ImportError sur les imports déplacés
++
++**Le symptôme :**
++
++```
++ImportError: cannot import name 'LLMChain' from 'langchain'
++```
++
++ou
++
++```
++LangChainDeprecationWarning: Importing ChatOpenAI from langchain.chat_models
++is deprecated. Please import from langchain_openai instead.
++```
++
++**Pourquoi ça arrive :**
++
++Depuis LangChain 0.2 (et renforcé en 0.3), les intégrations tierces ont été déplacées dans des packages séparés. `ChatOpenAI` n'est plus dans `langchain` mais dans `langchain-openai`. `ChatAnthropic` est dans `langchain-anthropic`. Et ainsi de suite.
++
++La plupart des tutoriels et réponses StackOverflow qu'on trouve en ligne utilisent encore les anciens imports.
++
++**La solution :**
++
++```python
++# ❌ Ancien import (ne fonctionne plus ou affiche un warning)
++from langchain.chat_models import ChatOpenAI
++from langchain.embeddings import OpenAIEmbeddings
++
++# ✅ Nouvel import
++from langchain_openai import ChatOpenAI, OpenAIEmbeddings
++```
++
++**Règle générale :** si la classe est liée à un fournisseur (OpenAI, Anthropic, Google, Cohere, etc.), elle est dans `langchain-<fournisseur>`. Installer le package séparé :
++
++```bash
++pip install langchain-openai
++# ou
++pip install langchain-anthropic
++```
++
++Les classes du cœur du framework restent dans `langchain-core` :
++
++```python
++from langchain_core.prompts import ChatPromptTemplate
++from langchain_core.output_parsers import StrOutputParser
++from langchain_core.runnables import RunnablePassthrough
++```
++
++## 2. TypeError dans les chaînes LCEL : types incompatibles
++
++**Le symptôme :**
++
++```
++TypeError: Expected mapping type as input to ChatPromptTemplate.
++Received: <class 'str'>
++```
++
++ou
++
++```
++TypeError: Expected a Runnable, callable or mapping.
++```
++
++**Pourquoi ça arrive :**
++
++Chaque composant LCEL attend un type d'entrée spécifique. Un `ChatPromptTemplate` attend un dictionnaire `{"variable": "valeur"}`. Si vous lui envoyez une string, il échoue.
++
++**La solution :**
++
++Vérifiez la signature d'entrée/sortie de chaque composant de la chaîne :
++
++```python
++# ❌ Erreur : invoke attend un dict, pas une string
++chain = prompt | model | StrOutputParser()
++result = chain.invoke("ma question")
++
++# ✅ Correct : passer un dictionnaire
++result = chain.invoke({"question": "ma question"})
++```
++
++Pour déboguer une chaîne complexe, inspectez le graphe :
++
++```python
++# Afficher la structure et les types attendus
++chain.get_graph().print_ascii()
++
++# Voir les schémas d'entrée/sortie
++print(chain.input_schema.model_json_schema())
++print(chain.output_schema.model_json_schema())
++```
++
++## 3. Clé API manquante ou mal configurée
++
++**Le symptôme :**
++
++```
++openai.AuthenticationError: Error code: 401 - Incorrect API key provided
++```
++
++ou
++
++```
++anthropic.AuthenticationError: Could not resolve authentication method.
++```
++
++**Pourquoi ça arrive :**
++
++Les packages d'intégration cherchent la clé API dans des variables d'environnement spécifiques. Si la variable n'existe pas ou a le mauvais nom, l'erreur est souvent cryptique.
++
++**La solution :**
++
++Chaque fournisseur attend une variable précise :
++
++```bash
++# OpenAI
++export OPENAI_API_KEY="sk-..."
++
++# Anthropic
++export ANTHROPIC_API_KEY="sk-ant-..."
++
++# Google (Gemini)
++export GOOGLE_API_KEY="AI..."
++```
++
++Ou passez la clé directement (déconseillé en production, utile pour le debug) :
++
++```python
++from langchain_openai import ChatOpenAI
++
++# Clé explicite — pour le debug uniquement
++model = ChatOpenAI(model="gpt-4o-mini", api_key="sk-...")
++```
++
++**Piège courant :** créer un fichier `.env` sans utiliser `python-dotenv` pour le charger :
++
++```python
++# Le fichier .env ne se charge pas tout seul
++from dotenv import load_dotenv
++load_dotenv()  # Charge les variables de .env dans os.environ
++
++from langchain_openai import ChatOpenAI
++model = ChatOpenAI(model="gpt-4o-mini")  # Maintenant ça marche
++```
++
++## 4. Confusion entre invoke, run, call et predict
++
++**Le symptôme :**
++
++```
++AttributeError: 'RunnableSequence' object has no attribute 'run'
++```
++
++ou un `DeprecationWarning` sur `.predict()` ou `.__call__()`.
++
++**Pourquoi ça arrive :**
++
++LangChain a changé son API principale entre les versions 0.1, 0.2 et 0.3. Les anciennes méthodes (`run`, `predict`, `__call__`) sont dépréciées ou supprimées. Les tutoriels pré-0.3 utilisent encore ces méthodes.
++
++**La solution :**
++
++Depuis LangChain 0.3, il n'y a qu'une seule API — l'interface Runnable :
++
++```python
++# ❌ Anciennes méthodes (dépréciées)
++chain.run("ma question")
++chain.predict(question="ma question")
++chain("ma question")
++model.predict("ma question")
++
++# ✅ Méthodes Runnable (actuelles)
++chain.invoke({"question": "ma question"})   # Synchrone, une entrée
++chain.batch([{"question": "q1"}, ...])      # Synchrone, plusieurs entrées
++chain.stream({"question": "ma question"})   # Streaming
++await chain.ainvoke({"question": "..."})    # Asynchrone
++```
++
++**Tableau de correspondance :**
++
++| Ancien | Nouveau |
++|---|---|
++| `chain.run(input)` | `chain.invoke(input)` |
++| `chain.predict(**kwargs)` | `chain.invoke(kwargs)` |
++| `chain(input)` | `chain.invoke(input)` |
++| `model.predict(text)` | `model.invoke(text)` |
++| `model.apredict(text)` | `await model.ainvoke(text)` |
++
++## 5. Versions incompatibles entre packages LangChain
++
++**Le symptôme :**
++
++```
++pydantic.errors.PydanticSchemaGenerationError: Unable to generate
++pydantic-core schema for <class 'langchain_core...'>
++```
++
++ou des erreurs mystérieuses de sérialisation, de validation, ou de types.
++
++**Pourquoi ça arrive :**
++
++L'écosystème LangChain est distribué sur plusieurs packages (`langchain`, `langchain-core`, `langchain-community`, `langchain-openai`, etc.). Si ces packages ne sont pas à des versions compatibles, les modèles Pydantic internes divergent et provoquent des erreurs de sérialisation.
++
++**La solution :**
++
++Vérifiez les versions installées :
++
++```bash
++pip list | grep langchain
++```
++
++Résultat attendu (juillet 2026) :
++
++```
++langchain              1.3.13
++langchain-core         1.4.8
++langchain-community    0.6.x
++langchain-openai       0.5.x
++```
++
++**Règle :** mettez à jour tous les packages LangChain en même temps :
++
++```bash
++pip install --upgrade langchain langchain-core langchain-community langchain-openai
++```
++
++**Ne jamais fixer manuellement** `langchain-core` à une version différente de celle attendue par `langchain`. Laissez pip résoudre les dépendances.
++
++Si le problème persiste, repartez d'un environnement propre :
++
++```bash
++python -m venv .venv
++source .venv/bin/activate
++pip install langchain langchain-openai
++```
++
++## Bonus : activer les logs de debug
++
++Quand l'erreur n'est pas claire, activez les logs détaillés de LangChain :
++
++```python
++import langchain
++langchain.debug = True
++
++# Ou pour plus de granularité
++import logging
++logging.getLogger("langchain").setLevel(logging.DEBUG)
++```
++
++Avec `debug = True`, chaque étape de la chaîne affiche son entrée et sa sortie dans la console. C'est le premier réflexe quand une chaîne se comporte de manière inattendue.
+diff --git a/src/content/concepts/langchain-output-parsers.md b/src/content/concepts/langchain-output-parsers.md
+new file mode 100644
+index 0000000..c4e1edd
+--- /dev/null
++++ b/src/content/concepts/langchain-output-parsers.md
+@@ -0,0 +1,183 @@
++---
++title: "Output Parsers dans LangChain : structurer les réponses du LLM"
++library: langchain
++version: "1.3.13"
++python_min: "3.10"
++tags: [langchain, output-parser, pydantic, json, structured-output]
++lang: fr
++updated: 2026-07-17
++status: draft
++category: concept
++explanation: "Les Output Parsers transforment le texte brut du LLM en données structurées. Depuis LangChain 0.3, with_structured_output est la méthode recommandée — elle utilise le function calling natif du modèle."
++gotcha: "Ne pas mélanger with_structured_output et StrOutputParser dans la même chaîne : le premier renvoie un objet Pydantic, le second attend un AIMessage."
++see_also: [langchain-chains-lcel, langchain-prompt-templates]
++---
++
++# Output Parsers dans LangChain
++
++## Le problème
++
++Un LLM renvoie du texte. Votre application a besoin de données structurées — un objet Python, un dictionnaire, une liste. Le parseur de sortie transforme le texte brut du modèle en structure exploitable.
++
++LangChain propose plusieurs parseurs, du plus simple au plus robuste. Depuis LangChain 0.3, la méthode recommandée pour la plupart des cas est `with_structured_output`, mais les parseurs classiques restent utiles dans certains contextes.
++
++## StrOutputParser : extraire le texte brut
++
++Le parseur le plus simple. Il extrait la chaîne de caractères du message de réponse.
++
++```python
++from langchain_core.output_parsers import StrOutputParser
++from langchain_core.prompts import ChatPromptTemplate
++from langchain_openai import ChatOpenAI
++
++prompt = ChatPromptTemplate.from_template("Résume en une phrase : {texte}")
++model = ChatOpenAI(model="gpt-4o-mini")
++parser = StrOutputParser()
++
++chain = prompt | model | parser
++result = chain.invoke({"texte": "LangChain est un framework..."})
++# result est une str, pas un AIMessage
++print(type(result))  # <class 'str'>
++```
++
++Sans `StrOutputParser`, la chaîne renvoie un objet `AIMessage`. Avec, elle renvoie directement le contenu texte. Presque toutes les chaînes LCEL l'utilisent en dernier maillon.
++
++## JsonOutputParser : extraire du JSON
++
++Quand le modèle doit renvoyer un objet JSON :
++
++```python
++from langchain_core.output_parsers import JsonOutputParser
++
++parser = JsonOutputParser()
++
++prompt = ChatPromptTemplate.from_template(
++    """Extrais les informations suivantes du texte.
++Réponds UNIQUEMENT avec un objet JSON valide, sans texte autour.
++
++Champs attendus : nom, age, ville
++
++Texte : {texte}
++
++{format_instructions}"""
++)
++
++# Injecter les instructions de format dans le prompt
++prompt_with_format = prompt.partial(
++    format_instructions=parser.get_format_instructions()
++)
++
++chain = prompt_with_format | model | parser
++result = chain.invoke({"texte": "Marie, 28 ans, habite à Lyon."})
++print(result)  # {"nom": "Marie", "age": 28, "ville": "Lyon"}
++print(type(result))  # <class 'dict'>
++```
++
++`get_format_instructions()` génère un texte qui indique au modèle le format attendu. Le parseur tente ensuite d'extraire le JSON de la réponse, même si le modèle ajoute du texte autour.
++
++## PydanticOutputParser : validation avec un schéma
++
++Pour une validation stricte avec un modèle Pydantic :
++
++```python
++from langchain_core.output_parsers import PydanticOutputParser
++from pydantic import BaseModel, Field
++
++class PersonneInfo(BaseModel):
++    nom: str = Field(description="Le nom complet de la personne")
++    age: int = Field(description="L'âge en années")
++    ville: str = Field(description="La ville de résidence")
++
++parser = PydanticOutputParser(pydantic_object=PersonneInfo)
++
++prompt = ChatPromptTemplate.from_template(
++    """Extrais les informations de la personne mentionnée dans le texte.
++
++{format_instructions}
++
++Texte : {texte}"""
++)
++
++chain = prompt.partial(
++    format_instructions=parser.get_format_instructions()
++) | model | parser
++
++result = chain.invoke({"texte": "Pierre Dupont, 35 ans, vit à Bordeaux."})
++print(result.nom)   # Pierre Dupont
++print(result.age)   # 35
++print(type(result)) # <class 'PersonneInfo'>
++```
++
++Avantage par rapport au `JsonOutputParser` : Pydantic valide les types (un `age` qui n'est pas un entier lève une erreur), fournit des valeurs par défaut, et documente le schéma via les descriptions de champs.
++
++## with_structured_output : la méthode recommandée
++
++Depuis LangChain 0.3, la méthode `with_structured_output` sur les modèles de chat est le moyen recommandé pour obtenir des sorties structurées. Elle utilise les fonctionnalités natives du modèle (function calling, tool use) au lieu de demander au LLM de formater du JSON dans sa réponse textuelle.
++
++```python
++from pydantic import BaseModel, Field
++from langchain_openai import ChatOpenAI
++
++class Analyse(BaseModel):
++    sentiment: str = Field(description="positif, négatif ou neutre")
++    score: float = Field(description="Score de confiance entre 0 et 1")
++    mots_cles: list[str] = Field(description="3 mots-clés principaux")
++
++model = ChatOpenAI(model="gpt-4o-mini")
++model_structure = model.with_structured_output(Analyse)
++
++prompt = ChatPromptTemplate.from_template(
++    "Analyse le sentiment de ce texte : {texte}"
++)
++
++chain = prompt | model_structure
++result = chain.invoke({"texte": "Ce produit est excellent, je le recommande !"})
++print(result.sentiment)  # positif
++print(result.score)      # 0.95
++print(result.mots_cles)  # ["excellent", "recommande", "produit"]
++```
++
++Pourquoi préférer `with_structured_output` :
++
++- **Plus fiable** — le modèle utilise son mécanisme natif de function calling, pas du formatage texte.
++- **Pas besoin de format_instructions** — le schéma Pydantic est transmis directement au modèle.
++- **Pas de parseur séparé** — le modèle renvoie directement l'objet Pydantic.
++- **Streaming supporté** — les champs arrivent au fur et à mesure.
++
++## Quand utiliser quoi
++
++| Situation | Outil recommandé |
++|---|---|
++| Texte brut en sortie | `StrOutputParser` |
++| JSON structuré, modèle récent (GPT-4, Claude, Gemini) | `with_structured_output` |
++| JSON structuré, modèle sans function calling | `PydanticOutputParser` |
++| JSON sans schéma strict | `JsonOutputParser` |
++| Listes simples | `CommaSeparatedListOutputParser` |
++
++## Gestion des erreurs de parsing
++
++Les modèles ne produisent pas toujours un JSON valide. `OutputFixingParser` tente de corriger les erreurs en renvoyant la sortie malformée au modèle :
++
++```python
++from langchain.output_parsers import OutputFixingParser
++
++# Encapsule un parseur existant avec auto-correction
++fixing_parser = OutputFixingParser.from_llm(
++    parser=PydanticOutputParser(pydantic_object=PersonneInfo),
++    llm=model
++)
++
++# Si le premier parsing échoue, le modèle est rappelé
++# avec le JSON malformé + l'erreur pour correction
++chain = prompt | model | fixing_parser
++```
++
++Le coût : un appel LLM supplémentaire en cas d'échec. En production, surveillez le taux de corrections — s'il est élevé, améliorez le prompt plutôt que de compter sur le fixing.
++
++## Points d'attention
++
++**`with_structured_output` ne fonctionne pas avec tous les modèles.** Il nécessite le support du function calling ou tool use. Les modèles OpenAI (GPT-4, GPT-4o), Anthropic (Claude 3+), et Google (Gemini) le supportent. Les modèles locaux via Ollama ne le supportent pas toujours — vérifiez avec `model.with_structured_output` et gérez le `NotImplementedError`.
++
++**Ne pas mélanger `with_structured_output` et `StrOutputParser`.** Le premier renvoie un objet Pydantic, le second attend un `AIMessage`. Les deux dans la même chaîne lèvent une erreur de type.
++
++**Les descriptions des champs Pydantic comptent.** Le modèle les utilise pour comprendre quoi extraire. `score: float` est ambigu. `score: float = Field(description="Score de confiance entre 0 et 1")` est clair.
+diff --git a/src/content/concepts/langchain-prompt-templates.md b/src/content/concepts/langchain-prompt-templates.md
+new file mode 100644
+index 0000000..9cd9cf8
+--- /dev/null
++++ b/src/content/concepts/langchain-prompt-templates.md
+@@ -0,0 +1,192 @@
++---
++title: "Prompt Templates dans LangChain : structurer vos prompts"
++library: langchain
++version: "1.3.13"
++python_min: "3.10"
++tags: [langchain, prompt, template, chat, few-shot]
++lang: fr
++updated: 2026-07-17
++status: draft
++category: concept
++explanation: "Les Prompt Templates sont des objets structurés qui génèrent des prompts formatés à partir de variables. ChatPromptTemplate produit des listes de messages (système, humain, assistant) compatibles LCEL."
++gotcha: "Les doubles accolades {{ }} échappent le formatage. Si votre prompt contient du JSON, utilisez {{ et }} pour les accolades littérales."
++see_also: [langchain-chains-lcel, langchain-output-parsers]
++---
++
++# Prompt Templates dans LangChain
++
++## Pourquoi ne pas envoyer des strings directement
++
++On peut techniquement envoyer une chaîne de caractères brute à un modèle. Mais dès qu'on veut injecter des variables, gérer un message système, ajouter des exemples few-shot ou réutiliser le même format dans plusieurs chaînes, les strings deviennent ingérables.
++
++Les Prompt Templates de LangChain résolvent ce problème : ce sont des objets structurés qui génèrent des prompts formatés à partir de variables. Ils s'intègrent nativement dans les chaînes LCEL via l'opérateur `|`.
++
++## ChatPromptTemplate : le template standard
++
++La grande majorité des cas d'usage passent par `ChatPromptTemplate`. Il produit une liste de messages (système, humain, assistant) prêts à être envoyés à un modèle de chat.
++
++```python
++from langchain_core.prompts import ChatPromptTemplate
++
++# Template avec message système + message utilisateur
++prompt = ChatPromptTemplate.from_messages([
++    ("system", "Tu es un expert en {domaine}. Réponds en français."),
++    ("human", "{question}"),
++])
++
++# Formater avec des variables
++messages = prompt.invoke({
++    "domaine": "machine learning",
++    "question": "Qu'est-ce qu'un embedding ?"
++})
++print(messages)
++```
++
++Les variables entre accolades `{domaine}` et `{question}` sont remplacées à l'exécution. Le template vérifie que toutes les variables sont fournies — une variable manquante lève une `KeyError` explicite.
++
++## Raccourci from_template
++
++Pour un prompt simple sans message système :
++
++```python
++prompt = ChatPromptTemplate.from_template(
++    "Traduis ce texte en {langue} : {texte}"
++)
++
++# Équivalent à :
++prompt = ChatPromptTemplate.from_messages([
++    ("human", "Traduis ce texte en {langue} : {texte}")
++])
++```
++
++`from_template` crée un template avec un seul message humain. Pratique pour les cas simples, mais `from_messages` est plus lisible dès qu'on ajoute un message système.
++
++## Messages système : donner un rôle au modèle
++
++Le message système définit le comportement du modèle. C'est l'endroit pour spécifier le ton, la langue, les contraintes de format, ou le domaine d'expertise.
++
++```python
++prompt = ChatPromptTemplate.from_messages([
++    ("system", """Tu es un assistant technique pour développeurs Python.
++Règles :
++- Réponds toujours en français
++- Inclus un exemple de code quand c'est pertinent
++- Signale les pièges courants avec ⚠️"""),
++    ("human", "{question}"),
++])
++```
++
++Le message système n'est pas une garantie — le modèle peut s'en écarter — mais c'est le mécanisme le plus fiable pour orienter le comportement.
++
++## Variables partielles
++
++Quand certaines variables sont connues à l'avance et d'autres à l'exécution :
++
++```python
++# Fixer la langue à l'avance
++prompt_fr = prompt.partial(langue="français")
++
++# Plus tard, fournir seulement le texte
++result = prompt_fr.invoke({"texte": "Hello, how are you?"})
++```
++
++Utile quand un même template est utilisé dans plusieurs contextes avec des valeurs par défaut différentes.
++
++## Few-shot : apprendre par l'exemple
++
++Le few-shot prompting consiste à montrer des exemples d'entrée/sortie au modèle avant de poser la vraie question. LangChain propose `FewShotChatMessagePromptTemplate` pour structurer cela.
++
++```python
++from langchain_core.prompts import (
++    ChatPromptTemplate,
++    FewShotChatMessagePromptTemplate,
++)
++
++# Définir le format d'un exemple
++example_prompt = ChatPromptTemplate.from_messages([
++    ("human", "{input}"),
++    ("ai", "{output}"),
++])
++
++# Les exemples
++examples = [
++    {"input": "2+2", "output": "4"},
++    {"input": "la capitale du Japon", "output": "Tokyo"},
++]
++
++# Le template few-shot
++few_shot = FewShotChatMessagePromptTemplate(
++    example_prompt=example_prompt,
++    examples=examples,
++)
++
++# Assembler le prompt final
++prompt = ChatPromptTemplate.from_messages([
++    ("system", "Réponds de manière concise, en un seul mot ou chiffre."),
++    few_shot,
++    ("human", "{question}"),
++])
++
++messages = prompt.invoke({"question": "la couleur du ciel"})
++```
++
++Le modèle voit les exemples comme des échanges précédents et reproduit le même format. C'est plus fiable qu'une instruction textuelle pour contrôler le format de sortie.
++
++## Composition dans une chaîne LCEL
++
++Les templates sont des `Runnable` — ils se composent directement avec `|` :
++
++```python
++from langchain_core.output_parsers import StrOutputParser
++from langchain_openai import ChatOpenAI
++
++model = ChatOpenAI(model="gpt-4o-mini")
++
++# Le prompt est le premier maillon de la chaîne
++chain = prompt | model | StrOutputParser()
++result = chain.invoke({"question": "3 * 7"})
++```
++
++Le template reçoit un dictionnaire, produit des messages, que le modèle consomme directement. Le typage est vérifié automatiquement : si le dictionnaire ne contient pas toutes les variables attendues, l'erreur est immédiate.
++
++## MessagesPlaceholder : injecter un historique de conversation
++
++Pour les chatbots ou les agents qui maintiennent un historique :
++
++```python
++from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
++
++prompt = ChatPromptTemplate.from_messages([
++    ("system", "Tu es un assistant utile."),
++    MessagesPlaceholder(variable_name="historique"),
++    ("human", "{question}"),
++])
++
++from langchain_core.messages import HumanMessage, AIMessage
++
++messages = prompt.invoke({
++    "historique": [
++        HumanMessage(content="Salut !"),
++        AIMessage(content="Bonjour ! Comment puis-je t'aider ?"),
++    ],
++    "question": "Rappelle-moi ce que j'ai dit."
++})
++```
++
++`MessagesPlaceholder` insère une liste de messages à l'endroit voulu dans le template. Indispensable pour les applications conversationnelles.
++
++## Points d'attention
++
++**Les doubles accolades échappent le formatage.** Si votre prompt contient du JSON ou du code avec des accolades, utilisez `{{` et `}}` pour les accolades littérales, sinon LangChain les interprètera comme des variables.
++
++```python
++# ❌ Erreur : LangChain cherche une variable "key"
++prompt = ChatPromptTemplate.from_template('Génère du JSON : {"key": "value"}')
++
++# ✅ Correct : accolades échappées
++prompt = ChatPromptTemplate.from_template('Génère du JSON : {{"key": "value"}}')
++```
++
++**`PromptTemplate` (sans Chat) est pour les modèles de complétion**, pas les modèles de chat. Avec les modèles actuels (GPT-4, Claude, Gemini), utilisez toujours `ChatPromptTemplate`.
++
++**L'ordre des messages compte.** Le message système doit être en premier. Les exemples few-shot avant le message utilisateur. L'historique de conversation après le message système et avant la question.
+diff --git a/src/layouts/Layout.astro b/src/layouts/Layout.astro
+index 4a69d1a..8959803 100644
+--- a/src/layouts/Layout.astro
++++ b/src/layouts/Layout.astro
+@@ -19,6 +19,8 @@ const { title, description = "La doc IA/ML en français, dans votre IDE." } = As
+       <nav>
+         <a href="/" class="logo">LaSource<span>.dev</span></a>
+         <div class="nav-links">
++          <a href="/concepts">Concepts</a>
++          <a href="/comparatifs">Comparatifs</a>
+           <a href="/tutoriels">Tutoriels</a>
+           <a href="/releases">Releases</a>
+           <a href="/mcp" class="cta">Installer le MCP</a>
+diff --git a/src/pages/comparatifs/[id].astro b/src/pages/comparatifs/[id].astro
+new file mode 100644
+index 0000000..f119ac0
+--- /dev/null
++++ b/src/pages/comparatifs/[id].astro
+@@ -0,0 +1,110 @@
++---
++import Layout from '../../layouts/Layout.astro';
++import { getCollection, render } from 'astro:content';
++
++export async function getStaticPaths() {
++  const comparatifs = await getCollection('comparatifs');
++  return comparatifs.map((entry) => ({
++    params: { id: entry.id },
++    props: { entry },
++  }));
++}
++
++const { entry } = Astro.props;
++const { Content } = await render(entry);
++---
++
++<Layout title={entry.data.title} description={entry.data.recommendation}>
++  <article>
++    <div class="tags">
++      {entry.data.libraries_compared.map((lib: string) => (
++        <span class="tag">{lib}</span>
++      ))}
++    </div>
++    <h1>{entry.data.title}</h1>
++    <blockquote class="reco">{entry.data.recommendation}</blockquote>
++
++    <div class="content">
++      <Content />
++    </div>
++  </article>
++</Layout>
++
++<style>
++  article {
++    padding: 32px 0;
++    max-width: 720px;
++  }
++  .tags {
++    display: flex;
++    gap: 8px;
++  }
++  .tag {
++    font-size: 11px;
++    text-transform: uppercase;
++    letter-spacing: 0.5px;
++    color: var(--accent);
++    background: var(--accent-bg);
++    padding: 2px 8px;
++    border-radius: 4px;
++    font-weight: 600;
++  }
++  h1 {
++    font-size: 26px;
++    margin: 10px 0 12px;
++  }
++  .reco {
++    font-size: 15px;
++    color: var(--text-secondary);
++    border-left: 3px solid var(--accent);
++    padding: 8px 16px;
++    margin: 0 0 28px;
++    font-style: italic;
++  }
++  .content {
++    font-size: 15px;
++    line-height: 1.7;
++  }
++  .content :global(h2) {
++    font-size: 20px;
++    margin: 32px 0 12px;
++  }
++  .content :global(h3) {
++    font-size: 16px;
++    margin: 24px 0 8px;
++  }
++  .content :global(pre) {
++    background: var(--surface-alt);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    padding: 16px;
++    overflow-x: auto;
++    font-size: 13px;
++    line-height: 1.5;
++  }
++  .content :global(code) {
++    font-family: "SF Mono", "Fira Code", monospace;
++    font-size: 0.9em;
++  }
++  .content :global(p code) {
++    background: var(--surface-alt);
++    padding: 2px 6px;
++    border-radius: 4px;
++  }
++  .content :global(table) {
++    width: 100%;
++    border-collapse: collapse;
++    font-size: 14px;
++    margin: 16px 0;
++  }
++  .content :global(th),
++  .content :global(td) {
++    border: 1px solid var(--border);
++    padding: 8px 12px;
++    text-align: left;
++  }
++  .content :global(th) {
++    background: var(--surface-alt);
++    font-weight: 600;
++  }
++</style>
+diff --git a/src/pages/comparatifs/index.astro b/src/pages/comparatifs/index.astro
+new file mode 100644
+index 0000000..5ef91df
+--- /dev/null
++++ b/src/pages/comparatifs/index.astro
+@@ -0,0 +1,86 @@
++---
++import Layout from '../../layouts/Layout.astro';
++import { getCollection } from 'astro:content';
++
++const comparatifs = await getCollection('comparatifs');
++const published = comparatifs
++  .filter((c) => c.data.status === 'published' || c.data.status === 'draft')
++  .sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
++---
++
++<Layout title="Comparatifs" description="Comparatifs détaillés des frameworks IA/ML — LaSource.dev">
++  <section>
++    <h1>Comparatifs</h1>
++    <p class="subtitle">Analyses détaillées pour choisir le bon framework selon votre projet.</p>
++
++    <div class="grid">
++      {published.map((entry) => (
++        <a href={`/comparatifs/${entry.id}`} class="card">
++          <div class="tags">
++            {entry.data.libraries_compared.map((lib: string) => (
++              <span class="tag">{lib}</span>
++            ))}
++          </div>
++          <h2>{entry.data.title}</h2>
++          <p class="reco">{entry.data.recommendation}</p>
++        </a>
++      ))}
++    </div>
++  </section>
++</Layout>
++
++<style>
++  section {
++    padding: 32px 0;
++  }
++  h1 {
++    font-size: 26px;
++    margin: 0 0 4px;
++  }
++  .subtitle {
++    color: var(--text-secondary);
++    font-size: 15px;
++    margin: 0 0 32px;
++  }
++  .grid {
++    display: grid;
++    gap: 16px;
++  }
++  .card {
++    display: block;
++    text-decoration: none;
++    color: var(--text-primary);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    padding: 20px 24px;
++    transition: border-color 0.15s;
++  }
++  .card:hover {
++    border-color: var(--accent);
++  }
++  .tags {
++    display: flex;
++    gap: 8px;
++  }
++  .tag {
++    font-size: 11px;
++    text-transform: uppercase;
++    letter-spacing: 0.5px;
++    color: var(--accent);
++    background: var(--accent-bg);
++    padding: 2px 8px;
++    border-radius: 4px;
++    font-weight: 600;
++  }
++  .card h2 {
++    font-size: 16px;
++    margin: 10px 0 8px;
++  }
++  .reco {
++    font-size: 14px;
++    color: var(--text-secondary);
++    margin: 0;
++    line-height: 1.5;
++    font-style: italic;
++  }
++</style>
+diff --git a/src/pages/concepts/[id].astro b/src/pages/concepts/[id].astro
+new file mode 100644
+index 0000000..5445085
+--- /dev/null
++++ b/src/pages/concepts/[id].astro
+@@ -0,0 +1,152 @@
++---
++import Layout from '../../layouts/Layout.astro';
++import { getCollection, render } from 'astro:content';
++
++export async function getStaticPaths() {
++  const concepts = await getCollection('concepts');
++  return concepts.map((entry) => ({
++    params: { id: entry.id },
++    props: { entry },
++  }));
++}
++
++const { entry } = Astro.props;
++const { Content } = await render(entry);
++---
++
++<Layout title={entry.data.title} description={entry.data.explanation}>
++  <article>
++    <span class="tag">{entry.data.library} {entry.data.version && <span class="muted">v{entry.data.version}</span>}</span>
++    <h1>{entry.data.title}</h1>
++    <p class="explanation">{entry.data.explanation}</p>
++
++    {entry.data.gotcha && (
++      <div class="gotcha">
++        <p class="gotcha-title">⚠️ Point d'attention</p>
++        <p>{entry.data.gotcha}</p>
++      </div>
++    )}
++
++    <div class="content">
++      <Content />
++    </div>
++
++    {entry.data.see_also && entry.data.see_also.length > 0 && (
++      <div class="see-also">
++        <p class="see-also-title">Voir aussi</p>
++        <ul>
++          {entry.data.see_also.map((ref: string) => (
++            <li><a href={`/concepts/${ref}`}>{ref}</a></li>
++          ))}
++        </ul>
++      </div>
++    )}
++  </article>
++</Layout>
++
++<style>
++  article {
++    padding: 32px 0;
++    max-width: 720px;
++  }
++  .tag {
++    font-size: 12px;
++    color: var(--accent);
++  }
++  .muted {
++    color: var(--text-muted);
++  }
++  h1 {
++    font-size: 26px;
++    margin: 8px 0 12px;
++  }
++  .explanation {
++    font-size: 15px;
++    color: var(--text-secondary);
++    margin: 0 0 20px;
++  }
++  .gotcha {
++    background: #fffbe6;
++    border: 1px solid #f0e4a0;
++    border-radius: var(--radius);
++    padding: 14px 16px;
++    margin: 0 0 24px;
++  }
++  .gotcha-title {
++    font-weight: 600;
++    font-size: 13px;
++    margin: 0 0 4px;
++  }
++  .gotcha p:last-child {
++    font-size: 14px;
++    margin: 0;
++    color: var(--text-secondary);
++  }
++  .content {
++    font-size: 15px;
++    line-height: 1.7;
++  }
++  .content :global(h2) {
++    font-size: 20px;
++    margin: 32px 0 12px;
++  }
++  .content :global(h3) {
++    font-size: 16px;
++    margin: 24px 0 8px;
++  }
++  .content :global(pre) {
++    background: var(--surface-alt);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    padding: 16px;
++    overflow-x: auto;
++    font-size: 13px;
++    line-height: 1.5;
++  }
++  .content :global(code) {
++    font-family: "SF Mono", "Fira Code", monospace;
++    font-size: 0.9em;
++  }
++  .content :global(p code) {
++    background: var(--surface-alt);
++    padding: 2px 6px;
++    border-radius: 4px;
++  }
++  .content :global(table) {
++    width: 100%;
++    border-collapse: collapse;
++    font-size: 14px;
++    margin: 16px 0;
++  }
++  .content :global(th),
++  .content :global(td) {
++    border: 1px solid var(--border);
++    padding: 8px 12px;
++    text-align: left;
++  }
++  .content :global(th) {
++    background: var(--surface-alt);
++    font-weight: 600;
++  }
++  .see-also {
++    margin-top: 40px;
++    padding-top: 20px;
++    border-top: 1px solid var(--border);
++  }
++  .see-also-title {
++    font-weight: 600;
++    font-size: 14px;
++    margin: 0 0 8px;
++  }
++  .see-also ul {
++    list-style: none;
++    padding: 0;
++    margin: 0;
++  }
++  .see-also li {
++    margin: 4px 0;
++  }
++  .see-also a {
++    font-size: 14px;
++  }
++</style>
+diff --git a/src/pages/concepts/index.astro b/src/pages/concepts/index.astro
+new file mode 100644
+index 0000000..26dca0d
+--- /dev/null
++++ b/src/pages/concepts/index.astro
+@@ -0,0 +1,74 @@
++---
++import Layout from '../../layouts/Layout.astro';
++import { getCollection } from 'astro:content';
++
++const concepts = await getCollection('concepts');
++const published = concepts
++  .filter((c) => c.data.status === 'published' || c.data.status === 'draft')
++  .sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime());
++---
++
++<Layout title="Concepts" description="Fiches concept IA/ML en français — LangChain, Transformers, vLLM et plus.">
++  <section>
++    <h1>Concepts</h1>
++    <p class="subtitle">Fiches pédagogiques sur les concepts clés des frameworks IA/ML.</p>
++
++    <div class="grid">
++      {published.map((entry) => (
++        <a href={`/concepts/${entry.id}`} class="card">
++          <span class="tag">{entry.data.library}</span>
++          <h2>{entry.data.title}</h2>
++          <p>{entry.data.explanation}</p>
++        </a>
++      ))}
++    </div>
++  </section>
++</Layout>
++
++<style>
++  section {
++    padding: 32px 0;
++  }
++  h1 {
++    font-size: 26px;
++    margin: 0 0 4px;
++  }
++  .subtitle {
++    color: var(--text-secondary);
++    font-size: 15px;
++    margin: 0 0 32px;
++  }
++  .grid {
++    display: grid;
++    gap: 16px;
++  }
++  .card {
++    display: block;
++    text-decoration: none;
++    color: var(--text-primary);
++    border: 1px solid var(--border);
++    border-radius: var(--radius);
++    padding: 20px 24px;
++    transition: border-color 0.15s;
++  }
++  .card:hover {
++    border-color: var(--accent);
++  }
++  .tag {
++    font-size: 11px;
++    text-transform: uppercase;
++    letter-spacing: 0.5px;
++    color: var(--accent);
++    font-weight: 600;
++  }
++  .card h2 {
++    font-size: 16px;
++    margin: 6px 0 8px;
++  }
++  .card p {
++    font-size: 14px;
++    color: var(--text-secondary);
++    margin: 0;
++    line-height: 1.5;
++  }
++</style>
+-- 
+2.43.0
+
