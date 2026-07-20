@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URI: postgresql://postgres:postgres@localhost:5432/lasource
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+      PAYLOAD_SECRET: ci-only-secret-that-is-at-least-32-characters
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run build
