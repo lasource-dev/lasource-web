@@ -1,0 +1,22 @@
+# Ontologie minimale du Knowledge Core.
+# Les listes seront étendues uniquement après validation d'un besoin métier.
+entities:
+  - Technology
+  - Category
+  - Source
+  - Relation
+  - Tutorial
+  - Recipe
+  - Error
+  - Release
+  - Comparison
+
+relations:
+  - compatible_with
+  - developed_by
+  - depends_on
+  - uses
+  - supports
+  - alternative_to
+  - integrates_with
+  - replaces
