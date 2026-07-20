@@ -1,0 +1,6 @@
+# Placeholder des catégories principales utilisées pour la navigation.
+#
+# Toute catégorie future devra inclure un identifiant stable, un libellé, une
+# définition et des exemples validés. Aucune catégorie métier n'est définie ici.
+version: 1
+categories: []

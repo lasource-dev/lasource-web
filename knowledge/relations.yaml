@@ -1,0 +1,6 @@
+# Placeholder des relations autorisées entre entités de connaissance.
+#
+# Chaque relation future précisera son sens, sa direction, ses contraintes et
+# les exigences de provenance. Aucune relation métier n'est définie ici.
+version: 1
+relations: []
