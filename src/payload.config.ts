@@ -14,6 +14,7 @@ export default buildConfig({
   collections: [Users, Technologies],
   db: postgresAdapter({
     idType: 'uuid',
+    push: process.env.NODE_ENV === 'test',
     pool: {
       connectionString: environment.DATABASE_URI,
     },

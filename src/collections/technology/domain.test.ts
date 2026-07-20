@@ -7,6 +7,7 @@ import {
   TECHNOLOGY_INDEX_POLICY,
   normalizeAliases,
   normalizeSourceReferences,
+  normalizeTechnologySlug,
   prepareTechnologyData,
   validateSlug,
 } from './domain'
@@ -44,6 +45,20 @@ describe('Technology domain', () => {
     })
   })
 
+  it('génère et normalise le slug à la création', () => {
+    expect(
+      prepareTechnologyData({ canonical_name: 'Éditeur  IA & SDK' }, 'create'),
+    ).toMatchObject({ slug: 'editeur-ia-sdk' })
+    expect(normalizeTechnologySlug('  LangChain.JS  ')).toBe('langchain-js')
+  })
+
+  it('préserve le slug lors du renommage et refuse sa modification', () => {
+    expect(prepareTechnologyData({ canonical_name: 'Nouveau nom' }, 'update', technology()).slug).toBeUndefined()
+    expect(() =>
+      prepareTechnologyData({ slug: 'nouveau-slug' }, 'update', technology()),
+    ).toThrow('Technology slug is immutable')
+  })
+
   it('normalise les alias et retire le nom canonique', () => {
     expect(
       normalizeAliases(
@@ -56,6 +71,25 @@ describe('Technology domain', () => {
         'LangChain',
       ),
     ).toEqual([{ alias: 'LangChain JS' }])
+
+    expect(
+      normalizeAliases(
+        [
+          { alias: ' LangChain ' },
+          { alias: 'langchain' },
+          { alias: 'LANGCHAIN' },
+          { alias: '  LangChain   JS ' },
+          { alias: 'LANGCHAIN JS' },
+        ],
+        'LangChain Core',
+      ),
+    ).toEqual([{ alias: 'LangChain' }, { alias: 'LangChain JS' }])
+  })
+
+  it('conserve les alias existants lorsqu’ils sont absents d’une mise à jour', () => {
+    expect(
+      prepareTechnologyData({ canonical_name: 'MCP renommé' }, 'update', technology({ aliases: [{ alias: 'MCP' }] })),
+    ).not.toHaveProperty('aliases')
   })
 
   it('interdit de modifier l’identifiant métier', () => {

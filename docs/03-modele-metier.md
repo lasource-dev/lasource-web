@@ -6,7 +6,11 @@ Ce document décrit les responsabilités du domaine, sans définir de schéma Pa
 
 La Technologie est l'entité racine. Elle porte son identité, ses liens officiels, son positionnement, sa fraîcheur et son statut éditorial. Son identifiant public stable est un slug unique.
 
-L'implémentation initiale utilise l'UUID natif Payload comme identifiant métier immuable. Elle distingue le nom canonique de ses alias, synchronise le statut éditorial avec les brouillons Payload et conserve un état de fraîcheur ainsi qu'une date de vérification. La catégorie reste provisoirement textuelle jusqu'à l'issue #8. Les sources sont référencées par identifiant stable et URL optionnelle jusqu'à l'issue #9, sans créer de seconde vérité.
+L'implémentation initiale utilise l'UUID natif Payload comme identifiant métier immuable. Le slug est généré et normalisé à la création à partir du nom canonique lorsqu'il n'est pas fourni. Il reste ensuite stable, y compris si le nom canonique change, afin de préserver l'URL publique ; toute modification explicite est rejetée.
+
+Les alias sont nettoyés sans modifier leur graphie utile : espaces externes retirés, espaces internes regroupés, doublons éliminés sans distinction de casse et nom canonique exclu. L'ordre et la casse de la première occurrence sont conservés. Une mise à jour qui ne fournit pas d'alias laisse la liste existante intacte.
+
+La Technologie synchronise le statut éditorial avec les brouillons Payload et conserve un état de fraîcheur ainsi qu'une date de vérification. La catégorie reste provisoirement textuelle jusqu'à l'issue #8. Les sources sont référencées par identifiant stable et URL optionnelle jusqu'à l'issue #9, sans créer de seconde vérité.
 
 ## Contenu documentaire
 
