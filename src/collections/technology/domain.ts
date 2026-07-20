@@ -107,6 +107,24 @@ export function assertImmutableTechnologyID(
   }
 }
 
+export function normalizeTechnologySlug(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('en')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export function assertImmutableTechnologySlug(
+  incomingSlug: string | undefined,
+  originalSlug: string | null | undefined,
+): void {
+  if (incomingSlug !== undefined && originalSlug && incomingSlug !== originalSlug) {
+    throw new Error('Technology slug is immutable')
+  }
+}
+
 export function payloadStatusFor(editorialStatus: EditorialStatus | null | undefined) {
   return editorialStatus === 'published' ? ('published' as const) : ('draft' as const)
 }
@@ -122,6 +140,13 @@ export function prepareTechnologyData(
 ): Partial<Technology> {
   if (operation === 'update') {
     assertImmutableTechnologyID(data.id, originalDoc?.id)
+  }
+
+  if (operation === 'create') {
+    data.slug = normalizeTechnologySlug(data.slug ?? data.canonical_name ?? '')
+  } else if (data.slug !== undefined) {
+    data.slug = normalizeTechnologySlug(data.slug)
+    assertImmutableTechnologySlug(data.slug, originalDoc?.slug)
   }
 
   const canonicalName = data.canonical_name ?? originalDoc?.canonical_name

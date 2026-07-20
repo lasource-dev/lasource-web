@@ -62,7 +62,10 @@ export const Technologies: CollectionConfig = {
             {
               name: 'slug',
               type: 'text',
-              admin: { description: 'Identifiant public unique, en minuscules et séparé par des tirets.' },
+              admin: {
+                description:
+                  'Généré à la création, normalisé et stable pour préserver les URLs publiques.',
+              },
               ...TECHNOLOGY_INDEX_POLICY.slug,
               required: true,
               validate: validateSlug,
