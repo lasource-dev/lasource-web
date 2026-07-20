@@ -2,6 +2,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { buildConfig } from 'payload'
 
 import { Users } from './collections/Users'
+import { Categories } from './collections/Categories'
 import { Technologies } from './collections/Technologies'
 import { readServerEnvironment } from './lib/env'
 
@@ -11,7 +12,7 @@ export default buildConfig({
   admin: {
     user: Users.slug,
   },
-  collections: [Users, Technologies],
+  collections: [Users, Categories, Technologies],
   db: postgresAdapter({
     idType: 'uuid',
     push: process.env.NODE_ENV === 'test',

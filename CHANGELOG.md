@@ -10,3 +10,4 @@ Les changements significatifs de LaSource.dev sont consignés ici. Le format sui
 - première décision d'architecture consacrant la Technologie comme entité racine ;
 - placeholders du futur référentiel de connaissance.
 - collection Payload `technologies` et page publique `/technologies/[slug]` avec publication, fraîcheur, sources provisoires et métadonnées SEO.
+- ressource Payload `categories`, relation principale `Technology N → 1 Category` et migration réexécutable du champ textuel historique.

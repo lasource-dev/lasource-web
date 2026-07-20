@@ -12,6 +12,8 @@ entities:
   - Comparison
 
 relations:
+  - belongs_to_category
+  - classifies
   - compatible_with
   - developed_by
   - depends_on
@@ -20,3 +22,11 @@ relations:
   - alternative_to
   - integrates_with
   - replaces
+
+entity_relations:
+  Technology:
+    relations:
+      - belongs_to_category
+  Category:
+    relations:
+      - classifies
