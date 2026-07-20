@@ -1,0 +1,75 @@
+.page {
+  display: block;
+  margin: 0 auto;
+  max-width: 52rem;
+  min-height: 100vh;
+  padding: 4rem 1.5rem;
+  text-align: left;
+}
+
+.eyebrow {
+  color: #667085;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0;
+}
+
+.summary {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  margin: 1.5rem 0;
+}
+
+.aliases {
+  color: #667085;
+  margin: 0 0 2rem;
+}
+
+.content {
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.details {
+  border-block: 1px solid #d0d5dd;
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  margin: 2.5rem 0;
+}
+
+.detail {
+  padding: 1rem 0;
+}
+
+.detail dt {
+  color: #667085;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.detail dd {
+  margin: 0.35rem 0 0;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.links a {
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.2em;
+}

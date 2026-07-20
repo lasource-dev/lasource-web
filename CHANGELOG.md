@@ -9,3 +9,4 @@ Les changements significatifs de LaSource.dev sont consignés ici. Le format sui
 - documentation fondatrice du produit, de la taxonomie, du modèle documentaire, de l'architecture et du workflow ;
 - première décision d'architecture consacrant la Technologie comme entité racine ;
 - placeholders du futur référentiel de connaissance.
+- collection Payload `technologies` et page publique `/technologies/[slug]` avec publication, fraîcheur, sources provisoires et métadonnées SEO.
