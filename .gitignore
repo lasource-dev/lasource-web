@@ -6,7 +6,6 @@ coverage/
 .env.local
 .env.*.local
 !.env.example
-payload-types.ts
 *.tsbuildinfo
 npm-debug.log*
 .DS_Store

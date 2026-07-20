@@ -2,6 +2,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { buildConfig } from 'payload'
 
 import { Users } from './collections/Users'
+import { Technologies } from './collections/Technologies'
 import { readServerEnvironment } from './lib/env'
 
 const environment = readServerEnvironment()
@@ -10,8 +11,9 @@ export default buildConfig({
   admin: {
     user: Users.slug,
   },
-  collections: [Users],
+  collections: [Users, Technologies],
   db: postgresAdapter({
+    idType: 'uuid',
     pool: {
       connectionString: environment.DATABASE_URI,
     },

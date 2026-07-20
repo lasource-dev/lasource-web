@@ -6,6 +6,8 @@ Ce document décrit les responsabilités du domaine, sans définir de schéma Pa
 
 La Technologie est l'entité racine. Elle porte son identité, ses liens officiels, son positionnement, sa fraîcheur et son statut éditorial. Son identifiant public stable est un slug unique.
 
+L'implémentation initiale utilise l'UUID natif Payload comme identifiant métier immuable. Elle distingue le nom canonique de ses alias, synchronise le statut éditorial avec les brouillons Payload et conserve un état de fraîcheur ainsi qu'une date de vérification. La catégorie reste provisoirement textuelle jusqu'à l'issue #8. Les sources sont référencées par identifiant stable et URL optionnelle jusqu'à l'issue #9, sans créer de seconde vérité.
+
 ## Contenu documentaire
 
 Un contenu explique un aspect d'une ou plusieurs technologies : présentation, cas d'usage, concept, installation, tutoriel, recette, erreur fréquente, comparaison, FAQ ou note de version. Il possède ses propres sources et son cycle éditorial.
