@@ -1,6 +1,11 @@
 # Placeholder des relations autorisées entre entités de connaissance.
 #
 # Chaque relation future précisera son sens, sa direction, ses contraintes et
-# les exigences de provenance. Aucune relation métier n'est définie ici.
+# les exigences de provenance.
 version: 1
-relations: []
+relations:
+  - name: supported_by_source
+    from: Technology
+    to: Source
+    cardinality: many_to_many
+    description: Une source publiée et active étaye une information de technologie.

@@ -27,6 +27,10 @@ entity_relations:
   Technology:
     relations:
       - belongs_to_category
+      - supported_by_source
   Category:
     relations:
       - classifies
+  Source:
+    relations:
+      - supports_claim

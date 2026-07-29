@@ -10,7 +10,7 @@ L'implémentation initiale utilise l'UUID natif Payload comme identifiant métie
 
 Les alias sont nettoyés sans modifier leur graphie utile : espaces externes retirés, espaces internes regroupés, doublons éliminés sans distinction de casse et nom canonique exclu. L'ordre et la casse de la première occurrence sont conservés. Une mise à jour qui ne fournit pas d'alias laisse la liste existante intacte.
 
-La Technologie synchronise le statut éditorial avec les brouillons Payload et conserve un état de fraîcheur ainsi qu'une date de vérification. Les sources sont référencées par identifiant stable et URL optionnelle jusqu'à l'issue #9, sans créer de seconde vérité.
+La Technologie synchronise le statut éditorial avec les brouillons Payload et conserve un état de fraîcheur ainsi qu'une date de vérification. Elle peut référencer plusieurs Sources ; une Technologie publiée ne peut citer que des Sources publiées et actives.
 
 ## Catégorie
 
@@ -24,7 +24,9 @@ Un contenu explique un aspect d'une ou plusieurs technologies : présentation, c
 
 ## Source
 
-Une Source qualifie la provenance d'une information : URL, type, éditeur, date de consultation et éventuellement version concernée. Les sources officielles sont prioritaires.
+Une Source qualifie la provenance d'une information. Son UUID est immuable et son URL canonique est unique. Elle porte un type contrôlé, un titre, un auteur et une date de publication facultatifs, un score de confiance entier de 0 à 100 et une date de dernière vérification.
+
+L'URL est normalisée en retirant les fragments et les paramètres de suivi connus (`utm_*`, `gclid`, `fbclid`) sans supprimer les paramètres fonctionnels. Une Source active doit être vérifiée avant publication. Son cycle éditorial comprend brouillon, publication et archivage. La Source n'a pas de page publique autonome à ce stade.
 
 ## Version et vérification
 

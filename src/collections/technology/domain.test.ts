@@ -6,7 +6,6 @@ import {
   FRESHNESS_STATUSES,
   TECHNOLOGY_INDEX_POLICY,
   normalizeAliases,
-  normalizeSourceReferences,
   normalizeTechnologySlug,
   prepareTechnologyData,
   validateSlug,
@@ -136,12 +135,4 @@ describe('Technology domain', () => {
     expect(validateSlug('LangChain JS')).not.toBe(true)
   })
 
-  it('normalise et déduplique les références de sources provisoires', () => {
-    expect(
-      normalizeSourceReferences([
-        { source_id: 'docs:payload', source_url: ' https://payloadcms.com/docs ' },
-        { source_id: 'DOCS:PAYLOAD', source_url: 'https://example.com' },
-      ]),
-    ).toEqual([{ source_id: 'docs:payload', source_url: 'https://payloadcms.com/docs' }])
-  })
 })
