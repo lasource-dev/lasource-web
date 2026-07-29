@@ -12,11 +12,15 @@ describe('Category SQL migration', () => {
     expect(CATEGORY_MIGRATION_UP_SQL).toContain('technology."category_id" IS NULL')
   })
 
-  it('refuse de supprimer le champ historique avant rattachement complet', () => {
+  it('conserve les colonnes historiques comme audit après rattachement complet', () => {
     const guard = CATEGORY_MIGRATION_UP_SQL.indexOf('Category migration refused')
-    const dropLegacy = CATEGORY_MIGRATION_UP_SQL.indexOf('DROP COLUMN IF EXISTS "legacy_category"')
     expect(guard).toBeGreaterThan(-1)
-    expect(dropLegacy).toBeGreaterThan(guard)
+    expect(CATEGORY_MIGRATION_UP_SQL).toContain(
+      'ADD COLUMN IF NOT EXISTS "legacy_category" varchar',
+    )
+    expect(CATEGORY_MIGRATION_UP_SQL).not.toContain(
+      'DROP COLUMN IF EXISTS "legacy_category"',
+    )
   })
 
   it('restaure les valeurs textuelles lors du rollback', () => {

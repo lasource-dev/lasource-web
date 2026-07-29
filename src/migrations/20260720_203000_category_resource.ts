@@ -109,6 +109,8 @@ END $$;
 
 ALTER TABLE "technologies" ADD COLUMN IF NOT EXISTS "category_id" uuid;
 ALTER TABLE "_technologies_v" ADD COLUMN IF NOT EXISTS "version_category_id" uuid;
+ALTER TABLE "technologies" ADD COLUMN IF NOT EXISTS "legacy_category" varchar;
+ALTER TABLE "_technologies_v" ADD COLUMN IF NOT EXISTS "version_legacy_category" varchar;
 
 WITH legacy_names AS (
   SELECT DISTINCT COALESCE(NULLIF(regexp_replace(trim("legacy_category"), '\\s+', ' ', 'g'), ''), 'Non classée') AS canonical_name
@@ -174,8 +176,6 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 CREATE INDEX IF NOT EXISTS "payload_locked_documents_rels_categories_id_idx"
   ON "payload_locked_documents_rels" ("categories_id");
 
-ALTER TABLE "technologies" DROP COLUMN IF EXISTS "legacy_category";
-ALTER TABLE "_technologies_v" DROP COLUMN IF EXISTS "version_legacy_category";
 `
 
 export const CATEGORY_MIGRATION_DOWN_SQL = `
@@ -195,6 +195,8 @@ DROP INDEX IF EXISTS "payload_locked_documents_rels_categories_id_idx";
 ALTER TABLE "technologies" DROP COLUMN IF EXISTS "category_id";
 ALTER TABLE "_technologies_v" DROP COLUMN IF EXISTS "version_category_id";
 ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "categories_id";
+ALTER TABLE "technologies" DROP COLUMN IF EXISTS "legacy_category";
+ALTER TABLE "_technologies_v" DROP COLUMN IF EXISTS "version_legacy_category";
 
 DROP TABLE IF EXISTS "_categories_v_version_aliases";
 DROP TABLE IF EXISTS "_categories_v";
