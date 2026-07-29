@@ -1,7 +1,8 @@
 # LaSource.dev
 
 Fondation technique de LaSource.dev basée sur Next.js, Payload CMS, PostgreSQL
-et TypeScript strict. Aucun modèle de contenu métier n'est encore défini.
+et TypeScript strict. Le Knowledge Core expose les ressources Category,
+Technology, Source et Relation.
 
 ## Prérequis
 
@@ -37,6 +38,24 @@ npm run dev
 Lors du premier accès à l'administration, Payload propose de créer le premier
 compte administrateur.
 
+## Données de démonstration
+
+Après avoir configuré PostgreSQL et appliqué les migrations, chargez le jeu
+minimal du Knowledge Core avec :
+
+```bash
+npm run seed
+```
+
+La commande crée trois catégories, trois technologies, leurs sources officielles
+et une relation de démonstration. Elle peut être relancée sans créer de doublon :
+les documents retrouvés par leur clé métier sont réutilisés, sans modification
+ni suppression des données existantes. Le seed n'est jamais exécuté
+automatiquement au démarrage.
+
+Une fois le chargement terminé, la page
+<http://localhost:3000/technologies/next-js> est disponible publiquement.
+
 ## Variables d'environnement
 
 | Variable | Obligatoire | Description | Exemple local |
@@ -67,7 +86,7 @@ src/
 ├── app/
 │   ├── (frontend)/   # application publique Next.js
 │   └── (payload)/    # administration et API Payload CMS
-├── collections/      # collections Payload (authentification uniquement)
+├── collections/      # collections Payload du Knowledge Core et authentification
 ├── lib/              # configuration partagée et tests unitaires
 └── payload.config.ts # configuration Payload et adaptateur PostgreSQL
 ```
@@ -83,3 +102,4 @@ src/
 | `npm test` | exécute les tests Vitest |
 | `npm run typecheck` | vérifie TypeScript strict sans produire de fichiers |
 | `npm run generate:types` | régénère les types Payload après modification des collections |
+| `npm run seed` | charge les données minimales de démonstration sans suppression |
