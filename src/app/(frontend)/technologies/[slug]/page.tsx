@@ -8,6 +8,7 @@ import type { Technology } from '../../../../../payload-types'
 import { readServerEnvironment } from '../../../../lib/env'
 import {
   buildTechnologyMetadata,
+  getPublicTechnologyCategory,
   loadPublishedTechnology,
   type TechnologyQuery,
 } from '../../../../lib/technology-public'
@@ -24,7 +25,7 @@ const queryPublishedTechnologies: TechnologyQuery = async (slug) => {
   const payload = await getPayload({ config })
   const result = await payload.find({
     collection: 'technologies',
-    depth: 0,
+    depth: 1,
     limit: 1,
     overrideAccess: false,
     pagination: false,
@@ -84,6 +85,9 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
 
   if (!technology) notFound()
 
+  const category = getPublicTechnologyCategory(technology)
+  if (!category) notFound()
+
   const aliases = technology.aliases?.map(({ alias }) => alias).filter(Boolean) ?? []
   const links = [
     technology.official_website_url
@@ -100,6 +104,7 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
       <p className={styles.eyebrow}>Technologie</p>
       <h1 className={styles.title}>{technology.canonical_name}</h1>
       <p className={styles.summary}>{technology.short_description}</p>
+      <p className={styles.aliases}>Catégorie : {category.canonical_name}</p>
 
       {aliases.length > 0 ? (
         <p className={styles.aliases}>Aussi connue sous : {aliases.join(', ')}</p>

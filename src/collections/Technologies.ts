@@ -1,6 +1,8 @@
 import type { CollectionBeforeValidateHook, CollectionConfig } from 'payload'
 
-import type { Technology } from '../../payload-types'
+import type { Category, Technology } from '../../payload-types'
+
+import { assertValidPublishedTechnologyCategory } from './category/domain'
 
 import {
   EDITORIAL_STATUSES,
@@ -12,13 +14,35 @@ import {
   validateSourceID,
 } from './technology/domain'
 
-const prepareTechnology: CollectionBeforeValidateHook<Technology> = ({
+const prepareTechnology: CollectionBeforeValidateHook<Technology> = async ({
   data,
   operation,
   originalDoc,
+  req,
 }) => {
   if (!data) return data
-  return prepareTechnologyData(data, operation, originalDoc)
+  const prepared = prepareTechnologyData(data, operation, originalDoc)
+  const editorialStatus = prepared.editorial_status ?? originalDoc?.editorial_status ?? 'draft'
+
+  if (editorialStatus === 'published') {
+    const categoryValue = prepared.category ?? originalDoc?.category
+    const categoryID =
+      typeof categoryValue === 'object' && categoryValue !== null ? categoryValue.id : categoryValue
+
+    if (!categoryID) {
+      throw new Error('A published Technology requires a published Category')
+    }
+
+    const category = (await req.payload.findByID({
+      collection: 'categories',
+      id: categoryID,
+      overrideAccess: true,
+    })) as Category
+
+    assertValidPublishedTechnologyCategory(editorialStatus, category)
+  }
+
+  return prepared
 }
 
 export const Technologies: CollectionConfig = {
@@ -97,11 +121,11 @@ export const Technologies: CollectionConfig = {
             { name: 'long_description', type: 'textarea' },
             {
               name: 'category',
-              type: 'text',
+              type: 'relationship',
               admin: {
-                description: "Valeur provisoire jusqu'à l'implémentation de l'issue #8 Catégorie.",
+                description: 'Catégorie principale de la technologie.',
               },
-              maxLength: 120,
+              relationTo: 'categories',
               required: true,
             },
             { name: 'company', type: 'text', maxLength: 160 },

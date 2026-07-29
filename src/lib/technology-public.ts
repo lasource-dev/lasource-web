@@ -1,9 +1,17 @@
 import type { Metadata } from 'next'
 
-import type { Technology } from '../../payload-types'
+import type { Category, Technology } from '../../payload-types'
+import { isPublishedCategory } from '../collections/category/domain'
 import { isPublishedTechnology } from '../collections/technology/domain'
 
 export type TechnologyQuery = (slug: string) => Promise<readonly Technology[]>
+
+export function getPublicTechnologyCategory(technology: Technology): Category | null {
+  const category = technology.category
+  return typeof category === 'object' && category !== null && isPublishedCategory(category)
+    ? category
+    : null
+}
 
 export async function loadPublishedTechnology(
   slug: string,
@@ -14,7 +22,8 @@ export async function loadPublishedTechnology(
   if (
     !technology ||
     technology.slug !== slug ||
-    !isPublishedTechnology(technology.editorial_status, technology._status)
+    !isPublishedTechnology(technology.editorial_status, technology._status) ||
+    !getPublicTechnologyCategory(technology)
   ) {
     return null
   }

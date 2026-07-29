@@ -1,0 +1,141 @@
+import type {
+  CollectionBeforeChangeHook,
+  CollectionBeforeValidateHook,
+  CollectionConfig,
+} from 'payload'
+
+import type { Category } from '../../payload-types'
+import {
+  assertCategoryCanBecomeNonPublic,
+  CATEGORY_INDEX_POLICY,
+  prepareCategoryData,
+  validateSlug,
+} from './category/domain'
+
+const prepareCategory: CollectionBeforeValidateHook<Category> = ({ data, operation, originalDoc }) => {
+  if (!data) return data
+  return prepareCategoryData(data, operation, originalDoc)
+}
+
+const preventInvalidatingPublishedTechnologies: CollectionBeforeChangeHook<Category> = async ({
+  data,
+  operation,
+  originalDoc,
+  req,
+}) => {
+  if (
+    operation !== 'update' ||
+    !originalDoc?.id ||
+    (data.archived !== true && data.editorial_status !== 'draft')
+  ) {
+    return data
+  }
+
+  const references = await req.payload.count({
+    collection: 'technologies',
+    overrideAccess: true,
+    where: {
+      and: [
+        { category: { equals: originalDoc.id } },
+        { editorial_status: { equals: 'published' } },
+        { _status: { equals: 'published' } },
+      ],
+    },
+  })
+
+  assertCategoryCanBecomeNonPublic(references.totalDocs)
+
+  return data
+}
+
+export const Categories: CollectionConfig = {
+  slug: 'categories',
+  admin: {
+    defaultColumns: ['canonical_name', 'slug', 'editorial_status', 'archived', 'updatedAt'],
+    group: 'Knowledge Core',
+    useAsTitle: 'canonical_name',
+  },
+  access: {
+    read: ({ req }) =>
+      req.user
+        ? true
+        : {
+            archived: { equals: false },
+            editorial_status: { equals: 'published' },
+            _status: { equals: 'published' },
+          },
+  },
+  disableDuplicate: true,
+  hooks: {
+    beforeChange: [preventInvalidatingPublishedTechnologies],
+    beforeValidate: [prepareCategory],
+  },
+  labels: { plural: 'Catégories', singular: 'Catégorie' },
+  versions: {
+    drafts: { autosave: false, schedulePublish: false },
+    maxPerDoc: 25,
+  },
+  fields: [
+    {
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Identité',
+          fields: [
+            {
+              name: 'slug',
+              type: 'text',
+              admin: { description: 'Généré à la création puis stable.' },
+              ...CATEGORY_INDEX_POLICY.slug,
+              required: true,
+              validate: validateSlug,
+            },
+            {
+              name: 'canonical_name',
+              type: 'text',
+              ...CATEGORY_INDEX_POLICY.canonical_name,
+              maxLength: 120,
+              required: true,
+            },
+            {
+              name: 'aliases',
+              type: 'array',
+              fields: [{ name: 'alias', type: 'text', maxLength: 120, required: true }],
+            },
+          ],
+        },
+        {
+          label: 'Description',
+          fields: [
+            { name: 'short_description', type: 'textarea', maxLength: 320, required: true },
+            { name: 'long_description', type: 'textarea' },
+          ],
+        },
+        {
+          label: 'Gouvernance',
+          fields: [
+            {
+              name: 'editorial_status',
+              type: 'select',
+              defaultValue: 'draft',
+              ...CATEGORY_INDEX_POLICY.editorial_status,
+              options: [
+                { label: 'draft', value: 'draft' },
+                { label: 'published', value: 'published' },
+              ],
+              required: true,
+            },
+            { name: 'archived', type: 'checkbox', defaultValue: false, required: true },
+          ],
+        },
+        {
+          label: 'Référencement',
+          fields: [
+            { name: 'meta_title', type: 'text', maxLength: 60 },
+            { name: 'meta_description', type: 'textarea', maxLength: 160 },
+          ],
+        },
+      ],
+    },
+  ],
+}

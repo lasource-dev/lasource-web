@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    categories: Category;
     technologies: Technology;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -77,6 +78,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -144,6 +146,33 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  /**
+   * Généré à la création puis stable.
+   */
+  slug: string;
+  canonical_name: string;
+  aliases?:
+    | {
+        alias: string;
+        id?: string | null;
+      }[]
+    | null;
+  short_description: string;
+  long_description?: string | null;
+  editorial_status: 'draft' | 'published';
+  archived: boolean;
+  meta_title?: string | null;
+  meta_description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "technologies".
  */
 export interface Technology {
@@ -165,9 +194,9 @@ export interface Technology {
   short_description: string;
   long_description?: string | null;
   /**
-   * Valeur provisoire jusqu'à l'implémentation de l'issue #8 Catégorie.
+   * Catégorie principale de la technologie.
    */
-  category: string;
+  category: string | Category;
   company?: string | null;
   license?: string | null;
   primary_language?: string | null;
@@ -222,6 +251,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: string | User;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
       } | null)
     | ({
         relationTo: 'technologies';
@@ -290,6 +323,29 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  slug?: T;
+  canonical_name?: T;
+  aliases?:
+    | T
+    | {
+        alias?: T;
+        id?: T;
+      };
+  short_description?: T;
+  long_description?: T;
+  editorial_status?: T;
+  archived?: T;
+  meta_title?: T;
+  meta_description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

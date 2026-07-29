@@ -1,12 +1,25 @@
 import { describe, expect, it } from 'vitest'
 
-import type { Technology } from '../../payload-types'
+import type { Category, Technology } from '../../payload-types'
 import { buildTechnologyMetadata, loadPublishedTechnology } from './technology-public'
+
+const category = (overrides: Partial<Category> = {}): Category => ({
+  _status: 'published',
+  archived: false,
+  canonical_name: 'Protocole',
+  createdAt: '2026-07-20T00:00:00.000Z',
+  editorial_status: 'published',
+  id: '018f1f3d-7f1b-7a88-a91f-a22f63c596d2',
+  short_description: 'Standard d’échange entre systèmes.',
+  slug: 'protocole',
+  updatedAt: '2026-07-20T00:00:00.000Z',
+  ...overrides,
+})
 
 const technology = (overrides: Partial<Technology> = {}): Technology => ({
   _status: 'published',
   canonical_name: 'Model Context Protocol',
-  category: 'Protocole',
+  category: category(),
   createdAt: '2026-07-20T00:00:00.000Z',
   editorial_status: 'published',
   freshness_status: 'fresh',
@@ -30,6 +43,8 @@ describe('public Technology resource', () => {
     technology({ _status: 'draft' }),
     technology({ editorial_status: 'draft' }),
     technology({ editorial_status: 'archived' }),
+    technology({ category: category({ _status: 'draft', editorial_status: 'draft' }) }),
+    technology({ category: category({ archived: true }) }),
   ])('retourne null pour un contenu non publié ou archivé', async (hidden) => {
     await expect(loadPublishedTechnology(hidden.slug, async () => [hidden])).resolves.toBeNull()
   })

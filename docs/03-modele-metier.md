@@ -10,7 +10,13 @@ L'implémentation initiale utilise l'UUID natif Payload comme identifiant métie
 
 Les alias sont nettoyés sans modifier leur graphie utile : espaces externes retirés, espaces internes regroupés, doublons éliminés sans distinction de casse et nom canonique exclu. L'ordre et la casse de la première occurrence sont conservés. Une mise à jour qui ne fournit pas d'alias laisse la liste existante intacte.
 
-La Technologie synchronise le statut éditorial avec les brouillons Payload et conserve un état de fraîcheur ainsi qu'une date de vérification. La catégorie reste provisoirement textuelle jusqu'à l'issue #8. Les sources sont référencées par identifiant stable et URL optionnelle jusqu'à l'issue #9, sans créer de seconde vérité.
+La Technologie synchronise le statut éditorial avec les brouillons Payload et conserve un état de fraîcheur ainsi qu'une date de vérification. Les sources sont référencées par identifiant stable et URL optionnelle jusqu'à l'issue #9, sans créer de seconde vérité.
+
+## Catégorie
+
+La Catégorie est une ressource autonome qui classe une famille de technologies. Elle possède un UUID et un slug stables, un nom canonique, des alias éventuels, une description et son propre cycle éditorial.
+
+Une Technologie appartient à exactement une catégorie principale (`belongs_to_category`) et une Catégorie classe plusieurs technologies (`classifies`) : la cardinalité est `Technology N → 1 Category`. Une Technologie ne peut être publiée que si sa catégorie est elle-même publiée et non archivée. Une catégorie utilisée par une technologie publiée ne peut pas être archivée ou dépubliée.
 
 ## Contenu documentaire
 

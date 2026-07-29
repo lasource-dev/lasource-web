@@ -1,6 +1,8 @@
-# Placeholder du vocabulaire canonique de LaSource.dev.
-#
-# Ce fichier décrira les types d'entités et sujets transversaux lorsque leur
-# gouvernance sera validée. Aucun terme métier n'est ajouté à ce stade.
+# Vocabulaire structurel minimal de LaSource.dev.
+# Les catégories concrètes sont gérées dans Payload et ne sont pas dupliquées ici.
 version: 1
-terms: []
+terms:
+  category:
+    definition: Famille principale à laquelle appartient une technologie.
+    cardinality_per_technology: 1
+    hierarchy: false
