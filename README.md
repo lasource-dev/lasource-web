@@ -26,9 +26,10 @@ Créez une base PostgreSQL nommée `lasource`, puis adaptez `DATABASE_URI` dans
 openssl rand -base64 32
 ```
 
-Démarrez ensuite l'application :
+Appliquez la migration initiale sur la base vide, puis démarrez l'application :
 
 ```bash
+npm run payload -- migrate
 npm run dev
 ```
 
@@ -103,3 +104,4 @@ src/
 | `npm run typecheck` | vérifie TypeScript strict sans produire de fichiers |
 | `npm run generate:types` | régénère les types Payload après modification des collections |
 | `npm run seed` | charge les données minimales de démonstration sans suppression |
+| `npm run payload -- migrate` | applique les migrations PostgreSQL en attente |
