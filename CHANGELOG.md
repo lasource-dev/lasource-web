@@ -15,3 +15,5 @@ Les changements significatifs de LaSource.dev sont consignés ici. Le format sui
 - ressource Payload `relations`, arêtes Technology sourcées, dirigées ou symétriques, avec unicité canonique.
 - jeu de démonstration déterministe et réexécutable pour Category, Technology,
   Source et Relation.
+- migration PostgreSQL initiale complète pour l'installation sur une base vide.
+- correction du layout public Next.js avec les balises racine requises.

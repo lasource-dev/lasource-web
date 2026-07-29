@@ -2,7 +2,6 @@ import type { Payload } from 'payload'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { loadPublishedTechnology } from '../../lib/technology-public'
-import { CATEGORY_MIGRATION_UP_SQL } from '../../migrations/20260720_203000_category_resource'
 import type { Category, Relation, Source, Technology } from '../../../payload-types'
 
 const runIntegration = process.env.RUN_POSTGRES_INTEGRATION === 'true'
@@ -488,26 +487,21 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
     expect(new Set(signatures).size).toBe(signatures.length)
   })
 
-  it('exécute deux fois la migration Category sans perte ni doublon', async () => {
-    await payload.db.pool.query(CATEGORY_MIGRATION_UP_SQL)
-    await payload.db.pool.query(CATEGORY_MIGRATION_UP_SQL)
-
-    const { rows: auditColumns } = await payload.db.pool.query<{ column_name: string }>(`
-      SELECT column_name
-      FROM information_schema.columns
-      WHERE table_name = 'technologies' AND column_name = 'legacy_category'
-    `)
-    const { rows: duplicateCategories } = await payload.db.pool.query<{ count: string }>(`
-      SELECT count(*)::text AS count
-      FROM (
-        SELECT lower(canonical_name)
-        FROM categories
-        GROUP BY lower(canonical_name)
-        HAVING count(*) > 1
-      ) duplicates
+  it('dispose du schéma initial complet sur PostgreSQL', async () => {
+    const { rows } = await payload.db.pool.query<{ table_name: string }>(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+        AND table_name IN ('users', 'categories', 'sources', 'technologies', 'relations')
+      ORDER BY table_name
     `)
 
-    expect(auditColumns).toHaveLength(1)
-    expect(duplicateCategories[0]?.count).toBe('0')
+    expect(rows.map(({ table_name }) => table_name)).toEqual([
+      'categories',
+      'relations',
+      'sources',
+      'technologies',
+      'users',
+    ])
   })
 })

@@ -9,5 +9,9 @@ export const metadata: Metadata = {
 }
 
 export default function FrontendLayout({ children }: Readonly<{ children: ReactNode }>) {
-  return children
+  return (
+    <html lang="fr">
+      <body>{children}</body>
+    </html>
+  )
 }
