@@ -13,3 +13,5 @@ Les changements significatifs de LaSource.dev sont consignés ici. Le format sui
 - ressource Payload `categories`, relation principale `Technology N → 1 Category` et migration réexécutable du champ textuel historique.
 - ressource Payload `sources`, provenance contrôlée et relation traçable depuis `Technology`.
 - ressource Payload `relations`, arêtes Technology sourcées, dirigées ou symétriques, avec unicité canonique.
+- jeu de démonstration déterministe et réexécutable pour Category, Technology,
+  Source et Relation.

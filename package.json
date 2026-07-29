@@ -15,7 +15,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "payload": "payload",
-    "generate:types": "payload generate:types"
+    "generate:types": "payload generate:types",
+    "seed": "payload run src/seed.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.86.0",
