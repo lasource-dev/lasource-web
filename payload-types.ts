@@ -71,6 +71,7 @@ export interface Config {
     categories: Category;
     sources: Source;
     technologies: Technology;
+    relations: Relation;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +83,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     sources: SourcesSelect<false> | SourcesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
+    relations: RelationsSelect<false> | RelationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -244,6 +246,28 @@ export interface Technology {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "relations".
+ */
+export interface Relation {
+  id: string;
+  source: string | Technology;
+  relation_type:
+    'compatible_with' | 'depends_on' | 'uses' | 'supports' | 'alternative_to' | 'integrates_with' | 'replaces';
+  target: string | Technology;
+  canonical_key: string;
+  /**
+   * Sources qui justifient cette relation.
+   */
+  source_ids?: (string | Source)[] | null;
+  verified_at?: string | null;
+  editorial_status: 'draft' | 'published';
+  archived: boolean;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -281,6 +305,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'technologies';
         value: string | Technology;
+      } | null)
+    | ({
+        relationTo: 'relations';
+        value: string | Relation;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -417,6 +445,23 @@ export interface TechnologiesSelect<T extends boolean = true> {
   meta_title?: T;
   meta_description?: T;
   source_ids?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "relations_select".
+ */
+export interface RelationsSelect<T extends boolean = true> {
+  source?: T;
+  relation_type?: T;
+  target?: T;
+  canonical_key?: T;
+  source_ids?: T;
+  verified_at?: T;
+  editorial_status?: T;
+  archived?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

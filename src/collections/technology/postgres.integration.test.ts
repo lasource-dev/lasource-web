@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { loadPublishedTechnology } from '../../lib/technology-public'
 import { CATEGORY_MIGRATION_UP_SQL } from '../../migrations/20260720_203000_category_resource'
-import type { Category, Source, Technology } from '../../../payload-types'
+import type { Category, Relation, Source, Technology } from '../../../payload-types'
 
 const runIntegration = process.env.RUN_POSTGRES_INTEGRATION === 'true'
 
@@ -12,6 +12,7 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
   let primaryCategoryID: string
   const createdCategoryIDs: string[] = []
   const createdSourceIDs: string[] = []
+  const createdRelationIDs: string[] = []
   const createdIDs: string[] = []
 
   const createCategory = async (
@@ -107,6 +108,40 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
     return document
   }
 
+  const createRelation = async (
+    suffix: string,
+    sourceID: string,
+    targetID: string,
+    overrides: Partial<Relation> = {},
+  ) => {
+    const document = await payload.create({
+      collection: 'relations',
+      data: {
+        archived: false,
+        editorial_status: 'draft',
+        relation_type: 'uses',
+        source: sourceID,
+        target: targetID,
+        ...overrides,
+      },
+      draft: true,
+      overrideAccess: true,
+    })
+    createdRelationIDs.push(document.id)
+
+    if (overrides.editorial_status === 'published') {
+      return payload.update({
+        collection: 'relations',
+        id: document.id,
+        data: { editorial_status: 'published' },
+        draft: false,
+        overrideAccess: true,
+      })
+    }
+
+    return document
+  }
+
   const findPublicBySlug = async (slug: string) => {
     const result = await payload.find({
       collection: 'technologies',
@@ -131,6 +166,9 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
   }, 60_000)
 
   afterAll(async () => {
+    for (const id of createdRelationIDs.reverse()) {
+      await payload.delete({ collection: 'relations', id, overrideAccess: true })
+    }
     for (const id of createdIDs.reverse()) {
       await payload.delete({ collection: 'technologies', id, overrideAccess: true })
     }
@@ -315,6 +353,111 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
         overrideAccess: true,
       }),
     ).rejects.toThrow('A Source used by a published Technology cannot be archived')
+  })
+
+  it('canonise les relations et bloque les doublons symétriques', async () => {
+    const first = await createTechnology('Relation symmetric A')
+    const second = await createTechnology('Relation symmetric B')
+    const relation = await createRelation('symmetric', second.id, first.id, {
+      relation_type: 'compatible_with',
+    })
+
+    expect(relation.canonical_key).toBe(
+      `compatible_with:${[first.id, second.id].sort().join(':')}`,
+    )
+    await expect(
+      createRelation('symmetric duplicate', first.id, second.id, {
+        relation_type: 'compatible_with',
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('conserve le sens des relations dirigées et refuse les auto-relations', async () => {
+    const first = await createTechnology('Relation directed A')
+    const second = await createTechnology('Relation directed B')
+    const forward = await createRelation('forward', first.id, second.id)
+    const reverse = await createRelation('reverse', second.id, first.id)
+
+    expect(forward.canonical_key).not.toBe(reverse.canonical_key)
+    await expect(createRelation('self', first.id, first.id)).rejects.toThrow(
+      'cannot link a Technology to itself',
+    )
+  })
+
+  it('publie seulement une relation vérifiée entre ressources publiques et sourcées', async () => {
+    const first = await createTechnology('Relation public A', {
+      editorial_status: 'published',
+    })
+    const second = await createTechnology('Relation public B', {
+      editorial_status: 'published',
+    })
+    const evidence = await createSource('relation-evidence', {
+      editorial_status: 'published',
+      verified_at: '2026-07-20T12:00:00.000Z',
+    })
+
+    const published = await createRelation('published', first.id, second.id, {
+      editorial_status: 'published',
+      source_ids: [evidence.id],
+      verified_at: '2026-07-20T12:00:00.000Z',
+    })
+    expect(published._status).toBe('published')
+
+    await expect(
+      payload.update({
+        collection: 'technologies',
+        id: first.id,
+        data: { editorial_status: 'archived' },
+        overrideAccess: true,
+      }),
+    ).rejects.toThrow('Technology used by a published Relation')
+    await expect(
+      payload.update({
+        collection: 'sources',
+        id: evidence.id,
+        data: { archived: true },
+        overrideAccess: true,
+      }),
+    ).rejects.toThrow('Source used by a published Relation')
+    await expect(
+      payload.delete({
+        collection: 'technologies',
+        id: first.id,
+        overrideAccess: true,
+      }),
+    ).rejects.toThrow('Technology used by a Relation cannot be deleted')
+    await expect(
+      payload.delete({
+        collection: 'sources',
+        id: evidence.id,
+        overrideAccess: true,
+      }),
+    ).rejects.toThrow('Source used by a Relation cannot be deleted')
+  })
+
+  it('refuse de publier une relation sans preuve ou avec une extrémité non publique', async () => {
+    const draft = await createTechnology('Relation draft endpoint')
+    const published = await createTechnology('Relation published endpoint', {
+      editorial_status: 'published',
+    })
+    const evidence = await createSource('relation-valid-evidence', {
+      editorial_status: 'published',
+      verified_at: '2026-07-20T12:00:00.000Z',
+    })
+
+    await expect(
+      createRelation('draft endpoint', draft.id, published.id, {
+        editorial_status: 'published',
+        source_ids: [evidence.id],
+        verified_at: '2026-07-20T12:00:00.000Z',
+      }),
+    ).rejects.toThrow('published source Technology')
+    await expect(
+      createRelation('missing evidence', published.id, draft.id, {
+        editorial_status: 'published',
+        verified_at: '2026-07-20T12:00:00.000Z',
+      }),
+    ).rejects.toThrow()
   })
 
   it('matérialise exactement les index utiles dans PostgreSQL', async () => {

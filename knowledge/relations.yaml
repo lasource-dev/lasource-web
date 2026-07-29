@@ -9,3 +9,34 @@ relations:
     to: Source
     cardinality: many_to_many
     description: Une source publiée et active étaye une information de technologie.
+  - name: compatible_with
+    from: Technology
+    to: Technology
+    direction: symmetric
+  - name: alternative_to
+    from: Technology
+    to: Technology
+    direction: symmetric
+  - name: integrates_with
+    from: Technology
+    to: Technology
+    direction: symmetric
+  - name: depends_on
+    from: Technology
+    to: Technology
+    direction: directed
+  - name: uses
+    from: Technology
+    to: Technology
+    direction: directed
+  - name: supports
+    from: Technology
+    to: Technology
+    direction: directed
+  - name: replaces
+    from: Technology
+    to: Technology
+    direction: directed
+reserved_relations:
+  - name: developed_by
+    reason: Nécessite une future ressource Organization.
