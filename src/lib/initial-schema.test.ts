@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   INITIAL_SCHEMA_DOWN_SQL,
   INITIAL_SCHEMA_UP_SQL,
-} from './20260729_200000_initial_schema'
-import { migrations } from './index'
+} from '../migrations/20260729_200000_initial_schema'
+import { migrations } from '../migrations'
 
 const requiredTables = [
   'users',
