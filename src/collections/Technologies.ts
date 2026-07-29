@@ -1,8 +1,9 @@
 import type { CollectionBeforeValidateHook, CollectionConfig } from 'payload'
 
-import type { Category, Technology } from '../../payload-types'
+import type { Category, Source, Technology } from '../../payload-types'
 
 import { assertValidPublishedTechnologyCategory } from './category/domain'
+import { assertValidPublishedTechnologySources } from './source/domain'
 
 import {
   EDITORIAL_STATUSES,
@@ -11,7 +12,6 @@ import {
   prepareTechnologyData,
   validateHTTPURL,
   validateSlug,
-  validateSourceID,
 } from './technology/domain'
 
 const prepareTechnology: CollectionBeforeValidateHook<Technology> = async ({
@@ -40,6 +40,19 @@ const prepareTechnology: CollectionBeforeValidateHook<Technology> = async ({
     })) as Category
 
     assertValidPublishedTechnologyCategory(editorialStatus, category)
+
+    const sourceValues = prepared.source_ids ?? originalDoc?.source_ids ?? []
+    const sources = await Promise.all(
+      sourceValues.map(async (value) => {
+        if (typeof value === 'object') return value
+        return (await req.payload.findByID({
+          collection: 'sources',
+          id: value,
+          overrideAccess: true,
+        })) as Source
+      }),
+    )
+    assertValidPublishedTechnologySources(editorialStatus, sources)
   }
 
   return prepared
@@ -185,15 +198,12 @@ export const Technologies: CollectionConfig = {
           fields: [
             {
               name: 'source_ids',
-              type: 'array',
+              type: 'relationship',
               admin: {
-                description:
-                  "Références provisoires compatibles avec la future collection Source de l'issue #9.",
+                description: 'Sources publiées qui étayent les informations de cette technologie.',
               },
-              fields: [
-                { name: 'source_id', type: 'text', required: true, validate: validateSourceID },
-                { name: 'source_url', type: 'text', validate: validateHTTPURL },
-              ],
+              hasMany: true,
+              relationTo: 'sources',
             },
           ],
         },

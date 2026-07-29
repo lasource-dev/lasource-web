@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     categories: Category;
+    sources: Source;
     technologies: Technology;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -79,6 +80,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    sources: SourcesSelect<false> | SourcesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -173,12 +175,34 @@ export interface Category {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sources".
+ */
+export interface Source {
+  id: string;
+  /**
+   * URL canonique normalisée, sans paramètres de suivi.
+   */
+  url: string;
+  type: 'documentation' | 'github' | 'rfc' | 'official_blog' | 'video' | 'scientific_publication';
+  title: string;
+  author?: string | null;
+  published_at?: string | null;
+  confidence_score: number;
+  verified_at?: string | null;
+  editorial_status: 'draft' | 'published';
+  archived: boolean;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "technologies".
  */
 export interface Technology {
   id: string;
   /**
-   * Identifiant public unique, en minuscules et séparé par des tirets.
+   * Généré à la création, normalisé et stable pour préserver les URLs publiques.
    */
   slug: string;
   canonical_name: string;
@@ -211,15 +235,9 @@ export interface Technology {
   meta_title?: string | null;
   meta_description?: string | null;
   /**
-   * Références provisoires compatibles avec la future collection Source de l'issue #9.
+   * Sources publiées qui étayent les informations de cette technologie.
    */
-  source_ids?:
-    | {
-        source_id: string;
-        source_url?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  source_ids?: (string | Source)[] | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -255,6 +273,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categories';
         value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'sources';
+        value: string | Source;
       } | null)
     | ({
         relationTo: 'technologies';
@@ -349,6 +371,24 @@ export interface CategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sources_select".
+ */
+export interface SourcesSelect<T extends boolean = true> {
+  url?: T;
+  type?: T;
+  title?: T;
+  author?: T;
+  published_at?: T;
+  confidence_score?: T;
+  verified_at?: T;
+  editorial_status?: T;
+  archived?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "technologies_select".
  */
 export interface TechnologiesSelect<T extends boolean = true> {
@@ -376,13 +416,7 @@ export interface TechnologiesSelect<T extends boolean = true> {
   verified_at?: T;
   meta_title?: T;
   meta_description?: T;
-  source_ids?:
-    | T
-    | {
-        source_id?: T;
-        source_url?: T;
-        id?: T;
-      };
+  source_ids?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

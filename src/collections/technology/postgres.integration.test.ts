@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { loadPublishedTechnology } from '../../lib/technology-public'
 import { CATEGORY_MIGRATION_UP_SQL } from '../../migrations/20260720_203000_category_resource'
-import type { Category, Technology } from '../../../payload-types'
+import type { Category, Source, Technology } from '../../../payload-types'
 
 const runIntegration = process.env.RUN_POSTGRES_INTEGRATION === 'true'
 
@@ -11,6 +11,7 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
   let payload: Payload
   let primaryCategoryID: string
   const createdCategoryIDs: string[] = []
+  const createdSourceIDs: string[] = []
   const createdIDs: string[] = []
 
   const createCategory = async (
@@ -76,6 +77,36 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
     return document
   }
 
+  const createSource = async (suffix: string, overrides: Partial<Source> = {}) => {
+    const document = await payload.create({
+      collection: 'sources',
+      data: {
+        archived: false,
+        confidence_score: 80,
+        editorial_status: 'draft',
+        title: `Source ${suffix}`,
+        type: 'documentation',
+        url: `https://example.com/${suffix}`,
+        ...overrides,
+      },
+      draft: true,
+      overrideAccess: true,
+    })
+    createdSourceIDs.push(document.id)
+
+    if (overrides.editorial_status === 'published') {
+      return payload.update({
+        collection: 'sources',
+        id: document.id,
+        data: { editorial_status: 'published' },
+        draft: false,
+        overrideAccess: true,
+      })
+    }
+
+    return document
+  }
+
   const findPublicBySlug = async (slug: string) => {
     const result = await payload.find({
       collection: 'technologies',
@@ -102,6 +133,9 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
   afterAll(async () => {
     for (const id of createdIDs.reverse()) {
       await payload.delete({ collection: 'technologies', id, overrideAccess: true })
+    }
+    for (const id of createdSourceIDs.reverse()) {
+      await payload.delete({ collection: 'sources', id, overrideAccess: true })
     }
     for (const id of createdCategoryIDs.reverse()) {
       await payload.delete({ collection: 'categories', id, overrideAccess: true })
@@ -229,6 +263,58 @@ describe.skipIf(!runIntegration)('Technology PostgreSQL integration', () => {
         editorial_status: 'published',
       }),
     ).rejects.toThrow('A published Technology requires a published, active Category')
+  })
+
+  it('garantit les invariants Source via Payload et PostgreSQL', async () => {
+    const created = await createSource('canonical?utm_source=test&page=2', {
+      url: 'HTTPS://EXAMPLE.com/documentation/?utm_source=test&page=2#intro',
+    })
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/)
+    expect(created.url).toBe('https://example.com/documentation?page=2')
+
+    await expect(
+      payload.update({
+        collection: 'sources',
+        id: created.id,
+        data: { id: '11111111-1111-4111-8111-111111111111' },
+        overrideAccess: true,
+      }),
+    ).rejects.toThrow('Source id is immutable')
+    await expect(
+      createSource('duplicate', { url: 'https://example.com/documentation?page=2' }),
+    ).rejects.toThrow()
+    await expect(
+      createSource('unverified', { editorial_status: 'published' }),
+    ).rejects.toThrow('verified_at is required')
+  })
+
+  it('relie uniquement des sources actives aux technologies publiées', async () => {
+    const draftSource = await createSource('draft-source')
+    await expect(
+      createTechnology('Invalid source', {
+        editorial_status: 'published',
+        source_ids: [draftSource.id],
+      }),
+    ).rejects.toThrow('A published Technology can only reference published, active Sources')
+
+    const publishedSource = await createSource('published-source', {
+      editorial_status: 'published',
+      verified_at: '2026-07-20T12:00:00.000Z',
+    })
+    const technology = await createTechnology('Cited', {
+      editorial_status: 'published',
+      source_ids: [publishedSource.id],
+    })
+    expect(technology.source_ids).toHaveLength(1)
+
+    await expect(
+      payload.update({
+        collection: 'sources',
+        id: publishedSource.id,
+        data: { archived: true },
+        overrideAccess: true,
+      }),
+    ).rejects.toThrow('A Source used by a published Technology cannot be archived')
   })
 
   it('matérialise exactement les index utiles dans PostgreSQL', async () => {
