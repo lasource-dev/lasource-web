@@ -34,3 +34,12 @@ entity_relations:
   Source:
     relations:
       - supports_claim
+  Relation:
+    endpoints:
+      - Technology
+    evidence:
+      - Source
+    constraints:
+      - no_self_relation
+      - canonical_uniqueness
+      - published_evidence_required

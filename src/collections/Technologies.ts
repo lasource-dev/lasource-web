@@ -1,9 +1,18 @@
-import type { CollectionBeforeValidateHook, CollectionConfig } from 'payload'
+import type {
+  CollectionBeforeChangeHook,
+  CollectionBeforeDeleteHook,
+  CollectionBeforeValidateHook,
+  CollectionConfig,
+} from 'payload'
 
 import type { Category, Source, Technology } from '../../payload-types'
 
 import { assertValidPublishedTechnologyCategory } from './category/domain'
 import { assertValidPublishedTechnologySources } from './source/domain'
+import {
+  assertResourceCanBeDeleted,
+  assertResourceCanBecomeNonPublic,
+} from './relation/domain'
 
 import {
   EDITORIAL_STATUSES,
@@ -58,6 +67,52 @@ const prepareTechnology: CollectionBeforeValidateHook<Technology> = async ({
   return prepared
 }
 
+const preventInvalidatingPublishedRelations: CollectionBeforeChangeHook<Technology> = async ({
+  data,
+  operation,
+  originalDoc,
+  req,
+}) => {
+  if (
+    operation !== 'update' ||
+    !originalDoc?.id ||
+    (data.editorial_status !== 'draft' && data.editorial_status !== 'archived')
+  ) {
+    return data
+  }
+
+  const references = await req.payload.count({
+    collection: 'relations',
+    overrideAccess: true,
+    where: {
+      and: [
+        {
+          or: [
+            { source: { equals: originalDoc.id } },
+            { target: { equals: originalDoc.id } },
+          ],
+        },
+        { editorial_status: { equals: 'published' } },
+        { _status: { equals: 'published' } },
+      ],
+    },
+  })
+
+  assertResourceCanBecomeNonPublic(references.totalDocs, 'Technology')
+  return data
+}
+
+const preventDeletingRelatedTechnology: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  const references = await req.payload.count({
+    collection: 'relations',
+    overrideAccess: true,
+    where: {
+      or: [{ source: { equals: id } }, { target: { equals: id } }],
+    },
+  })
+  assertResourceCanBeDeleted(references.totalDocs, 'Technology')
+}
+
 export const Technologies: CollectionConfig = {
   slug: 'technologies',
   admin: {
@@ -76,6 +131,8 @@ export const Technologies: CollectionConfig = {
   },
   disableDuplicate: true,
   hooks: {
+    beforeChange: [preventInvalidatingPublishedRelations],
+    beforeDelete: [preventDeletingRelatedTechnology],
     beforeValidate: [prepareTechnology],
   },
   labels: {

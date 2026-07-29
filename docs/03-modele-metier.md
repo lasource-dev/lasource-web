@@ -34,7 +34,11 @@ Une Version représente un état publié d'une technologie. Une Vérification at
 
 ## Relations
 
-Les relations relient des technologies ou contenus avec un sens explicite : alternative, compatibilité, dépendance, intégration, remplacement, tutoriel lié ou recette liée. Elles doivent pouvoir être expliquées et sourcées.
+Une Relation relie deux Technologies avec un sens explicite et des Sources justificatives. Son UUID, ses extrémités et son type sont immuables. Une clé canonique unique empêche les doublons ; elle trie les extrémités des relations symétriques et conserve l'ordre des relations dirigées.
+
+`compatible_with`, `alternative_to` et `integrates_with` sont symétriques. `depends_on`, `uses`, `supports` et `replaces` sont dirigées. `developed_by` reste réservé jusqu'à la création d'une ressource Organization. Les auto-relations sont interdites ; les cycles restent autorisés et ne sont pas analysés dans cette première version.
+
+Une Relation ne peut être publiée que si ses deux Technologies et au moins une Source sont publiées et actives, et si elle possède une date de vérification. Une ressource citée par une Relation publiée ne peut pas devenir non publique.
 
 ## Statut éditorial
 

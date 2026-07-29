@@ -1,5 +1,6 @@
 import type {
   CollectionBeforeChangeHook,
+  CollectionBeforeDeleteHook,
   CollectionBeforeValidateHook,
   CollectionConfig,
 } from 'payload'
@@ -14,6 +15,10 @@ import {
   validateConfidenceScore,
   validateSourceURL,
 } from './source/domain'
+import {
+  assertResourceCanBeDeleted,
+  assertResourceCanBecomeNonPublic,
+} from './relation/domain'
 
 const prepareSource: CollectionBeforeValidateHook<Source> = ({ data, operation, originalDoc }) => {
   if (!data) return data
@@ -47,7 +52,39 @@ const preventInvalidatingPublishedTechnologies: CollectionBeforeChangeHook<Sourc
   })
 
   assertSourceCanBecomeNonPublic(references.totalDocs)
+
+  const relationReferences = await req.payload.count({
+    collection: 'relations',
+    overrideAccess: true,
+    where: {
+      and: [
+        { source_ids: { contains: originalDoc.id } },
+        { editorial_status: { equals: 'published' } },
+        { _status: { equals: 'published' } },
+      ],
+    },
+  })
+  assertResourceCanBecomeNonPublic(relationReferences.totalDocs, 'Source')
   return data
+}
+
+const preventDeletingReferencedSource: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  const [technologyReferences, relationReferences] = await Promise.all([
+    req.payload.count({
+      collection: 'technologies',
+      overrideAccess: true,
+      where: { source_ids: { contains: id } },
+    }),
+    req.payload.count({
+      collection: 'relations',
+      overrideAccess: true,
+      where: { source_ids: { contains: id } },
+    }),
+  ])
+  assertResourceCanBeDeleted(
+    technologyReferences.totalDocs + relationReferences.totalDocs,
+    'Source',
+  )
 }
 
 export const Sources: CollectionConfig = {
@@ -70,6 +107,7 @@ export const Sources: CollectionConfig = {
   disableDuplicate: true,
   hooks: {
     beforeChange: [preventInvalidatingPublishedTechnologies],
+    beforeDelete: [preventDeletingReferencedSource],
     beforeValidate: [prepareSource],
   },
   labels: { plural: 'Sources', singular: 'Source' },
