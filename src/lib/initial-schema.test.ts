@@ -17,8 +17,11 @@ const requiredTables = [
 ]
 
 describe('initial PostgreSQL schema', () => {
-  it('is the first and only pre-production baseline', () => {
-    expect(migrations.map(({ name }) => name)).toEqual(['20260729_200000_initial_schema'])
+  it('keeps the initial baseline first and applies later migrations in order', () => {
+    expect(migrations.map(({ name }) => name)).toEqual([
+      '20260729_200000_initial_schema',
+      '20260730_131508_editorial_content',
+    ])
   })
 
   it.each(requiredTables)('creates the %s table on an empty database', (table) => {

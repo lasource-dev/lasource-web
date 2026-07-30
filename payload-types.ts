@@ -71,6 +71,7 @@ export interface Config {
     categories: Category;
     sources: Source;
     technologies: Technology;
+    'editorial-contents': EditorialContent;
     relations: Relation;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -83,6 +84,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     sources: SourcesSelect<false> | SourcesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
+    'editorial-contents': EditorialContentsSelect<false> | EditorialContentsSelect<true>;
     relations: RelationsSelect<false> | RelationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -168,6 +170,10 @@ export interface Category {
   short_description: string;
   long_description?: string | null;
   editorial_status: 'draft' | 'published';
+  review_status?: ('unreviewed' | 'in_review' | 'validated' | 'update_required') | null;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
+  next_review_at?: string | null;
   archived: boolean;
   meta_title?: string | null;
   meta_description?: string | null;
@@ -233,6 +239,10 @@ export interface Technology {
   official_website_url?: string | null;
   editorial_status: 'draft' | 'published' | 'archived';
   freshness_status: 'fresh' | 'review_due' | 'stale' | 'unknown';
+  review_status?: ('unreviewed' | 'in_review' | 'validated' | 'update_required') | null;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
+  next_review_at?: string | null;
   verified_at?: string | null;
   meta_title?: string | null;
   meta_description?: string | null;
@@ -240,6 +250,36 @@ export interface Technology {
    * Sources publiées qui étayent les informations de cette technologie.
    */
   source_ids?: (string | Source)[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "editorial-contents".
+ */
+export interface EditorialContent {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  content_type: 'guide' | 'tutorial';
+  level: 'beginner' | 'intermediate' | 'advanced' | 'all';
+  /**
+   * Contenu canonique en Markdown.
+   */
+  body_markdown: string;
+  categories?: (string | Category)[] | null;
+  technologies?: (string | Technology)[] | null;
+  source_ids: (string | Source)[];
+  editorial_status: 'draft' | 'published' | 'archived';
+  review_status: 'unreviewed' | 'in_review' | 'validated' | 'update_required';
+  published_at?: string | null;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
+  next_review_at: string;
+  meta_title?: string | null;
+  meta_description?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -305,6 +345,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'technologies';
         value: string | Technology;
+      } | null)
+    | ({
+        relationTo: 'editorial-contents';
+        value: string | EditorialContent;
       } | null)
     | ({
         relationTo: 'relations';
@@ -390,6 +434,10 @@ export interface CategoriesSelect<T extends boolean = true> {
   short_description?: T;
   long_description?: T;
   editorial_status?: T;
+  review_status?: T;
+  reviewed_at?: T;
+  reviewed_by?: T;
+  next_review_at?: T;
   archived?: T;
   meta_title?: T;
   meta_description?: T;
@@ -441,10 +489,40 @@ export interface TechnologiesSelect<T extends boolean = true> {
   official_website_url?: T;
   editorial_status?: T;
   freshness_status?: T;
+  review_status?: T;
+  reviewed_at?: T;
+  reviewed_by?: T;
+  next_review_at?: T;
   verified_at?: T;
   meta_title?: T;
   meta_description?: T;
   source_ids?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "editorial-contents_select".
+ */
+export interface EditorialContentsSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  description?: T;
+  content_type?: T;
+  level?: T;
+  body_markdown?: T;
+  categories?: T;
+  technologies?: T;
+  source_ids?: T;
+  editorial_status?: T;
+  review_status?: T;
+  published_at?: T;
+  reviewed_at?: T;
+  reviewed_by?: T;
+  next_review_at?: T;
+  meta_title?: T;
+  meta_description?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

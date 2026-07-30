@@ -6,7 +6,10 @@ export const EDITORIAL_STATUS_LABELS = {
   editorially_validated: 'Validé par la rédaction',
   expert_validated: 'Validé par un expert',
   in_review: 'En cours de revue',
+  unreviewed: 'En attente de relecture',
   updating: 'Mise à jour en cours',
+  update_required: 'Mise à jour nécessaire',
+  validated: 'Validé',
 } as const
 
 export type EditorialStatusValue = keyof typeof EDITORIAL_STATUS_LABELS
