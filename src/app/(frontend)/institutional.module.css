@@ -33,6 +33,15 @@
   max-width: 46rem;
 }
 
+.scope {
+  color: var(--foreground);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.6;
+  margin: 1rem 0 0;
+  max-width: 46rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

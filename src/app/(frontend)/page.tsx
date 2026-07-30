@@ -25,11 +25,14 @@ export default function HomePage() {
   return (
     <main className={styles.page} id="contenu">
       <section className={styles.hero}>
-        <p className={styles.eyebrow}>Connaissance technique structurée</p>
-        <h1>Comprendre une technologie sans recomposer soi-même toute l’information.</h1>
+        <p className={styles.eyebrow}>La référence des technologies de développement</p>
+        <h1>Tout ce qu’il faut pour comprendre une technologie, au même endroit.</h1>
         <p className={styles.lead}>
-          LaSource.dev relie les faits, les sources et les usages pour donner aux développeurs un
-          point de départ clair, vérifiable et maintenu.
+          Présentation, usages, compatibilités, alternatives, versions et sources : une connaissance
+          structurée, vérifiée et maintenue dans le temps.
+        </p>
+        <p className={styles.scope}>
+          Frameworks, langages, modèles d’IA, SDK, outils, protocoles et plateformes cloud.
         </p>
         <div className={styles.actions}>
           <Link className={styles.primaryAction} href="/technologies/next-js">
