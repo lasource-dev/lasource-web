@@ -1,17 +1,48 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import './globals.css'
 
 export const metadata: Metadata = {
-  description: 'LaSource.dev, ressources techniques open source.',
-  title: 'LaSource.dev',
+  description:
+    'LaSource.dev structure, vérifie et relie les connaissances techniques utiles aux développeurs.',
+  metadataBase: new URL('https://lasource.dev'),
+  title: {
+    default: 'LaSource.dev — Connaissances techniques structurées',
+    template: '%s | LaSource.dev',
+  },
 }
 
 export default function FrontendLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body>
+        <a className="skip-link" href="#contenu">
+          Aller au contenu
+        </a>
+        <header className="site-header">
+          <Link aria-label="LaSource.dev, accueil" className="site-brand" href="/">
+            LaSource<span>.dev</span>
+          </Link>
+          <nav aria-label="Navigation principale">
+            <Link href="/">Accueil</Link>
+            <Link href="/a-propos">À propos</Link>
+          </nav>
+        </header>
+        {children}
+        <footer className="site-footer">
+          <p>
+            LaSource.dev structure et relie une connaissance technique vérifiable, destinée à
+            rester utile dans le temps.
+          </p>
+          <nav aria-label="Navigation de pied de page">
+            <Link href="/">Accueil</Link>
+            <Link href="/a-propos">À propos</Link>
+            <Link href="/admin">Administration</Link>
+          </nav>
+        </footer>
+      </body>
     </html>
   )
 }

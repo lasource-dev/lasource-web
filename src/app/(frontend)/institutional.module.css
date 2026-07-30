@@ -1,0 +1,273 @@
+.page {
+  margin: 0 auto;
+  max-width: 76rem;
+  padding: 0 1.5rem 5rem;
+}
+
+.hero {
+  padding: clamp(5rem, 12vw, 9rem) 0;
+}
+
+.eyebrow {
+  color: var(--signal);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-size: clamp(2.75rem, 8vw, 6.5rem);
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+  margin: 0;
+  max-width: 15ch;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.6;
+  margin: 2rem 0 0;
+  max-width: 46rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.primaryAction,
+.secondaryAction,
+.disabledAction {
+  border: 1px solid var(--signal);
+  display: inline-flex;
+  font-weight: 750;
+  justify-content: center;
+  padding: 0.85rem 1.1rem;
+  text-decoration: none;
+}
+
+.primaryAction {
+  background: var(--signal);
+  color: white;
+}
+
+.primaryAction:hover {
+  background: var(--signal-dark);
+}
+
+.secondaryAction {
+  color: var(--signal-dark);
+}
+
+.section,
+.splitSection,
+.graphSection,
+.recentSection,
+.newsletter {
+  border-top: 1px solid var(--border);
+  padding: clamp(3.5rem, 7vw, 6rem) 0;
+}
+
+.section h2,
+.splitSection h2,
+.graphSection h2,
+.recentSection h2,
+.newsletter h2 {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.splitSection,
+.graphSection,
+.recentSection,
+.newsletter {
+  display: grid;
+  gap: 3rem;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 1fr);
+}
+
+.splitSection > p,
+.graphSection p,
+.recentSection > p,
+.newsletter p,
+.sectionIntro,
+.card p,
+.articleSection p,
+.articleSection li {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.splitSection > p,
+.recentSection > p {
+  margin: 0;
+}
+
+.graphSection {
+  background: var(--ink);
+  color: white;
+  margin-inline: -1.5rem;
+  padding-inline: 1.5rem;
+}
+
+.graphSection .eyebrow {
+  color: #8bd6b9;
+}
+
+.graphSection p {
+  color: #d5d5cc;
+  margin: 0 0 1rem;
+}
+
+.cardGrid {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 2.5rem;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  margin: -1px 0 0 -1px;
+  min-height: 13rem;
+  padding: 1.5rem;
+}
+
+.card h3 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.card p {
+  font-size: 0.975rem;
+  margin-bottom: 0;
+}
+
+.sectionIntro {
+  margin: 1rem 0 2rem;
+}
+
+.channelList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.channelList li {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-weight: 750;
+  padding: 0.75rem 1rem;
+}
+
+.newsletter {
+  align-items: end;
+}
+
+.newsletter p {
+  margin-bottom: 0;
+}
+
+.disabledAction {
+  border-color: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+  justify-self: end;
+}
+
+.articleHeader {
+  max-width: 58rem;
+  padding: clamp(4rem, 9vw, 7rem) 0;
+}
+
+.articleHeader h1 {
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin: 0;
+}
+
+.anchorNav {
+  border-block: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  padding: 1.25rem 0;
+}
+
+.anchorNav a {
+  color: var(--signal-dark);
+  font-weight: 700;
+  text-underline-offset: 0.2em;
+}
+
+.articleSection {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(12rem, 0.65fr) minmax(0, 1.35fr);
+  padding: 3.5rem 0;
+}
+
+.articleSection + .articleSection {
+  border-top: 1px solid var(--border);
+}
+
+.articleSection h2 {
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  letter-spacing: -0.035em;
+  margin: 0;
+}
+
+.articleSection p:first-child {
+  margin-top: 0;
+}
+
+.articleSection li + li {
+  margin-top: 0.75rem;
+}
+
+.commitment {
+  border-left: 4px solid var(--signal);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.45;
+  margin: 2rem 0 0;
+  padding-left: 1.5rem;
+}
+
+@media (max-width: 52rem) {
+  .cardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .splitSection,
+  .graphSection,
+  .recentSection,
+  .newsletter,
+  .articleSection {
+    grid-template-columns: 1fr;
+  }
+
+  .disabledAction {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 34rem) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+  }
+}
