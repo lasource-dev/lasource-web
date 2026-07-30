@@ -28,13 +28,16 @@
 }
 
 .status_in_review,
-.status_updating {
+.status_unreviewed,
+.status_updating,
+.status_update_required {
   background: #fff7dd;
   border-color: #ddbd63;
 }
 
 .status_editorially_validated,
-.status_expert_validated {
+.status_expert_validated,
+.status_validated {
   background: #e9f5ef;
   border-color: #79ac95;
   color: #174c3b;

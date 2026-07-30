@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit",
     "payload": "payload",
     "generate:types": "payload generate:types",
+    "import:content": "payload run src/import-editorial-content.ts",
     "seed": "payload run src/seed.ts"
   },
   "dependencies": {

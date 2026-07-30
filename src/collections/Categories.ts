@@ -11,6 +11,7 @@ import {
   prepareCategoryData,
   validateSlug,
 } from './category/domain'
+import { REVIEW_STATUSES } from './editorial/review'
 
 const prepareCategory: CollectionBeforeValidateHook<Category> = ({ data, operation, originalDoc }) => {
   if (!data) return data
@@ -125,6 +126,16 @@ export const Categories: CollectionConfig = {
               ],
               required: true,
             },
+            {
+              name: 'review_status',
+              type: 'select',
+              defaultValue: 'unreviewed',
+              index: true,
+              options: REVIEW_STATUSES.map((value) => ({ label: value, value })),
+            },
+            { name: 'reviewed_at', type: 'date' },
+            { name: 'reviewed_by', type: 'text', maxLength: 160 },
+            { name: 'next_review_at', type: 'date' },
             { name: 'archived', type: 'checkbox', defaultValue: false, required: true },
           ],
         },

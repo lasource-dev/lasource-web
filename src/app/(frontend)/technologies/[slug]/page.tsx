@@ -5,6 +5,8 @@ import { getPayload } from 'payload'
 import { cache } from 'react'
 
 import type { Technology } from '../../../../../payload-types'
+import { EditorialStatus } from '../../../../components/EditorialStatus'
+import { MarkdownContent } from '../../../../components/MarkdownContent'
 import { readServerEnvironment } from '../../../../lib/env'
 import {
   buildTechnologyMetadata,
@@ -102,6 +104,7 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
   return (
     <main className={styles.page}>
       <p className={styles.eyebrow}>Technologie</p>
+      <EditorialStatus status={technology.review_status ?? 'unreviewed'} />
       <h1 className={styles.title}>{technology.canonical_name}</h1>
       <p className={styles.summary}>{technology.short_description}</p>
       <p className={styles.aliases}>Catégorie : {category.canonical_name}</p>
@@ -112,7 +115,7 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
 
       {technology.long_description ? (
         <section aria-label="Présentation" className={styles.content}>
-          {technology.long_description}
+          <MarkdownContent source={technology.long_description} />
         </section>
       ) : null}
 

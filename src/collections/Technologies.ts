@@ -22,6 +22,7 @@ import {
   validateHTTPURL,
   validateSlug,
 } from './technology/domain'
+import { REVIEW_STATUSES } from './editorial/review'
 
 const prepareTechnology: CollectionBeforeValidateHook<Technology> = async ({
   data,
@@ -236,6 +237,16 @@ export const Technologies: CollectionConfig = {
               options: FRESHNESS_STATUSES.map((value) => ({ label: value, value })),
               required: true,
             },
+            {
+              name: 'review_status',
+              type: 'select',
+              defaultValue: 'unreviewed',
+              index: true,
+              options: REVIEW_STATUSES.map((value) => ({ label: value, value })),
+            },
+            { name: 'reviewed_at', type: 'date' },
+            { name: 'reviewed_by', type: 'text', maxLength: 160 },
+            { name: 'next_review_at', type: 'date' },
             {
               name: 'verified_at',
               type: 'date',

@@ -4,6 +4,7 @@ import { buildConfig } from 'payload'
 import { Users } from './collections/Users'
 import { Categories } from './collections/Categories'
 import { Technologies } from './collections/Technologies'
+import { EditorialContents } from './collections/EditorialContents'
 import { Sources } from './collections/Sources'
 import { Relations } from './collections/Relations'
 import { readServerEnvironment } from './lib/env'
@@ -14,7 +15,7 @@ export default buildConfig({
   admin: {
     user: Users.slug,
   },
-  collections: [Users, Categories, Sources, Technologies, Relations],
+  collections: [Users, Categories, Sources, Technologies, EditorialContents, Relations],
   db: postgresAdapter({
     idType: 'uuid',
     push: false,
