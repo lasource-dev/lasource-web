@@ -82,6 +82,59 @@
   padding: clamp(3.5rem, 7vw, 6rem) 0;
 }
 
+.publications {
+  border-top: 1px solid var(--border);
+  padding: 0 0 clamp(3.5rem, 7vw, 6rem);
+}
+
+.publicationGroup {
+  padding-top: 3rem;
+}
+
+.publicationGroup h3 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  letter-spacing: -0.035em;
+  margin: 0 0 1.5rem;
+}
+
+.publicationGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.publicationCard {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 14rem;
+  padding: 1.5rem;
+}
+
+.publicationCard h4 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  margin: 1.25rem 0 0;
+}
+
+.publicationCard h4 a {
+  text-decoration-color: var(--border);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+}
+
+.publicationCard h4 a:hover {
+  text-decoration-color: var(--signal);
+}
+
+.publicationCard p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0.85rem 0 0;
+}
+
 .section h2,
 .splitSection h2,
 .graphSection h2,
@@ -273,10 +326,18 @@
   .disabledAction {
     justify-self: start;
   }
+
+  .publicationGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 34rem) {
   .cardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .publicationGrid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,5 +1,9 @@
+import config from '@payload-config'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { getPayload } from 'payload'
+
+import { EditorialStatus } from '../../components/EditorialStatus'
 
 import styles from './institutional.module.css'
 
@@ -9,6 +13,8 @@ export const metadata: Metadata = {
     'Une connaissance technique structurée, sourcée et maintenue pour comprendre les technologies et leurs relations.',
   title: 'Comprendre les technologies avec une information fiable',
 }
+
+export const dynamic = 'force-dynamic'
 
 const contentTypes = [
   ['Technologies', 'Des fiches de référence reliées à leurs sources et à leur écosystème.'],
@@ -21,7 +27,42 @@ const contentTypes = [
 
 const channels = ['Web', 'IDE', 'MCP', 'Skills', 'API', 'Agents IA'] as const
 
-export default function HomePage() {
+export default async function HomePage() {
+  const payload = await getPayload({ config })
+  const [technologies, editorialContents] = await Promise.all([
+    payload.find({
+      collection: 'technologies',
+      depth: 0,
+      limit: 12,
+      overrideAccess: false,
+      pagination: false,
+      sort: 'canonical_name',
+      where: {
+        and: [
+          { editorial_status: { equals: 'published' } },
+          { _status: { equals: 'published' } },
+        ],
+      },
+    }),
+    payload.find({
+      collection: 'editorial-contents',
+      depth: 0,
+      limit: 12,
+      overrideAccess: false,
+      pagination: false,
+      sort: '-published_at',
+      where: {
+        and: [
+          { editorial_status: { equals: 'published' } },
+          { _status: { equals: 'published' } },
+        ],
+      },
+    }),
+  ])
+
+  const guides = editorialContents.docs.filter(({ content_type }) => content_type === 'guide')
+  const tutorials = editorialContents.docs.filter(({ content_type }) => content_type === 'tutorial')
+
   return (
     <main className={styles.page} id="contenu">
       <section className={styles.hero}>
@@ -113,13 +154,43 @@ export default function HomePage() {
 
       <section aria-labelledby="recent" className={styles.recentSection}>
         <div>
-          <p className={styles.eyebrow}>Contenus récents</p>
-          <h2 id="recent">Les premiers dossiers sont en préparation</h2>
+          <p className={styles.eyebrow}>À découvrir maintenant</p>
+          <h2 id="recent">Les premiers contenus sont en ligne</h2>
         </div>
         <p>
-          Cette zone accueillera les publications récentes dès que leur cycle éditorial sera
-          terminé. Aucun contenu ne sera présenté comme validé avant de l’être réellement.
+          Parcourez les premières fiches, guides et tutoriels. Chaque page affiche clairement son
+          niveau de validation éditoriale et les sources utilisées.
         </p>
+      </section>
+
+      <section aria-label="Premiers contenus publiés" className={styles.publications}>
+        <PublicationGroup
+          items={technologies.docs.map((technology) => ({
+            description: technology.short_description,
+            href: `/technologies/${technology.slug}`,
+            status: technology.review_status ?? 'unreviewed',
+            title: technology.canonical_name,
+          }))}
+          title="Technologies"
+        />
+        <PublicationGroup
+          items={guides.map((guide) => ({
+            description: guide.description,
+            href: `/guides/${guide.slug}`,
+            status: guide.review_status ?? 'unreviewed',
+            title: guide.title,
+          }))}
+          title="Guides"
+        />
+        <PublicationGroup
+          items={tutorials.map((tutorial) => ({
+            description: tutorial.description,
+            href: `/tutoriels/${tutorial.slug}`,
+            status: tutorial.review_status ?? 'unreviewed',
+            title: tutorial.title,
+          }))}
+          title="Tutoriels"
+        />
       </section>
 
       <section aria-labelledby="newsletter" className={styles.newsletter}>
@@ -135,5 +206,33 @@ export default function HomePage() {
         </span>
       </section>
     </main>
+  )
+}
+
+type PublicationItem = {
+  description: string
+  href: string
+  status: Parameters<typeof EditorialStatus>[0]['status']
+  title: string
+}
+
+function PublicationGroup({ items, title }: { items: PublicationItem[]; title: string }) {
+  if (items.length === 0) return null
+
+  return (
+    <section aria-labelledby={`publications-${title.toLowerCase()}`} className={styles.publicationGroup}>
+      <h3 id={`publications-${title.toLowerCase()}`}>{title}</h3>
+      <div className={styles.publicationGrid}>
+        {items.map((item) => (
+          <article className={styles.publicationCard} key={item.href}>
+            <EditorialStatus status={item.status} />
+            <h4>
+              <Link href={item.href}>{item.title}</Link>
+            </h4>
+            <p>{item.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
   )
 }
