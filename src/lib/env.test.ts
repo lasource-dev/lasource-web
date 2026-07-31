@@ -19,7 +19,35 @@ describe('readServerEnvironment', () => {
   it('requires a PostgreSQL connection string', () => {
     expect(() =>
       readServerEnvironment({ ...validEnvironment, DATABASE_URI: undefined }),
-    ).toThrow('DATABASE_URI is required')
+    ).toThrow('DATABASE_URI or DATABASE_URL is required')
+  })
+
+  it('uses the Neon DATABASE_URL when DATABASE_URI is absent', () => {
+    const environmentWithoutDatabaseURI = {
+      NEXT_PUBLIC_SERVER_URL: validEnvironment.NEXT_PUBLIC_SERVER_URL,
+      PAYLOAD_SECRET: validEnvironment.PAYLOAD_SECRET,
+    }
+    const databaseURL = 'postgresql://neon:secret@localhost:5432/lasource-preview'
+
+    expect(
+      readServerEnvironment({
+        ...environmentWithoutDatabaseURI,
+        DATABASE_URL: databaseURL,
+      }),
+    ).toEqual({
+      ...environmentWithoutDatabaseURI,
+      DATABASE_URI: databaseURL,
+      NEXT_PUBLIC_SERVER_URL: 'http://localhost:3000',
+    })
+  })
+
+  it('prefers an explicit DATABASE_URI over DATABASE_URL', () => {
+    expect(
+      readServerEnvironment({
+        ...validEnvironment,
+        DATABASE_URL: 'postgresql://neon:secret@localhost:5432/ignored',
+      }).DATABASE_URI,
+    ).toBe(validEnvironment.DATABASE_URI)
   })
 
   it('rejects short Payload secrets', () => {

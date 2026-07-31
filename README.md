@@ -61,7 +61,7 @@ Une fois le chargement terminé, la page
 
 | Variable | Obligatoire | Description | Exemple local |
 | --- | --- | --- | --- |
-| `DATABASE_URI` | oui | URL de connexion PostgreSQL utilisée exclusivement côté serveur | `postgresql://postgres:postgres@localhost:5432/lasource` |
+| `DATABASE_URI` ou `DATABASE_URL` | oui | URL de connexion PostgreSQL utilisée exclusivement côté serveur. `DATABASE_URI` est prioritaire ; l’intégration Neon/Vercel fournit `DATABASE_URL`. | `postgresql://postgres:postgres@localhost:5432/lasource` |
 | `PAYLOAD_SECRET` | oui | Secret d'au moins 32 caractères servant à signer les jetons Payload | valeur générée avec `openssl rand -base64 32` |
 | `NEXT_PUBLIC_SERVER_URL` | non | URL canonique publique, sans slash final ; vaut `http://localhost:3000` par défaut | `http://localhost:3000` |
 
@@ -79,6 +79,10 @@ npm run build
 
 La CI exécute ces quatre contrôles pour chaque pull request et chaque push sur
 `main`.
+
+Sur Vercel, `npm run build:vercel` applique les migrations Payload à la base de
+l’environnement avant le build. L’intégration Neon fournit une branche de base
+isolée aux déploiements de prévisualisation.
 
 ## Structure
 
