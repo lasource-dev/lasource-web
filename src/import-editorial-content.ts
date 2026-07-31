@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path'
 
 import { getPayload, type Payload } from 'payload'
 
+import { normalizeSourceURL } from './collections/source/domain'
 import config from './payload.config'
 
 type FrontMatter = Record<string, unknown>
@@ -162,16 +163,17 @@ try {
   const sourceRegistry = parseSourceRegistry(registryText)
   const sourceIDs = new Map<string, string>()
   for (const [id, source] of sourceRegistry) {
+    const normalizedURL = normalizeSourceURL(source.url)
     sourceIDs.set(
       id,
-      await upsert(payload, 'sources', 'url', source.url, {
+      await upsert(payload, 'sources', 'url', normalizedURL, {
         archived: false,
         author: source.publisher,
         confidence_score: 100,
         editorial_status: 'published',
         title: source.title,
         type: sourceTypeForPayload(source.source_type),
-        url: source.url,
+        url: normalizedURL,
         verified_at: `${source.checked_at}T00:00:00.000Z`,
         _status: 'published',
       }),
