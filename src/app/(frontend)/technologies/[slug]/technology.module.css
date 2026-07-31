@@ -73,3 +73,29 @@
   text-decoration-thickness: 0.12em;
   text-underline-offset: 0.2em;
 }
+
+.sources {
+  border-top: 1px solid #d0d5dd;
+  margin-top: 3rem;
+  padding-top: 2rem;
+}
+
+.sources h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.sources ul {
+  line-height: 1.6;
+  margin: 1rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.sources li + li {
+  margin-top: 0.75rem;
+}
+
+.sources a {
+  text-decoration-thickness: 0.1em;
+  text-underline-offset: 0.2em;
+}

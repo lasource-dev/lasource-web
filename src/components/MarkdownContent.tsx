@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 type MarkdownContentProps = {
+  skipLeadingTitle?: boolean
   source: string
 }
 
@@ -17,8 +18,13 @@ function inline(source: string): ReactNode[] {
   })
 }
 
-export function MarkdownContent({ source }: MarkdownContentProps) {
-  const lines = source.split('\n')
+export function MarkdownContent({ skipLeadingTitle = false, source }: MarkdownContentProps) {
+  const sourceLines = source.split('\n')
+  const firstContentLine = sourceLines.findIndex((line) => line.trim())
+  const lines =
+    skipLeadingTitle && firstContentLine >= 0 && /^#\s+/.test(sourceLines[firstContentLine])
+      ? sourceLines.filter((_, index) => index !== firstContentLine)
+      : sourceLines
   const blocks: ReactNode[] = []
   let index = 0
 

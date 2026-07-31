@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import { cache } from 'react'
 
 import type { Technology } from '../../../../../payload-types'
+import { ContentSources } from '../../../../components/ContentSources'
 import { EditorialStatus } from '../../../../components/EditorialStatus'
 import { MarkdownContent } from '../../../../components/MarkdownContent'
 import { readServerEnvironment } from '../../../../lib/env'
@@ -61,7 +62,14 @@ const formatVerificationDate = (value: string | null | undefined) =>
     ? new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'UTC' }).format(
         new Date(value),
       )
-    : 'Non vérifiée'
+    : 'Pas encore vérifiée'
+
+const FRESHNESS_LABELS: Record<Technology['freshness_status'], string> = {
+  fresh: 'Vérifiées récemment',
+  review_due: 'À revérifier',
+  stale: 'Probablement obsolètes',
+  unknown: 'Non vérifié',
+}
 
 type Detail = {
   label: string
@@ -77,7 +85,7 @@ const getDetails = (technology: Technology): Detail[] =>
     technology.latest_version
       ? { label: 'Dernière version', value: technology.latest_version }
       : null,
-    { label: 'Fraîcheur', value: technology.freshness_status },
+    { label: 'État des informations', value: FRESHNESS_LABELS[technology.freshness_status] },
     { label: 'Dernière vérification', value: formatVerificationDate(technology.verified_at) },
   ].filter((detail): detail is Detail => detail !== null)
 
@@ -110,12 +118,12 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
       <p className={styles.aliases}>Catégorie : {category.canonical_name}</p>
 
       {aliases.length > 0 ? (
-        <p className={styles.aliases}>Aussi connue sous : {aliases.join(', ')}</p>
+        <p className={styles.aliases}>Autres noms : {aliases.join(', ')}</p>
       ) : null}
 
       {technology.long_description ? (
         <section aria-label="Présentation" className={styles.content}>
-          <MarkdownContent source={technology.long_description} />
+          <MarkdownContent skipLeadingTitle source={technology.long_description} />
         </section>
       ) : null}
 
@@ -137,6 +145,8 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
           ))}
         </nav>
       ) : null}
+
+      <ContentSources className={styles.sources} sources={technology.source_ids} />
     </main>
   )
 }
