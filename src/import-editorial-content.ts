@@ -95,6 +95,9 @@ async function upsert(
     where: { [field]: { equals: value } },
   })
   const existing = result.docs[0]
+  if (existing && !hasChanges(existing as unknown as Record<string, unknown>, data)) {
+    return String(existing.id)
+  }
   const document = existing
     ? await payload.update({
         collection,
@@ -110,6 +113,26 @@ async function upsert(
         overrideAccess: true,
       })
   return String(document.id)
+}
+
+function comparable(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(comparable)
+  if (value && typeof value === 'object') {
+    if ('id' in value) return String(value.id)
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, entry]) => [key, comparable(entry)]),
+    )
+  }
+  return value
+}
+
+function hasChanges(existing: Record<string, unknown>, incoming: Record<string, unknown>): boolean {
+  return Object.entries(incoming).some(([key, value]) => {
+    if (value === undefined) return false
+    return JSON.stringify(comparable(existing[key])) !== JSON.stringify(comparable(value))
+  })
 }
 
 const asStrings = (value: unknown): string[] =>

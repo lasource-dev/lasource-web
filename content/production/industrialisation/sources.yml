@@ -1,0 +1,145 @@
+sources:
+  mdn-javascript-guide:
+    title: "Guide JavaScript"
+    url: "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
+    publisher: "Mozilla Contributors"
+    source_type: "official_documentation"
+    license: "CC-BY-SA-2.5-or-later"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  mdn-javascript-modules:
+    title: "Modules JavaScript"
+    url: "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide/Modules"
+    publisher: "Mozilla Contributors"
+    source_type: "official_documentation"
+    license: "CC-BY-SA-2.5-or-later"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  react-learn:
+    title: "Quick Start"
+    url: "https://react.dev/learn"
+    publisher: "React team"
+    source_type: "official_documentation"
+    license: "CC-BY-4.0"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  react-managing-state:
+    title: "Managing State"
+    url: "https://react.dev/learn/managing-state"
+    publisher: "React team"
+    source_type: "official_documentation"
+    license: "CC-BY-4.0"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  react-releases:
+    title: "React releases"
+    url: "https://github.com/facebook/react/releases"
+    publisher: "React team"
+    source_type: "official_releases"
+    license: "MIT"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  node-api:
+    title: "Node.js API documentation"
+    url: "https://nodejs.org/docs/latest/api/"
+    publisher: "Node.js contributors"
+    source_type: "official_documentation"
+    license: "MIT"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  node-introduction:
+    title: "Introduction to Node.js"
+    url: "https://nodejs.org/en/learn/getting-started/introduction-to-nodejs"
+    publisher: "Node.js contributors"
+    source_type: "official_documentation"
+    license: "MIT"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  node-releases:
+    title: "Node.js releases"
+    url: "https://github.com/nodejs/node/releases"
+    publisher: "Node.js contributors"
+    source_type: "official_releases"
+    license: "MIT"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  node-release-schedule:
+    title: "Node.js release schedule"
+    url: "https://github.com/nodejs/Release"
+    publisher: "Node.js Release Working Group"
+    source_type: "official_repository"
+    license: "MIT"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  typescript-handbook:
+    title: "The TypeScript Handbook"
+    url: "https://www.typescriptlang.org/docs/handbook/intro.html"
+    publisher: "Microsoft"
+    source_type: "official_documentation"
+    license: "to_verify"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  typescript-releases:
+    title: "TypeScript releases"
+    url: "https://github.com/microsoft/TypeScript/releases"
+    publisher: "Microsoft"
+    source_type: "official_releases"
+    license: "Apache-2.0"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  html-living-standard:
+    title: "HTML Living Standard"
+    url: "https://html.spec.whatwg.org/"
+    publisher: "WHATWG"
+    source_type: "standard"
+    license: "CC-BY-4.0"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  css-snapshot-2026:
+    title: "CSS Snapshot 2026"
+    url: "https://www.w3.org/TR/css-2026/"
+    publisher: "W3C CSS Working Group"
+    source_type: "standard"
+    license: "W3C-Document-License"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  git-reference:
+    title: "Git Reference"
+    url: "https://git-scm.com/docs"
+    publisher: "Git project contributors"
+    source_type: "official_documentation"
+    license: "GPL-2.0"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  git-releases:
+    title: "Git releases"
+    url: "https://github.com/git/git/releases"
+    publisher: "Git project contributors"
+    source_type: "official_releases"
+    license: "GPL-2.0"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  rfc-9110:
+    title: "RFC 9110 — HTTP Semantics"
+    url: "https://www.rfc-editor.org/rfc/rfc9110"
+    publisher: "IETF"
+    source_type: "standard"
+    license: "IETF-Trust"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  wcag-22:
+    title: "Web Content Accessibility Guidelines 2.2"
+    url: "https://www.w3.org/TR/WCAG22/"
+    publisher: "W3C"
+    source_type: "standard"
+    license: "W3C-Document-License"
+    attribution_required: true
+    checked_at: "2026-07-30"
+  wcag-22-quickref:
+    title: "How to Meet WCAG 2.2"
+    url: "https://www.w3.org/WAI/WCAG22/quickref/"
+    publisher: "W3C Web Accessibility Initiative"
+    source_type: "official_documentation"
+    license: "W3C-Document-License"
+    attribution_required: true
+    checked_at: "2026-07-30"
