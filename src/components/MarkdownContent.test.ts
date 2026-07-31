@@ -20,4 +20,17 @@ describe('MarkdownContent', () => {
     expect(markup).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
     expect(markup).not.toContain('<script>')
   })
+
+  it('peut ignorer le titre Markdown déjà affiché par la page', () => {
+    const markup = renderToStaticMarkup(
+      createElement(MarkdownContent, {
+        skipLeadingTitle: true,
+        source: '# CSS\n\nUne introduction.\n\n## À apprendre',
+      }),
+    )
+
+    expect(markup).not.toContain('# CSS')
+    expect(markup).toContain('<p>Une introduction.</p>')
+    expect(markup).toContain('<h2>À apprendre</h2>')
+  })
 })

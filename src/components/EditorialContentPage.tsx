@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
+import { ContentSources } from './ContentSources'
 import { MarkdownContent } from './MarkdownContent'
 import { EditorialStatus } from './EditorialStatus'
 import type { EditorialContentType } from '../lib/editorial-content-public'
@@ -14,11 +15,22 @@ type EditorialContentPageProps = {
   type: EditorialContentType
 }
 
+const LEVEL_LABELS = {
+  advanced: 'Avancé',
+  all: 'Tous niveaux',
+  beginner: 'Débutant',
+  intermediate: 'Intermédiaire',
+} as const
+
+const formatDate = (value: string) =>
+  new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(value))
+
 export async function EditorialContentPage({ slug, type }: EditorialContentPageProps) {
   const content = await loadPublishedEditorialContent(slug, type, async (queriedSlug, queriedType) => {
     const payload = await getPayload({ config })
     const result = await payload.find({
       collection: 'editorial-contents',
+      depth: 1,
       limit: 1,
       overrideAccess: false,
       pagination: false,
@@ -42,9 +54,26 @@ export async function EditorialContentPage({ slug, type }: EditorialContentPageP
       <EditorialStatus status={content.review_status} />
       <h1 className={styles.title}>{content.title}</h1>
       <p className={styles.summary}>{content.description}</p>
+      <dl className={styles.details}>
+        <div className={styles.detail}>
+          <dt>Niveau</dt>
+          <dd>{LEVEL_LABELS[content.level]}</dd>
+        </div>
+        {content.published_at ? (
+          <div className={styles.detail}>
+            <dt>Publié le</dt>
+            <dd>{formatDate(content.published_at)}</dd>
+          </div>
+        ) : null}
+        <div className={styles.detail}>
+          <dt>Prochaine vérification</dt>
+          <dd>{formatDate(content.next_review_at)}</dd>
+        </div>
+      </dl>
       <article className={styles.content}>
-        <MarkdownContent source={content.body_markdown} />
+        <MarkdownContent skipLeadingTitle source={content.body_markdown} />
       </article>
+      <ContentSources className={styles.sources} sources={content.source_ids} />
     </main>
   )
 }

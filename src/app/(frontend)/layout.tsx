@@ -6,10 +6,10 @@ import './globals.css'
 
 export const metadata: Metadata = {
   description:
-    'LaSource.dev structure, vérifie et relie les connaissances techniques utiles aux développeurs.',
+    'Des fiches, guides et tutoriels clairs pour comprendre les technologies du développement web.',
   metadataBase: new URL('https://lasource.dev'),
   title: {
-    default: 'LaSource.dev — Connaissances techniques structurées',
+    default: 'LaSource.dev — Comprendre les technologies du développement web',
     template: '%s | LaSource.dev',
   },
 }
@@ -33,8 +33,8 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
         {children}
         <footer className="site-footer">
           <p>
-            LaSource.dev structure et relie une connaissance technique vérifiable, destinée à
-            rester utile dans le temps.
+            Des fiches, guides et tutoriels clairs pour comprendre les technologies du
+            développement web.
           </p>
           <nav aria-label="Navigation de pied de page">
             <Link href="/">Accueil</Link>
