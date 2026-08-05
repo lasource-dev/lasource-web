@@ -1,4 +1,28 @@
 sources:
+  nextjs-documentation:
+    title: "Documentation Next.js"
+    url: "https://nextjs.org/docs"
+    publisher: "Vercel"
+    source_type: "official_documentation"
+    license: "MIT"
+    attribution_required: true
+    checked_at: "2026-08-05"
+  payload-documentation:
+    title: "Documentation Payload CMS"
+    url: "https://payloadcms.com/docs"
+    publisher: "Payload"
+    source_type: "official_documentation"
+    license: "MIT"
+    attribution_required: true
+    checked_at: "2026-08-05"
+  postgresql-documentation:
+    title: "Documentation PostgreSQL"
+    url: "https://www.postgresql.org/docs/current/"
+    publisher: "PostgreSQL Global Development Group"
+    source_type: "official_documentation"
+    license: "PostgreSQL License"
+    attribution_required: true
+    checked_at: "2026-08-05"
   mdn-javascript-guide:
     title: "Guide JavaScript"
     url: "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide"
