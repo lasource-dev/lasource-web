@@ -6,16 +6,17 @@ L'architecture sépare la connaissance canonique de ses canaux de diffusion. Ell
 
 ## Composants
 
-- **Payload CMS** gère les entités, le cycle éditorial et l'administration.
+- **Payload CMS** est la source canonique des entités et contenus ; il gère leur cycle éditorial, leurs versions et l'administration.
 - **PostgreSQL** stocke les données structurées et leurs relations.
 - **Next.js** fournit l'expérience web publique et les métadonnées associées.
-- **Référentiel Git** conserve la documentation, les décisions et les placeholders de connaissance versionnés.
+- **Référentiel Git** conserve le code, les migrations, la documentation et les décisions, mais pas la version canonique des contenus éditoriaux.
 - **Canaux futurs** — newsletter, MCP, API, Skills et formations — consomment la même connaissance canonique selon des contrats dédiés.
 
 ## Frontières
 
 - les détails de rendu appartiennent aux canaux, pas au modèle canonique ;
 - les secrets et données opérationnelles ne vivent pas dans Git ;
+- aucun build ou déploiement ne réimporte automatiquement un corpus éditorial dans Payload ;
 - la publication publique respecte le statut éditorial ;
 - les interfaces programmatiques ne sont ajoutées qu'avec un cas d'usage défini ;
 - les décisions difficiles à inverser sont consignées dans `docs/adr/`.

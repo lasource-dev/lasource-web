@@ -16,6 +16,12 @@ type SourceDefinition = {
   url: string
 }
 
+if (process.env.ALLOW_LEGACY_CONTENT_IMPORT !== 'true') {
+  throw new Error(
+    'Import refusé : Payload est la source éditoriale canonique. Définissez ALLOW_LEGACY_CONTENT_IMPORT=true uniquement pour une migration volontaire.',
+  )
+}
+
 const requestedSourceRoot = process.argv[2] ?? process.env.CONTENT_SOURCE_DIR
 if (!requestedSourceRoot) {
   throw new Error('Indiquez le dossier production-contenus en argument ou via CONTENT_SOURCE_DIR')

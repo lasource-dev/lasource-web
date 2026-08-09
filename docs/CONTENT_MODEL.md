@@ -30,6 +30,8 @@ Chaque unité documentaire devrait pouvoir exprimer un titre, un résumé, un st
 
 La fiche web peut présenter l'ensemble, tandis qu'une newsletter, une réponse MCP ou une formation sélectionne les sections utiles. Les canaux ne réécrivent pas les faits canoniques ; ils adaptent ordre, longueur et contexte.
 
+Les unités documentaires et leurs métadonnées canoniques sont conservées dans Payload. Les exports, sauvegardes ou anciens fichiers Markdown sont des représentations dérivées et ne doivent pas réimporter automatiquement leurs valeurs.
+
 ## Évolution
 
 Les sections sont introduites au rythme des besoins. Une section vide n'est pas publiée pour donner une impression artificielle d'exhaustivité. Toute évolution structurelle doit préserver les sources, les relations et l'historique éditorial.
