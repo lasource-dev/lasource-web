@@ -21,6 +21,7 @@ describe('initial PostgreSQL schema', () => {
     expect(migrations.map(({ name }) => name)).toEqual([
       '20260729_200000_initial_schema',
       '20260730_131508_editorial_content',
+      '20260809_162610_automation_identity',
     ])
   })
 

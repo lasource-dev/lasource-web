@@ -11,6 +11,7 @@ Les changements significatifs de LaSource.dev sont consignés ici. Le format sui
 
 ### Ajouté
 
+- identité Payload pour les automatisations éditoriales, authentifiée par clé API et limitée aux brouillons ;
 - documentation fondatrice du produit, de la taxonomie, du modèle documentaire, de l'architecture et du workflow ;
 - première décision d'architecture consacrant la Technologie comme entité racine ;
 - placeholders du futur référentiel de connaissance.

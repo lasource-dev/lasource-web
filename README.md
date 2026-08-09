@@ -60,6 +60,22 @@ ALLOW_LEGACY_CONTENT_IMPORT=true npm run import:legacy-content -- content/produc
 Cette commande peut remplacer des valeurs présentes dans Payload. Elle ne doit
 jamais être intégrée au build, au démarrage ou à une tâche planifiée.
 
+### Identité d'automatisation
+
+La collection `users` accepte les clés API et distingue les rôles
+`admin`, `editor` et `automation`. Un compte `automation` peut créer et modifier
+uniquement des documents dont les deux statuts sont encore `draft`. Le serveur
+force également ces statuts sur chaque écriture automatisée. Ce compte ne peut
+ni supprimer, ni publier, ni administrer les utilisateurs.
+
+Un administrateur crée ce compte dans `/admin/collections/users`, sélectionne le
+rôle **Automatisation**, active sa clé API et conserve celle-ci dans un
+gestionnaire de secrets. Une requête machine utilise l'en-tête :
+
+```text
+Authorization: users API-Key <clé>
+```
+
 ## Données de démonstration
 
 Après avoir configuré PostgreSQL et appliqué les migrations, chargez le jeu

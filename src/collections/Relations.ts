@@ -1,6 +1,7 @@
 import type { CollectionBeforeValidateHook, CollectionConfig } from 'payload'
 
 import type { Relation, Source, Technology } from '../../payload-types'
+import { editorialWriteAccess, forceAutomationDraft } from './editorial/automation-access'
 import {
   assertValidPublishedRelation,
   ENABLED_RELATION_TYPES,
@@ -66,6 +67,7 @@ export const Relations: CollectionConfig = {
     group: 'Knowledge Core',
   },
   access: {
+    ...editorialWriteAccess,
     read: ({ req }) =>
       req.user
         ? true
@@ -76,7 +78,7 @@ export const Relations: CollectionConfig = {
           },
   },
   disableDuplicate: true,
-  hooks: { beforeValidate: [prepareRelation] },
+  hooks: { beforeValidate: [forceAutomationDraft, prepareRelation] },
   indexes: [
     { fields: ['source', 'relation_type'] },
     { fields: ['target', 'relation_type'] },

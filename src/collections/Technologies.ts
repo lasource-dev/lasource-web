@@ -23,6 +23,7 @@ import {
   validateSlug,
 } from './technology/domain'
 import { REVIEW_STATUSES } from './editorial/review'
+import { editorialWriteAccess, forceAutomationDraft } from './editorial/automation-access'
 
 const prepareTechnology: CollectionBeforeValidateHook<Technology> = async ({
   data,
@@ -122,6 +123,7 @@ export const Technologies: CollectionConfig = {
     useAsTitle: 'canonical_name',
   },
   access: {
+    ...editorialWriteAccess,
     read: ({ req }) =>
       req.user
         ? true
@@ -134,7 +136,7 @@ export const Technologies: CollectionConfig = {
   hooks: {
     beforeChange: [preventInvalidatingPublishedRelations],
     beforeDelete: [preventDeletingRelatedTechnology],
-    beforeValidate: [prepareTechnology],
+    beforeValidate: [forceAutomationDraft, prepareTechnology],
   },
   labels: {
     plural: 'Technologies',
