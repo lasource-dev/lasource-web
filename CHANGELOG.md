@@ -4,6 +4,11 @@ Les changements significatifs de LaSource.dev sont consignés ici. Le format sui
 
 ## Non publié
 
+### Modifié
+
+- Payload et PostgreSQL deviennent la source éditoriale canonique ; le build Vercel n'importe plus automatiquement le corpus Markdown historique.
+- l'importeur historique exige désormais l'autorisation explicite `ALLOW_LEGACY_CONTENT_IMPORT=true`.
+
 ### Ajouté
 
 - documentation fondatrice du produit, de la taxonomie, du modèle documentaire, de l'architecture et du workflow ;

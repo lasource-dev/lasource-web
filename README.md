@@ -39,6 +39,27 @@ npm run dev
 Lors du premier accès à l'administration, Payload propose de créer le premier
 compte administrateur.
 
+## Gestion des contenus
+
+Payload CMS est la source de vérité éditoriale. Les catégories, sources,
+technologies, guides et tutoriels sont créés, relus, versionnés et publiés dans
+l'administration à l'adresse `/admin`. Une publication Payload est visible
+immédiatement sur le site public : elle ne nécessite ni commit Git ni nouveau
+déploiement.
+
+Les fichiers historiques de `content/production` sont conservés comme corpus de
+migration et de référence. Ils ne sont plus importés automatiquement par Vercel
+et ne doivent pas être utilisés pour modifier un contenu déjà géré par Payload.
+
+L'ancien importeur reste disponible pour une migration explicitement autorisée :
+
+```bash
+ALLOW_LEGACY_CONTENT_IMPORT=true npm run import:legacy-content -- content/production
+```
+
+Cette commande peut remplacer des valeurs présentes dans Payload. Elle ne doit
+jamais être intégrée au build, au démarrage ou à une tâche planifiée.
+
 ## Données de démonstration
 
 Après avoir configuré PostgreSQL et appliqué les migrations, chargez le jeu
@@ -81,8 +102,8 @@ La CI exécute ces quatre contrôles pour chaque pull request et chaque push sur
 `main`.
 
 Sur Vercel, `npm run build:vercel` applique les migrations Payload à la base de
-l’environnement avant le build. L’intégration Neon fournit une branche de base
-isolée aux déploiements de prévisualisation.
+l’environnement avant le build. Il n'importe aucun contenu. L’intégration Neon
+fournit une branche de base isolée aux déploiements de prévisualisation.
 
 ## Structure
 
@@ -108,4 +129,5 @@ src/
 | `npm run typecheck` | vérifie TypeScript strict sans produire de fichiers |
 | `npm run generate:types` | régénère les types Payload après modification des collections |
 | `npm run seed` | charge les données minimales de démonstration sans suppression |
+| `npm run import:legacy-content -- <dossier>` | migre volontairement un ancien corpus avec `ALLOW_LEGACY_CONTENT_IMPORT=true` |
 | `npm run payload -- migrate` | applique les migrations PostgreSQL en attente |

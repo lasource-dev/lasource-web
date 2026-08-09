@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "build:vercel": "npm run payload -- migrate && npm run publish:content && npm run build",
+    "build:vercel": "npm run payload -- migrate && npm run build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
@@ -17,8 +17,7 @@
     "typecheck": "tsc --noEmit",
     "payload": "payload",
     "generate:types": "payload generate:types",
-    "import:content": "payload run src/import-editorial-content.ts",
-    "publish:content": "npm run import:content -- content/production",
+    "import:legacy-content": "payload run src/import-editorial-content.ts",
     "seed": "payload run src/seed.ts"
   },
   "dependencies": {
