@@ -20,6 +20,7 @@ export function ContentSources({ className, sources }: ContentSourcesProps) {
           <li key={source.id}>
             <a href={source.url} rel="noreferrer" target="_blank">
               {source.title}
+              <span className="visually-hidden"> (s’ouvre dans un nouvel onglet)</span>
             </a>
             {source.author ? ` — ${source.author}` : null}
           </li>

@@ -111,18 +111,21 @@
   padding: 1.5rem;
 }
 
+.publicationCard h2,
 .publicationCard h4 {
   font-size: 1.25rem;
   line-height: 1.25;
   margin: 0;
 }
 
+.publicationCard h2 a,
 .publicationCard h4 a {
   text-decoration-color: var(--border);
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.2em;
 }
 
+.publicationCard h2 a:hover,
 .publicationCard h4 a:hover {
   text-decoration-color: var(--signal);
 }

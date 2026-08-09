@@ -46,5 +46,6 @@ export function buildTechnologyMetadata(technology: Technology, serverURL: strin
       url: canonical,
     },
     title,
+    twitter: { card: 'summary', description, title },
   }
 }

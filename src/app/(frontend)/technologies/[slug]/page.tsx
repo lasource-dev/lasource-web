@@ -6,9 +6,12 @@ import { cache } from 'react'
 
 import type { Technology } from '../../../../../payload-types'
 import { ContentSources } from '../../../../components/ContentSources'
+import { Breadcrumbs } from '../../../../components/Breadcrumbs'
 import { EditorialStatus } from '../../../../components/EditorialStatus'
 import { MarkdownContent } from '../../../../components/MarkdownContent'
+import { StructuredData } from '../../../../components/StructuredData'
 import { readServerEnvironment } from '../../../../lib/env'
+import { buildArticleData, buildBreadcrumbData } from '../../../../lib/structured-data'
 import {
   buildTechnologyMetadata,
   getPublicTechnologyCategory,
@@ -108,9 +111,33 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
       : null,
     technology.github_url ? { href: technology.github_url, label: 'GitHub' } : null,
   ].filter((link): link is { href: string; label: string } => link !== null)
+  const serverURL = readServerEnvironment().NEXT_PUBLIC_SERVER_URL
+  const canonical = new URL(`/technologies/${technology.slug}`, serverURL).toString()
 
   return (
-    <main className={styles.page}>
+    <main className={styles.page} id="contenu">
+      <StructuredData
+        data={[
+          buildArticleData({
+            canonical,
+            dateModified: technology.updatedAt,
+            description: technology.short_description,
+            headline: technology.canonical_name,
+          }),
+          buildBreadcrumbData(serverURL, [
+            { href: '/', label: 'Accueil' },
+            { href: '/technologies', label: 'Technologies' },
+            { href: `/technologies/${technology.slug}`, label: technology.canonical_name },
+          ]),
+        ]}
+      />
+      <Breadcrumbs
+        items={[
+          { href: '/', label: 'Accueil' },
+          { href: '/technologies', label: 'Technologies' },
+          { label: technology.canonical_name },
+        ]}
+      />
       <p className={styles.eyebrow}>Technologie</p>
       <EditorialStatus status={technology.review_status ?? 'unreviewed'} />
       <h1 className={styles.title}>{technology.canonical_name}</h1>
@@ -141,6 +168,7 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
           {links.map(({ href, label }) => (
             <a href={href} key={label} rel="noreferrer" target="_blank">
               {label}
+              <span className="visually-hidden"> (s’ouvre dans un nouvel onglet)</span>
             </a>
           ))}
         </nav>
