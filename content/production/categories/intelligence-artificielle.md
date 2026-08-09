@@ -3,16 +3,16 @@ title: "Intelligence artificielle"
 slug: "intelligence-artificielle"
 description: "Comprendre les modèles, API, bibliothèques et protocoles utilisés pour construire des applications fondées sur l’intelligence artificielle."
 type: "category"
-publication_status: "draft"
-review_status: "unreviewed"
+publication_status: "published"
+review_status: "validated"
 level: "all"
 categories: ["intelligence-artificielle"]
 technologies: ["openai-api", "hugging-face-transformers", "model-context-protocol"]
 tags: ["ia", "modeles", "agents", "inference"]
 sources: ["openai-api-overview", "huggingface-transformers", "mcp-introduction"]
-published_at: null
-reviewed_at: null
-reviewed_by: null
+published_at: "2026-08-09"
+reviewed_at: "2026-08-09"
+reviewed_by: "Équipe LaSource.dev"
 next_review_at: "2027-02-09"
 ---
 

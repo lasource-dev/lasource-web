@@ -3,16 +3,16 @@ title: "API OpenAI"
 slug: "openai-api"
 description: "Une API hébergée pour intégrer des modèles multimodaux, du raisonnement et des outils dans des applications."
 type: "technology"
-publication_status: "draft"
-review_status: "unreviewed"
+publication_status: "published"
+review_status: "validated"
 level: "intermediate"
 categories: ["intelligence-artificielle"]
 technologies: ["nodejs", "javascript", "typescript", "model-context-protocol"]
 tags: ["ia-generative", "api", "modeles", "agents"]
 sources: ["openai-api-overview", "openai-api-quickstart", "openai-models"]
-published_at: null
-reviewed_at: null
-reviewed_by: null
+published_at: "2026-08-09"
+reviewed_at: "2026-08-09"
+reviewed_by: "Équipe LaSource.dev"
 next_review_at: "2026-11-09"
 ---
 

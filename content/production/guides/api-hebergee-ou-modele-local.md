@@ -3,16 +3,16 @@ title: "API d’IA hébergée ou modèle local : comment choisir ?"
 slug: "api-hebergee-ou-modele-local"
 description: "Comparer une API d’IA hébergée et un modèle exécuté localement selon les données, le coût, la latence et l’exploitation."
 type: "guide"
-publication_status: "draft"
-review_status: "unreviewed"
+publication_status: "published"
+review_status: "validated"
 level: "intermediate"
 categories: ["intelligence-artificielle"]
 technologies: ["openai-api", "hugging-face-transformers"]
 tags: ["choix-technique", "inference", "hebergement", "modeles"]
 sources: ["openai-api-overview", "openai-models", "huggingface-transformers", "huggingface-transformers-quicktour"]
-published_at: null
-reviewed_at: null
-reviewed_by: null
+published_at: "2026-08-09"
+reviewed_at: "2026-08-09"
+reviewed_by: "Équipe LaSource.dev"
 next_review_at: "2026-11-09"
 ---
 

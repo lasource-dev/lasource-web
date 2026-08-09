@@ -3,16 +3,16 @@ title: "Hugging Face Transformers"
 slug: "hugging-face-transformers"
 description: "Une bibliothèque open source pour charger, exécuter et entraîner des modèles préentraînés de texte, vision, audio et multimodaux."
 type: "technology"
-publication_status: "draft"
-review_status: "unreviewed"
+publication_status: "published"
+review_status: "validated"
 level: "intermediate"
 categories: ["intelligence-artificielle"]
 technologies: ["openai-api"]
 tags: ["machine-learning", "modeles", "inference", "python"]
 sources: ["huggingface-transformers", "huggingface-transformers-quicktour"]
-published_at: null
-reviewed_at: null
-reviewed_by: null
+published_at: "2026-08-09"
+reviewed_at: "2026-08-09"
+reviewed_by: "Équipe LaSource.dev"
 next_review_at: "2027-02-09"
 ---
 

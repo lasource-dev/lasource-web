@@ -3,16 +3,16 @@ title: "Obtenir une première réponse de l’API OpenAI avec Node.js"
 slug: "premiere-reponse-openai-nodejs"
 description: "Créer un script Node.js minimal qui appelle la Responses API sans exposer sa clé secrète."
 type: "tutorial"
-publication_status: "draft"
-review_status: "unreviewed"
+publication_status: "published"
+review_status: "validated"
 level: "beginner"
 categories: ["intelligence-artificielle", "backend"]
 technologies: ["openai-api", "nodejs", "javascript"]
 tags: ["api", "nodejs", "responses-api", "secrets"]
 sources: ["openai-api-quickstart", "openai-api-overview", "openai-models", "node-introduction"]
-published_at: null
-reviewed_at: null
-reviewed_by: null
+published_at: "2026-08-09"
+reviewed_at: "2026-08-09"
+reviewed_by: "Équipe LaSource.dev"
 next_review_at: "2026-11-09"
 ---
 

@@ -3,16 +3,16 @@ title: "Model Context Protocol"
 slug: "model-context-protocol"
 description: "Un standard ouvert pour connecter des applications d’IA à des outils, ressources et modèles de prompts."
 type: "technology"
-publication_status: "draft"
-review_status: "unreviewed"
+publication_status: "published"
+review_status: "validated"
 level: "intermediate"
 categories: ["intelligence-artificielle"]
 technologies: ["openai-api", "nodejs", "typescript"]
 tags: ["mcp", "agents", "outils", "protocole"]
 sources: ["mcp-introduction", "mcp-architecture"]
-published_at: null
-reviewed_at: null
-reviewed_by: null
+published_at: "2026-08-09"
+reviewed_at: "2026-08-09"
+reviewed_by: "Équipe LaSource.dev"
 next_review_at: "2026-11-09"
 ---
 
