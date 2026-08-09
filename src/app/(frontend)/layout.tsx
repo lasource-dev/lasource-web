@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
+import { StructuredData } from '../../components/StructuredData'
+
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -12,12 +14,30 @@ export const metadata: Metadata = {
     default: 'LaSource.dev — Comprendre les technologies du développement web',
     template: '%s | LaSource.dev',
   },
+  twitter: { card: 'summary', site: '@lasourcedev' },
 }
 
 export default function FrontendLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="fr">
       <body>
+        <StructuredData
+          data={[
+            {
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'LaSource.dev',
+              url: 'https://lasource.dev',
+            },
+            {
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              inLanguage: 'fr-FR',
+              name: 'LaSource.dev',
+              url: 'https://lasource.dev',
+            },
+          ]}
+        />
         <a className="skip-link" href="#contenu">
           Aller au contenu
         </a>
@@ -27,6 +47,9 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
           </Link>
           <nav aria-label="Navigation principale">
             <Link href="/">Accueil</Link>
+            <Link href="/technologies">Technologies</Link>
+            <Link href="/guides">Guides</Link>
+            <Link href="/tutoriels">Tutoriels</Link>
             <Link href="/a-propos">À propos</Link>
           </nav>
         </header>
@@ -38,8 +61,10 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
           </p>
           <nav aria-label="Navigation de pied de page">
             <Link href="/">Accueil</Link>
+            <Link href="/technologies">Technologies</Link>
+            <Link href="/guides">Guides</Link>
+            <Link href="/tutoriels">Tutoriels</Link>
             <Link href="/a-propos">À propos</Link>
-            <Link href="/admin">Administration</Link>
           </nav>
         </footer>
       </body>

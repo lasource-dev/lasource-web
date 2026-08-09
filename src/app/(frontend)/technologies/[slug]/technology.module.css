@@ -39,6 +39,12 @@
   white-space: pre-wrap;
 }
 
+.content pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
 .details {
   border-block: 1px solid #d0d5dd;
   display: grid;

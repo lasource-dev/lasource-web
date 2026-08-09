@@ -33,7 +33,15 @@ export function buildEditorialContentMetadata(
   return {
     alternates: { canonical },
     description,
-    openGraph: { description, title, type: 'article', url: canonical },
+    openGraph: {
+      description,
+      modifiedTime: content.updatedAt,
+      ...(content.published_at ? { publishedTime: content.published_at } : {}),
+      title,
+      type: 'article',
+      url: canonical,
+    },
     title,
+    twitter: { card: 'summary', description, title },
   }
 }

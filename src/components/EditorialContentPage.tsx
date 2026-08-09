@@ -3,10 +3,14 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import { ContentSources } from './ContentSources'
+import { Breadcrumbs } from './Breadcrumbs'
 import { MarkdownContent } from './MarkdownContent'
+import { StructuredData } from './StructuredData'
 import { EditorialStatus } from './EditorialStatus'
 import type { EditorialContentType } from '../lib/editorial-content-public'
 import { loadPublishedEditorialContent } from '../lib/editorial-content-public'
+import { readServerEnvironment } from '../lib/env'
+import { buildArticleData, buildBreadcrumbData } from '../lib/structured-data'
 
 import styles from '../app/(frontend)/technologies/[slug]/technology.module.css'
 
@@ -48,8 +52,36 @@ export async function EditorialContentPage({ slug, type }: EditorialContentPageP
 
   if (!content) notFound()
 
+  const segment = type === 'guide' ? 'guides' : 'tutoriels'
+  const typeLabel = type === 'guide' ? 'Guides' : 'Tutoriels'
+  const serverURL = readServerEnvironment().NEXT_PUBLIC_SERVER_URL
+  const canonical = new URL(`/${segment}/${content.slug}`, serverURL).toString()
+
   return (
-    <main className={styles.page}>
+    <main className={styles.page} id="contenu">
+      <StructuredData
+        data={[
+          buildArticleData({
+            canonical,
+            dateModified: content.updatedAt,
+            datePublished: content.published_at,
+            description: content.description,
+            headline: content.title,
+          }),
+          buildBreadcrumbData(serverURL, [
+            { href: '/', label: 'Accueil' },
+            { href: `/${segment}`, label: typeLabel },
+            { href: `/${segment}/${content.slug}`, label: content.title },
+          ]),
+        ]}
+      />
+      <Breadcrumbs
+        items={[
+          { href: '/', label: 'Accueil' },
+          { href: `/${segment}`, label: typeLabel },
+          { label: content.title },
+        ]}
+      />
       <p className={styles.eyebrow}>{type === 'guide' ? 'Guide' : 'Tutoriel'}</p>
       <EditorialStatus status={content.review_status} />
       <h1 className={styles.title}>{content.title}</h1>
