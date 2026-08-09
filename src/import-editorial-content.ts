@@ -200,7 +200,9 @@ try {
       await upsert(payload, 'categories', 'slug', slug, {
         archived: false,
         canonical_name: title,
-        editorial_status: 'published',
+        editorial_status: content
+          ? statusForPayload(content.data.publication_status)
+          : 'published',
         long_description: content?.body,
         meta_description: description.slice(0, 160),
         meta_title: title.slice(0, 60),
@@ -208,7 +210,7 @@ try {
         review_status: 'unreviewed',
         short_description: description,
         slug,
-        _status: 'published',
+        _status: content ? statusForPayload(content.data.publication_status) : 'published',
       }),
     )
   }
@@ -269,7 +271,9 @@ try {
       meta_description: String(content.data.description).slice(0, 160),
       meta_title: String(content.data.title).slice(0, 60),
       next_review_at: `${String(content.data.next_review_at)}T00:00:00.000Z`,
-      published_at: `${String(content.data.published_at)}T00:00:00.000Z`,
+      published_at: content.data.published_at
+        ? `${String(content.data.published_at)}T00:00:00.000Z`
+        : undefined,
       review_status: content.data.review_status,
       slug: content.data.slug,
       source_ids: sourceDocuments,
