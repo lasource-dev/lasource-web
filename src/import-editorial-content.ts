@@ -200,15 +200,23 @@ try {
       await upsert(payload, 'categories', 'slug', slug, {
         archived: false,
         canonical_name: title,
-        editorial_status: 'published',
+        editorial_status: content
+          ? statusForPayload(content.data.publication_status)
+          : 'published',
         long_description: content?.body,
         meta_description: description.slice(0, 160),
         meta_title: title.slice(0, 60),
-        next_review_at: '2027-01-30T00:00:00.000Z',
-        review_status: 'unreviewed',
+        next_review_at: content?.data.next_review_at
+          ? `${String(content.data.next_review_at)}T00:00:00.000Z`
+          : '2027-01-30T00:00:00.000Z',
+        reviewed_at: content?.data.reviewed_at
+          ? `${String(content.data.reviewed_at)}T00:00:00.000Z`
+          : undefined,
+        reviewed_by: content?.data.reviewed_by || undefined,
+        review_status: content?.data.review_status ?? 'unreviewed',
         short_description: description,
         slug,
-        _status: 'published',
+        _status: content ? statusForPayload(content.data.publication_status) : 'published',
       }),
     )
   }
@@ -243,6 +251,10 @@ try {
         next_review_at: `${String(content.data.next_review_at)}T00:00:00.000Z`,
         official_documentation_url: officialDocumentation?.url,
         review_status: content.data.review_status,
+        reviewed_at: content.data.reviewed_at
+          ? `${String(content.data.reviewed_at)}T00:00:00.000Z`
+          : undefined,
+        reviewed_by: content.data.reviewed_by || undefined,
         short_description: content.data.description,
         slug,
         source_ids: sourceDocuments,
@@ -269,8 +281,14 @@ try {
       meta_description: String(content.data.description).slice(0, 160),
       meta_title: String(content.data.title).slice(0, 60),
       next_review_at: `${String(content.data.next_review_at)}T00:00:00.000Z`,
-      published_at: `${String(content.data.published_at)}T00:00:00.000Z`,
+      published_at: content.data.published_at
+        ? `${String(content.data.published_at)}T00:00:00.000Z`
+        : undefined,
       review_status: content.data.review_status,
+      reviewed_at: content.data.reviewed_at
+        ? `${String(content.data.reviewed_at)}T00:00:00.000Z`
+        : undefined,
+      reviewed_by: content.data.reviewed_by || undefined,
       slug: content.data.slug,
       source_ids: sourceDocuments,
       technologies: asStrings(content.data.technologies).flatMap((slug) => {

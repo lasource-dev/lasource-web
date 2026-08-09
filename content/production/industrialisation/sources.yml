@@ -1,4 +1,60 @@
 sources:
+  openai-api-overview:
+    title: "OpenAI API overview"
+    url: "https://developers.openai.com/api/docs/overview"
+    publisher: "OpenAI"
+    source_type: "official_documentation"
+    license: "OpenAI documentation terms"
+    attribution_required: true
+    checked_at: "2026-08-09"
+  openai-api-quickstart:
+    title: "OpenAI API quickstart"
+    url: "https://developers.openai.com/api/docs/quickstart"
+    publisher: "OpenAI"
+    source_type: "official_documentation"
+    license: "OpenAI documentation terms"
+    attribution_required: true
+    checked_at: "2026-08-09"
+  openai-models:
+    title: "OpenAI API models"
+    url: "https://developers.openai.com/api/docs/models"
+    publisher: "OpenAI"
+    source_type: "official_documentation"
+    license: "OpenAI documentation terms"
+    attribution_required: true
+    checked_at: "2026-08-09"
+  huggingface-transformers:
+    title: "Transformers documentation"
+    url: "https://huggingface.co/docs/transformers/main/index"
+    publisher: "Hugging Face"
+    source_type: "official_documentation"
+    license: "Apache-2.0"
+    attribution_required: true
+    checked_at: "2026-08-09"
+  huggingface-transformers-quicktour:
+    title: "Transformers quickstart"
+    url: "https://huggingface.co/docs/transformers/en/quicktour"
+    publisher: "Hugging Face"
+    source_type: "official_documentation"
+    license: "Apache-2.0"
+    attribution_required: true
+    checked_at: "2026-08-09"
+  mcp-introduction:
+    title: "Introduction to Model Context Protocol"
+    url: "https://modelcontextprotocol.io/docs/getting-started/intro"
+    publisher: "Model Context Protocol"
+    source_type: "official_documentation"
+    license: "Apache-2.0"
+    attribution_required: true
+    checked_at: "2026-08-09"
+  mcp-architecture:
+    title: "Model Context Protocol architecture"
+    url: "https://modelcontextprotocol.io/docs/learn/architecture"
+    publisher: "Model Context Protocol"
+    source_type: "official_documentation"
+    license: "Apache-2.0"
+    attribution_required: true
+    checked_at: "2026-08-09"
   nextjs-documentation:
     title: "Documentation Next.js"
     url: "https://nextjs.org/docs"
