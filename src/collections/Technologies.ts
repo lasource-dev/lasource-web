@@ -23,7 +23,7 @@ import {
   validateSlug,
 } from './technology/domain'
 import { REVIEW_STATUSES } from './editorial/review'
-import { editorialWriteAccess, forceAutomationDraft } from './editorial/automation-access'
+import { editorialWriteAccess, synchronizeEditorialStatus } from './editorial/automation-access'
 
 const prepareTechnology: CollectionBeforeValidateHook<Technology> = async ({
   data,
@@ -136,7 +136,7 @@ export const Technologies: CollectionConfig = {
   hooks: {
     beforeChange: [preventInvalidatingPublishedRelations],
     beforeDelete: [preventDeletingRelatedTechnology],
-    beforeValidate: [forceAutomationDraft, prepareTechnology],
+    beforeValidate: [synchronizeEditorialStatus, prepareTechnology],
   },
   labels: {
     plural: 'Technologies',

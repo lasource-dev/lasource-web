@@ -12,7 +12,7 @@ import {
   validateSlug,
 } from './category/domain'
 import { REVIEW_STATUSES } from './editorial/review'
-import { editorialWriteAccess, forceAutomationDraft } from './editorial/automation-access'
+import { editorialWriteAccess, synchronizeEditorialStatus } from './editorial/automation-access'
 
 const prepareCategory: CollectionBeforeValidateHook<Category> = ({ data, operation, originalDoc }) => {
   if (!data) return data
@@ -71,7 +71,7 @@ export const Categories: CollectionConfig = {
   disableDuplicate: true,
   hooks: {
     beforeChange: [preventInvalidatingPublishedTechnologies],
-    beforeValidate: [forceAutomationDraft, prepareCategory],
+    beforeValidate: [synchronizeEditorialStatus, prepareCategory],
   },
   labels: { plural: 'Catégories', singular: 'Catégorie' },
   versions: {

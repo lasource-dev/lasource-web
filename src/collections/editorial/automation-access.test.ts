@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   editorialWriteAccess,
-  forceAutomationDraft,
+  synchronizeEditorialStatus,
   isAdminUser,
   isAutomationUser,
 } from './automation-access'
@@ -16,7 +16,7 @@ describe('automation editorial access', () => {
   })
 
   it('forces automated writes to remain drafts', () => {
-    const result = forceAutomationDraft({
+    const result = synchronizeEditorialStatus({
       data: { editorial_status: 'published', _status: 'published', title: 'Brouillon' },
       req: { user: { role: 'automation' } },
     } as never)
@@ -28,9 +28,45 @@ describe('automation editorial access', () => {
     })
   })
 
-  it('does not alter an administrator write', () => {
-    const data = { editorial_status: 'published', _status: 'published' }
-    expect(forceAutomationDraft({ data, req: { user: { role: 'admin' } } } as never)).toBe(data)
+  it('synchronizes the business status when an administrator publishes', () => {
+    expect(
+      synchronizeEditorialStatus({
+        data: { editorial_status: 'draft', _status: 'published' },
+        originalDoc: { editorial_status: 'draft', _status: 'draft' },
+        req: { user: { role: 'admin' } },
+      } as never),
+    ).toMatchObject({ editorial_status: 'published', _status: 'published' })
+  })
+
+  it('synchronizes the Payload status when an administrator changes the business status', () => {
+    expect(
+      synchronizeEditorialStatus({
+        data: { editorial_status: 'published', _status: 'draft' },
+        originalDoc: { editorial_status: 'draft', _status: 'draft' },
+        req: { user: { role: 'admin' } },
+      } as never),
+    ).toMatchObject({ editorial_status: 'published', _status: 'published' })
+  })
+
+  it('keeps an archived resource unpublished', () => {
+    expect(
+      synchronizeEditorialStatus({
+        data: { editorial_status: 'archived', _status: 'published' },
+        originalDoc: { editorial_status: 'published', _status: 'published' },
+        req: { user: { role: 'admin' } },
+      } as never),
+    ).toMatchObject({ editorial_status: 'archived', _status: 'draft' })
+  })
+
+  it('does not mistake Payload-injected unchanged values for an explicit status change', () => {
+    const data = { editorial_status: 'draft', _status: 'draft', title: 'Titre corrigé' }
+    expect(
+      synchronizeEditorialStatus({
+        data,
+        originalDoc: { editorial_status: 'draft', _status: 'draft' },
+        req: { user: { role: 'admin' } },
+      } as never),
+    ).toBe(data)
   })
 
   it('limits automated updates to unpublished documents', async () => {
