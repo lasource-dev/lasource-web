@@ -8,6 +8,7 @@ Les changements significatifs de LaSource.dev sont consignés ici. Le format sui
 
 - synchronisation automatique du statut éditorial avec le statut de publication Payload ;
 - affichage des catégories et technologies comme tags sur les contenus, avec recommandations calculées par technologies communes ;
+- affichage des tags de classification et des guides ou tutoriels associés sur chaque fiche Technologie ;
 - Payload et PostgreSQL deviennent la source éditoriale canonique ; le build Vercel n'importe plus automatiquement le corpus Markdown historique.
 - l'importeur historique exige désormais l'autorisation explicite `ALLOW_LEGACY_CONTENT_IMPORT=true`.
 
