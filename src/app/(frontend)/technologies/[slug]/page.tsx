@@ -1,10 +1,11 @@
 import config from '@payload-config'
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import { cache } from 'react'
 
-import type { Technology } from '../../../../../payload-types'
+import type { EditorialContent, Technology } from '../../../../../payload-types'
 import { ContentSources } from '../../../../components/ContentSources'
 import { Breadcrumbs } from '../../../../components/Breadcrumbs'
 import { EditorialStatus } from '../../../../components/EditorialStatus'
@@ -50,6 +51,9 @@ const queryPublishedTechnologies: TechnologyQuery = async (slug) => {
 const getTechnology = cache((slug: string) =>
   loadPublishedTechnology(slug, queryPublishedTechnologies),
 )
+
+const contentHref = (content: EditorialContent) =>
+  `/${content.content_type === 'guide' ? 'guides' : 'tutoriels'}/${content.slug}`
 
 export async function generateMetadata({ params }: TechnologyPageProps): Promise<Metadata> {
   const { slug } = await params
@@ -113,6 +117,22 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
   ].filter((link): link is { href: string; label: string } => link !== null)
   const serverURL = readServerEnvironment().NEXT_PUBLIC_SERVER_URL
   const canonical = new URL(`/technologies/${technology.slug}`, serverURL).toString()
+  const payload = await getPayload({ config })
+  const relatedContents = await payload.find({
+    collection: 'editorial-contents',
+    depth: 0,
+    limit: 6,
+    overrideAccess: false,
+    pagination: false,
+    sort: '-published_at',
+    where: {
+      and: [
+        { technologies: { contains: technology.id } },
+        { editorial_status: { equals: 'published' } },
+        { _status: { equals: 'published' } },
+      ],
+    },
+  })
 
   return (
     <main className={styles.page} id="contenu">
@@ -142,7 +162,23 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
       <EditorialStatus status={technology.review_status ?? 'unreviewed'} />
       <h1 className={styles.title}>{technology.canonical_name}</h1>
       <p className={styles.summary}>{technology.short_description}</p>
-      <p className={styles.aliases}>Catégorie : {category.canonical_name}</p>
+      <section aria-labelledby="technology-taxonomy" className={styles.taxonomy}>
+        <h2 className={styles.visuallyHidden} id="technology-taxonomy">
+          Classification de la technologie
+        </h2>
+        <div className={styles.tagGroup}>
+          <h3>Type</h3>
+          <ul className={styles.tags}>
+            <li className={styles.tag}>{category.canonical_name}</li>
+          </ul>
+        </div>
+        <div className={styles.tagGroup}>
+          <h3>Technologie</h3>
+          <ul className={styles.tags}>
+            <li className={styles.tag}>{technology.canonical_name}</li>
+          </ul>
+        </div>
+      </section>
 
       {aliases.length > 0 ? (
         <p className={styles.aliases}>Autres noms : {aliases.join(', ')}</p>
@@ -172,6 +208,24 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
             </a>
           ))}
         </nav>
+      ) : null}
+
+      {relatedContents.docs.length ? (
+        <section aria-labelledby="technology-related-content" className={styles.related}>
+          <h2 id="technology-related-content">
+            Guides et tutoriels sur {technology.canonical_name}
+          </h2>
+          <ul>
+            {relatedContents.docs.map((content) => (
+              <li key={content.id}>
+                <h3>
+                  <Link href={contentHref(content)}>{content.title}</Link>
+                </h3>
+                <p>{content.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : null}
 
       <ContentSources className={styles.sources} sources={technology.source_ids} />
