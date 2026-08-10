@@ -19,7 +19,7 @@ import {
   assertResourceCanBeDeleted,
   assertResourceCanBecomeNonPublic,
 } from './relation/domain'
-import { editorialWriteAccess, forceAutomationDraft } from './editorial/automation-access'
+import { editorialWriteAccess, synchronizeEditorialStatus } from './editorial/automation-access'
 
 const prepareSource: CollectionBeforeValidateHook<Source> = ({ data, operation, originalDoc }) => {
   if (!data) return data
@@ -110,7 +110,7 @@ export const Sources: CollectionConfig = {
   hooks: {
     beforeChange: [preventInvalidatingPublishedTechnologies],
     beforeDelete: [preventDeletingReferencedSource],
-    beforeValidate: [forceAutomationDraft, prepareSource],
+    beforeValidate: [synchronizeEditorialStatus, prepareSource],
   },
   labels: { plural: 'Sources', singular: 'Source' },
   versions: {

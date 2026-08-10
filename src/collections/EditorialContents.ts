@@ -3,7 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { EDITORIAL_STATUSES } from './technology/domain'
 import { REVIEW_STATUSES } from './editorial/review'
 import { validateSlug } from './technology/domain'
-import { editorialWriteAccess, forceAutomationDraft } from './editorial/automation-access'
+import { editorialWriteAccess, synchronizeEditorialStatus } from './editorial/automation-access'
 
 export const EditorialContents: CollectionConfig = {
   slug: 'editorial-contents',
@@ -23,7 +23,7 @@ export const EditorialContents: CollectionConfig = {
           },
   },
   disableDuplicate: true,
-  hooks: { beforeValidate: [forceAutomationDraft] },
+  hooks: { beforeValidate: [synchronizeEditorialStatus] },
   versions: {
     drafts: { autosave: false, schedulePublish: false },
     maxPerDoc: 25,

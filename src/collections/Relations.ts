@@ -1,7 +1,7 @@
 import type { CollectionBeforeValidateHook, CollectionConfig } from 'payload'
 
 import type { Relation, Source, Technology } from '../../payload-types'
-import { editorialWriteAccess, forceAutomationDraft } from './editorial/automation-access'
+import { editorialWriteAccess, synchronizeEditorialStatus } from './editorial/automation-access'
 import {
   assertValidPublishedRelation,
   ENABLED_RELATION_TYPES,
@@ -78,7 +78,7 @@ export const Relations: CollectionConfig = {
           },
   },
   disableDuplicate: true,
-  hooks: { beforeValidate: [forceAutomationDraft, prepareRelation] },
+  hooks: { beforeValidate: [synchronizeEditorialStatus, prepareRelation] },
   indexes: [
     { fields: ['source', 'relation_type'] },
     { fields: ['target', 'relation_type'] },
