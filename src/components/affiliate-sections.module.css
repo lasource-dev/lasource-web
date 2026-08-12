@@ -52,6 +52,21 @@
   padding: 1.25rem;
 }
 
+.cardHeader {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.logo {
+  height: 2.75rem;
+  max-width: 10rem;
+  object-fit: contain;
+  object-position: right top;
+  width: auto;
+}
+
 .card h3 {
   font-size: 1.15rem;
   margin: 0.75rem 0 0;
@@ -94,8 +109,35 @@
 }
 
 .cta {
-  color: var(--signal-dark);
+  align-items: center;
+  background: var(--signal);
+  border: 1px solid var(--signal);
+  border-radius: 0.35rem;
+  color: white;
+  display: inline-flex;
   font-weight: 700;
-  text-decoration-thickness: 0.12em;
-  text-underline-offset: 0.2em;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  text-decoration: none;
+}
+
+.cta:hover {
+  background: var(--signal-dark);
+  border-color: var(--signal-dark);
+}
+
+@media (max-width: 30rem) {
+  .cardHeader {
+    align-items: flex-start;
+    flex-direction: column-reverse;
+  }
+
+  .logo {
+    object-position: left top;
+  }
+
+  .cta {
+    width: 100%;
+  }
 }

@@ -15,6 +15,9 @@ type AffiliateSectionsProps = {
 const partnerName = (partner: string | AffiliatePartner) =>
   typeof partner === 'object' ? partner.name : null
 
+const partnerLogo = (partner: string | AffiliatePartner) =>
+  typeof partner === 'object' ? partner.logo_url : null
+
 const selectionLabels = {
   editorial: 'Sélection éditoriale',
   expert_source: 'Recommandation documentée',
@@ -63,10 +66,24 @@ export function AffiliateSections({ contentSlug, sections }: AffiliateSectionsPr
                 })
                 return (
                   <li className={styles.card} key={offer.id}>
-                    <div className={styles.meta}>
-                      <span>{selectionLabels[offer.selection_basis]}</span>
-                      {commercialLabels[offer.commercial_relationship] ? (
-                        <span>{commercialLabels[offer.commercial_relationship]}</span>
+                    <div className={styles.cardHeader}>
+                      <div className={styles.meta}>
+                        <span>{selectionLabels[offer.selection_basis]}</span>
+                        {commercialLabels[offer.commercial_relationship] ? (
+                          <span>{commercialLabels[offer.commercial_relationship]}</span>
+                        ) : null}
+                      </div>
+                      {partnerLogo(offer.partner) ? (
+                        // Partner logos are managed in Payload and can come from different domains.
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          alt={`Logo ${partnerName(offer.partner) ?? offer.title}`}
+                          className={styles.logo}
+                          height="44"
+                          loading="lazy"
+                          src={partnerLogo(offer.partner) ?? undefined}
+                          width="160"
+                        />
                       ) : null}
                     </div>
                     <h3>{offer.title}</h3>
