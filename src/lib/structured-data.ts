@@ -28,15 +28,19 @@ export const buildArticleData = ({
   description: string
   headline: string
   type?: 'Article' | 'TechArticle'
-}) => ({
-  '@context': 'https://schema.org',
-  '@type': type,
-  dateModified,
-  ...(datePublished ? { datePublished } : {}),
-  description,
-  headline,
-  inLanguage: 'fr-FR',
-  mainEntityOfPage: canonical,
-  publisher: { '@type': 'Organization', name: SITE_NAME, url: 'https://lasource.dev' },
-  url: canonical,
-})
+}) => {
+  const siteURL = new URL(canonical).origin
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': type,
+    dateModified,
+    ...(datePublished ? { datePublished } : {}),
+    description,
+    headline,
+    inLanguage: 'fr-FR',
+    mainEntityOfPage: canonical,
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: siteURL },
+    url: canonical,
+  }
+}

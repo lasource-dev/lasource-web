@@ -8,10 +8,12 @@ import { StructuredData } from '../../components/StructuredData'
 
 import './globals.css'
 
+const siteURL = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+
 export const metadata: Metadata = {
   description:
     'Des fiches, guides et tutoriels clairs pour comprendre les technologies du développement web.',
-  metadataBase: new URL('https://lasource.dev'),
+  metadataBase: new URL(siteURL),
   title: {
     default: 'LaSource.dev — Comprendre les technologies du développement web',
     template: '%s | LaSource.dev',
@@ -32,14 +34,14 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'LaSource.dev',
-              url: 'https://lasource.dev',
+              url: siteURL,
             },
             {
               '@context': 'https://schema.org',
               '@type': 'WebSite',
               inLanguage: 'fr-FR',
               name: 'LaSource.dev',
-              url: 'https://lasource.dev',
+              url: siteURL,
             },
           ]}
         />
