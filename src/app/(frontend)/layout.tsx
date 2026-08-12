@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 import { StructuredData } from '../../components/StructuredData'
 
@@ -15,6 +17,9 @@ export const metadata: Metadata = {
     template: '%s | LaSource.dev',
   },
   twitter: { card: 'summary', site: '@lasourcedev' },
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 }
 
 export default function FrontendLayout({ children }: Readonly<{ children: ReactNode }>) {
@@ -68,6 +73,8 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
             <Link href="/a-propos">À propos</Link>
           </nav>
         </footer>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
