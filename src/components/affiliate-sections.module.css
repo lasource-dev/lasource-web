@@ -1,0 +1,101 @@
+.container {
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+}
+
+.section h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.heading > span,
+.meta span {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.disclosure {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  margin: 0.75rem 0 0;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.card h3 {
+  font-size: 1.15rem;
+  margin: 0.75rem 0 0;
+}
+
+.card > p {
+  line-height: 1.6;
+}
+
+.card .partner {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.card dl {
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding-top: 1rem;
+}
+
+.card dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.card dd {
+  line-height: 1.5;
+  margin: 0.2rem 0 0;
+}
+
+.cta {
+  color: var(--signal-dark);
+  font-weight: 700;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.2em;
+}

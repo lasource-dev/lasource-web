@@ -23,6 +23,7 @@ describe('initial PostgreSQL schema', () => {
       '20260730_131508_editorial_content',
       '20260809_162610_automation_identity',
       '20260810_170800_sync_editorial_status',
+      '20260812_105458_affiliate_recommendations',
     ])
   })
 

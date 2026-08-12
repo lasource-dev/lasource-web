@@ -89,6 +89,16 @@ export const EditorialContents: CollectionConfig = {
       relationTo: 'technologies',
     },
     {
+      name: 'pinned_affiliate_offers',
+      type: 'relationship',
+      admin: {
+        description:
+          'Sélection éditoriale prioritaire. Les ressources restent regroupées par thématique.',
+      },
+      hasMany: true,
+      relationTo: 'affiliate-offers',
+    },
+    {
       name: 'source_ids',
       type: 'relationship',
       hasMany: true,

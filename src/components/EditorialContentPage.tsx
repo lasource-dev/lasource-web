@@ -9,10 +9,12 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { MarkdownContent } from './MarkdownContent'
 import { StructuredData } from './StructuredData'
 import { EditorialStatus } from './EditorialStatus'
+import { AffiliateSections } from './AffiliateSections'
 import type { EditorialContentType } from '../lib/editorial-content-public'
 import { loadPublishedEditorialContent } from '../lib/editorial-content-public'
 import { readServerEnvironment } from '../lib/env'
 import { buildArticleData, buildBreadcrumbData } from '../lib/structured-data'
+import { loadAffiliateSections } from '../lib/affiliate-recommendations'
 
 import styles from '../app/(frontend)/technologies/[slug]/technology.module.css'
 
@@ -87,6 +89,7 @@ export async function EditorialContentPage({ slug, type }: EditorialContentPageP
       })
     : { docs: [] }
   const relatedContents = relatedResult.docs.filter((item) => item.id !== content.id).slice(0, 4)
+  const affiliateSections = await loadAffiliateSections(payload, content)
   const categories = populatedCategories(content)
   const technologies = populatedTechnologies(content)
 
@@ -170,6 +173,7 @@ export async function EditorialContentPage({ slug, type }: EditorialContentPageP
       <article className={styles.content}>
         <MarkdownContent skipLeadingTitle source={content.body_markdown} />
       </article>
+      <AffiliateSections contentSlug={content.slug} sections={affiliateSections} />
       {relatedContents.length ? (
         <section aria-labelledby="related-content" className={styles.related}>
           <h2 id="related-content">À lire aussi sur les mêmes technologies</h2>

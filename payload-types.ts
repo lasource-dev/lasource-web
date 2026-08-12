@@ -73,6 +73,9 @@ export interface Config {
     technologies: Technology;
     'editorial-contents': EditorialContent;
     relations: Relation;
+    'affiliate-partners': AffiliatePartner;
+    'affiliate-offers': AffiliateOffer;
+    'affiliate-events': AffiliateEvent;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +89,9 @@ export interface Config {
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
     'editorial-contents': EditorialContentsSelect<false> | EditorialContentsSelect<true>;
     relations: RelationsSelect<false> | RelationsSelect<true>;
+    'affiliate-partners': AffiliatePartnersSelect<false> | AffiliatePartnersSelect<true>;
+    'affiliate-offers': AffiliateOffersSelect<false> | AffiliateOffersSelect<true>;
+    'affiliate-events': AffiliateEventsSelect<false> | AffiliateEventsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -275,6 +281,10 @@ export interface EditorialContent {
   body_markdown: string;
   categories?: (string | Category)[] | null;
   technologies?: (string | Technology)[] | null;
+  /**
+   * Sélection éditoriale prioritaire. Les ressources restent regroupées par thématique.
+   */
+  pinned_affiliate_offers?: (string | AffiliateOffer)[] | null;
   source_ids: (string | Source)[];
   editorial_status: 'draft' | 'published' | 'archived';
   review_status: 'unreviewed' | 'in_review' | 'validated' | 'update_required';
@@ -287,6 +297,60 @@ export interface EditorialContent {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-offers".
+ */
+export interface AffiliateOffer {
+  id: string;
+  slug: string;
+  title: string;
+  partner: string | AffiliatePartner;
+  resource_type:
+    'book' | 'course' | 'developer_tool' | 'cloud' | 'hosting' | 'monitoring' | 'certification' | 'free_resource';
+  /**
+   * Vide : ressource potentiellement pertinente pour toute technologie.
+   */
+  technologies?: (string | Technology)[] | null;
+  /**
+   * Vide : guides et tutoriels.
+   */
+  content_types?: ('guide' | 'tutorial')[] | null;
+  /**
+   * Vide : tous les niveaux.
+   */
+  levels?: ('beginner' | 'intermediate' | 'advanced' | 'all')[] | null;
+  /**
+   * Apport original de LaSource, jamais copié depuis le marchand.
+   */
+  why_recommended: string;
+  best_for: string;
+  limitations: string;
+  selection_basis: 'tested' | 'researched' | 'expert_source' | 'editorial';
+  last_verified_at: string;
+  commercial_relationship: 'none' | 'affiliate' | 'sponsored' | 'provided_access';
+  destination_url: string;
+  cta_label: string;
+  priority: number;
+  status: 'active' | 'paused' | 'expired';
+  starts_at?: string | null;
+  ends_at?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-partners".
+ */
+export interface AffiliatePartner {
+  id: string;
+  name: string;
+  website_url?: string | null;
+  logo_url?: string | null;
+  status: 'active' | 'inactive';
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -309,6 +373,18 @@ export interface Relation {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-events".
+ */
+export interface AffiliateEvent {
+  id: string;
+  offer: string | AffiliateOffer;
+  content?: (string | null) | EditorialContent;
+  channel: 'web' | 'mcp' | 'newsletter';
+  placement?: string | null;
+  occurred_at: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -357,6 +433,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'relations';
         value: string | Relation;
+      } | null)
+    | ({
+        relationTo: 'affiliate-partners';
+        value: string | AffiliatePartner;
+      } | null)
+    | ({
+        relationTo: 'affiliate-offers';
+        value: string | AffiliateOffer;
+      } | null)
+    | ({
+        relationTo: 'affiliate-events';
+        value: string | AffiliateEvent;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -522,6 +610,7 @@ export interface EditorialContentsSelect<T extends boolean = true> {
   body_markdown?: T;
   categories?: T;
   technologies?: T;
+  pinned_affiliate_offers?: T;
   source_ids?: T;
   editorial_status?: T;
   review_status?: T;
@@ -551,6 +640,56 @@ export interface RelationsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-partners_select".
+ */
+export interface AffiliatePartnersSelect<T extends boolean = true> {
+  name?: T;
+  website_url?: T;
+  logo_url?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-offers_select".
+ */
+export interface AffiliateOffersSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  partner?: T;
+  resource_type?: T;
+  technologies?: T;
+  content_types?: T;
+  levels?: T;
+  why_recommended?: T;
+  best_for?: T;
+  limitations?: T;
+  selection_basis?: T;
+  last_verified_at?: T;
+  commercial_relationship?: T;
+  destination_url?: T;
+  cta_label?: T;
+  priority?: T;
+  status?: T;
+  starts_at?: T;
+  ends_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "affiliate-events_select".
+ */
+export interface AffiliateEventsSelect<T extends boolean = true> {
+  offer?: T;
+  content?: T;
+  channel?: T;
+  placement?: T;
+  occurred_at?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

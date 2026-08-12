@@ -51,6 +51,7 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
             <Link href="/guides">Guides</Link>
             <Link href="/tutoriels">Tutoriels</Link>
             <Link href="/a-propos">À propos</Link>
+            <Link href="/politique-affiliation">Affiliation</Link>
           </nav>
         </header>
         {children}
