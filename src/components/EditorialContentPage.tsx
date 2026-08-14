@@ -1,7 +1,5 @@
-import config from '@payload-config'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getPayload } from 'payload'
 import type { Category, EditorialContent, Technology } from '../../payload-types'
 
 import { ContentSources } from './ContentSources'
@@ -13,6 +11,7 @@ import { AffiliateSections } from './AffiliateSections'
 import type { EditorialContentType } from '../lib/editorial-content-public'
 import { loadPublishedEditorialContent } from '../lib/editorial-content-public'
 import { readServerEnvironment } from '../lib/env'
+import { getApplicationPayload } from '../lib/get-application-payload'
 import { buildArticleData, buildBreadcrumbData } from '../lib/structured-data'
 import { loadAffiliateSections } from '../lib/affiliate-recommendations'
 
@@ -48,7 +47,7 @@ const contentHref = (content: EditorialContent) =>
   `/${content.content_type === 'guide' ? 'guides' : 'tutoriels'}/${content.slug}`
 
 export async function EditorialContentPage({ slug, type }: EditorialContentPageProps) {
-  const payload = await getPayload({ config })
+  const payload = await getApplicationPayload()
   const content = await loadPublishedEditorialContent(slug, type, async (queriedSlug, queriedType) => {
     const result = await payload.find({
       collection: 'editorial-contents',

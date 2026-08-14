@@ -1,4 +1,5 @@
-import config from '@payload-config'
 import { GRAPHQL_POST } from '@payloadcms/next/routes'
 
-export const POST = GRAPHQL_POST(config)
+const loadConfig = () => import('@payload-config').then(({ default: config }) => config)
+
+export const POST = (request: Request) => GRAPHQL_POST(loadConfig())(request)

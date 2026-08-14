@@ -1,8 +1,7 @@
-import config from '@payload-config'
 import type { Metadata } from 'next'
-import { getPayload } from 'payload'
 
 import { ContentIndex } from '../../../components/ContentIndex'
+import { getApplicationPayload } from '../../../lib/get-application-payload'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
 }
 
 export default async function TutorialsIndexPage() {
-  const payload = await getPayload({ config })
+  const payload = await getApplicationPayload()
   const contents = await payload.find({
     collection: 'editorial-contents',
     depth: 0,

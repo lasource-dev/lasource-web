@@ -1,9 +1,8 @@
-import config from '@payload-config'
 import type { Metadata } from 'next'
-import { getPayload } from 'payload'
 
 import { EditorialContentPage } from '../../../../components/EditorialContentPage'
 import { readServerEnvironment } from '../../../../lib/env'
+import { getApplicationPayload } from '../../../../lib/get-application-payload'
 import {
   buildEditorialContentMetadata,
   loadPublishedEditorialContent,
@@ -16,7 +15,7 @@ type PageProps = { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const content = await loadPublishedEditorialContent(slug, 'guide', async () => {
-    const payload = await getPayload({ config })
+    const payload = await getApplicationPayload()
     const result = await payload.find({
       collection: 'editorial-contents',
       limit: 1,
