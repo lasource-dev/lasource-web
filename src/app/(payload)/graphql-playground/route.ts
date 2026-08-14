@@ -1,4 +1,5 @@
-import config from '@payload-config'
 import { GRAPHQL_PLAYGROUND_GET } from '@payloadcms/next/routes'
 
-export const GET = GRAPHQL_PLAYGROUND_GET(config)
+const loadConfig = () => import('@payload-config').then(({ default: config }) => config)
+
+export const GET = (request: Request) => GRAPHQL_PLAYGROUND_GET(loadConfig())(request)

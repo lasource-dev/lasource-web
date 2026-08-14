@@ -1,4 +1,3 @@
-import config from '@payload-config'
 import { type NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 
@@ -7,6 +6,7 @@ const SAFE_PLACEMENT = /^[a-z0-9_-]{1,80}$/
 const SAFE_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+  const { default: config } = await import('@payload-config')
   const { slug } = await params
   if (!SAFE_SLUG.test(slug)) return new NextResponse(null, { status: 404 })
 

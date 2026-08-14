@@ -1,4 +1,3 @@
-import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { readServerEnvironment } from '../../lib/env'
@@ -19,6 +18,7 @@ const escapeXML = (value: string) =>
   })
 
 export async function GET() {
+  const { default: config } = await import('@payload-config')
   const serverURL = readServerEnvironment().NEXT_PUBLIC_SERVER_URL
   const payload = await getPayload({ config })
   const [technologies, contents] = await Promise.all([

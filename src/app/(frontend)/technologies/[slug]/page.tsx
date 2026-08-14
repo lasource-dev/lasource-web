@@ -1,8 +1,6 @@
-import config from '@payload-config'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getPayload } from 'payload'
 import { cache } from 'react'
 
 import type { EditorialContent, Technology } from '../../../../../payload-types'
@@ -12,6 +10,7 @@ import { EditorialStatus } from '../../../../components/EditorialStatus'
 import { MarkdownContent } from '../../../../components/MarkdownContent'
 import { StructuredData } from '../../../../components/StructuredData'
 import { readServerEnvironment } from '../../../../lib/env'
+import { getApplicationPayload } from '../../../../lib/get-application-payload'
 import { buildArticleData, buildBreadcrumbData } from '../../../../lib/structured-data'
 import {
   buildTechnologyMetadata,
@@ -29,7 +28,7 @@ type TechnologyPageProps = {
 }
 
 const queryPublishedTechnologies: TechnologyQuery = async (slug) => {
-  const payload = await getPayload({ config })
+  const payload = await getApplicationPayload()
   const result = await payload.find({
     collection: 'technologies',
     depth: 1,
@@ -117,7 +116,7 @@ export default async function TechnologyPage({ params }: TechnologyPageProps) {
   ].filter((link): link is { href: string; label: string } => link !== null)
   const serverURL = readServerEnvironment().NEXT_PUBLIC_SERVER_URL
   const canonical = new URL(`/technologies/${technology.slug}`, serverURL).toString()
-  const payload = await getPayload({ config })
+  const payload = await getApplicationPayload()
   const relatedContents = await payload.find({
     collection: 'editorial-contents',
     depth: 0,

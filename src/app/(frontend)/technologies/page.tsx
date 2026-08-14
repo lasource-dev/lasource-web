@@ -1,8 +1,7 @@
-import config from '@payload-config'
 import type { Metadata } from 'next'
-import { getPayload } from 'payload'
 
 import { ContentIndex } from '../../../components/ContentIndex'
+import { getApplicationPayload } from '../../../lib/get-application-payload'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
@@ -11,8 +10,14 @@ export const metadata: Metadata = {
   title: 'Technologies du développement web',
 }
 
-export default async function TechnologiesIndexPage() {
-  const payload = await getPayload({ config })
+export default async function TechnologiesIndexPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string | string[] }>
+}) {
+  const requestedQuery = (await searchParams).q
+  const search = (Array.isArray(requestedQuery) ? requestedQuery[0] : requestedQuery)?.trim().slice(0, 80) ?? ''
+  const payload = await getApplicationPayload()
   const technologies = await payload.find({
     collection: 'technologies',
     depth: 0,
@@ -20,7 +25,13 @@ export default async function TechnologiesIndexPage() {
     overrideAccess: false,
     pagination: false,
     sort: 'canonical_name',
-    where: { and: [{ editorial_status: { equals: 'published' } }, { _status: { equals: 'published' } }] },
+    where: {
+      and: [
+        { editorial_status: { equals: 'published' } },
+        { _status: { equals: 'published' } },
+        ...(search ? [{ canonical_name: { contains: search } }] : []),
+      ],
+    },
   })
 
   return (
@@ -31,6 +42,7 @@ export default async function TechnologiesIndexPage() {
         href: `/technologies/${technology.slug}`,
         title: technology.canonical_name,
       }))}
+      search={search}
       title="Technologies"
     />
   )

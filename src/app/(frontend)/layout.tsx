@@ -12,10 +12,10 @@ const siteURL = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000').
 
 export const metadata: Metadata = {
   description:
-    'Des fiches, guides et tutoriels clairs pour comprendre les technologies du développement web.',
+    'Des fiches, guides et tutoriels clairs pour comprendre les technologies du Web et de l’intelligence artificielle.',
   metadataBase: new URL(siteURL),
   title: {
-    default: 'LaSource.dev — Comprendre les technologies du développement web',
+    default: 'LaSource.dev — Comprendre les technologies du Web et de l’intelligence artificielle',
     template: '%s | LaSource.dev',
   },
   twitter: { card: 'summary', site: '@lasourcedev' },
@@ -58,14 +58,13 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
             <Link href="/guides">Guides</Link>
             <Link href="/tutoriels">Tutoriels</Link>
             <Link href="/a-propos">À propos</Link>
-            <Link href="/politique-affiliation">Affiliation</Link>
           </nav>
         </header>
         {children}
         <footer className="site-footer">
           <p>
-            Des fiches, guides et tutoriels clairs pour comprendre les technologies du
-            développement web.
+            Des fiches, guides et tutoriels clairs pour comprendre les technologies du Web et de
+            l’intelligence artificielle.
           </p>
           <nav aria-label="Navigation de pied de page">
             <Link href="/">Accueil</Link>
@@ -73,6 +72,7 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
             <Link href="/guides">Guides</Link>
             <Link href="/tutoriels">Tutoriels</Link>
             <Link href="/a-propos">À propos</Link>
+            <Link href="/politique-affiliation">Affiliation</Link>
           </nav>
         </footer>
         <Analytics />
