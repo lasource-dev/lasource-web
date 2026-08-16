@@ -1,0 +1,40 @@
+.page { margin: 0 auto; max-width: 76rem; padding: 0 1.5rem 6rem; }
+.breadcrumb { color: var(--muted); display: flex; flex-wrap: wrap; font-size: .82rem; gap: .55rem; padding-top: 2rem; }
+.breadcrumb a { color: inherit; }
+.hero { border-bottom: 1px solid var(--border); padding: clamp(4rem, 9vw, 7rem) 0 3rem; }
+.hero h1, .profileHero h1 { font-size: clamp(2.7rem, 7vw, 5.4rem); letter-spacing: -.055em; line-height: 1; margin: 0; max-width: 14ch; }
+.hero > p:last-child, .intro { color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.3rem); line-height: 1.65; max-width: 48rem; }
+.eyebrow { color: var(--signal); font-size: .76rem; font-weight: 800; letter-spacing: .12em; margin: 0 0 1rem; text-transform: uppercase; }
+.directory { display: grid; gap: 1px; grid-template-columns: repeat(3, 1fr); padding-top: 3rem; }
+.card { background: var(--panel); border: 1px solid var(--border); display: flex; flex-direction: column; min-height: 24rem; padding: 1.5rem; }
+.card h2 { font-size: 1.65rem; letter-spacing: -.035em; margin: .3rem 0 0; }
+.card > p { color: var(--muted); line-height: 1.6; }
+.location { color: var(--signal-dark); font-size: .72rem; font-weight: 800; margin: 0; text-transform: uppercase; }
+.card dl { border-top: 1px solid var(--border); margin: auto 0 1.5rem; padding-top: 1rem; }
+.card dl div + div { margin-top: .8rem; }
+.card dt, .identity dt { color: var(--muted); font-size: .72rem; }
+.card dd, .identity dd { line-height: 1.45; margin: .2rem 0 0; }
+.card > a { color: var(--signal-dark); font-weight: 800; }
+.profileHero { align-items: end; display: grid; gap: clamp(2rem, 7vw, 6rem); grid-template-columns: 1.4fr .8fr; padding: clamp(4rem, 9vw, 7rem) 0 4rem; }
+.identity { background: var(--panel); border: 1px solid var(--border); padding: 1.5rem; }
+.identity dl { margin: 0 0 1.5rem; }
+.identity dl div { border-bottom: 1px solid var(--border); padding: .8rem 0; }
+.identity a { background: var(--signal); color: white; display: block; font-weight: 800; padding: .85rem 1rem; text-align: center; text-decoration: none; }
+.overview { border-block: 1px solid var(--border); display: grid; gap: 4rem; grid-template-columns: 1fr 1fr; padding: 4rem 0; }
+.overview h2, .prosCons h2, .prices > h2, .sources h2 { font-size: clamp(1.7rem, 3vw, 2.5rem); letter-spacing: -.04em; margin: 0 0 1.2rem; }
+.overview p, .prosCons li, .priceNote, .sources p { color: var(--muted); line-height: 1.7; }
+.serviceList { align-content: center; display: flex; flex-wrap: wrap; gap: .6rem; }
+.serviceList span { background: var(--panel); border: 1px solid var(--border); font-size: .85rem; font-weight: 750; padding: .7rem .85rem; }
+.prosCons { display: grid; gap: 1px; grid-template-columns: 1fr 1fr; padding: 4rem 0; }
+.prosCons article { background: var(--panel); border: 1px solid var(--border); padding: clamp(1.5rem, 4vw, 2.5rem); }
+.prosCons ul { margin: 0; padding-left: 1.2rem; }
+.prosCons li + li { margin-top: .65rem; }
+.prices { border-top: 1px solid var(--border); padding-top: 4rem; }
+.prices :global(.gpu-comparator) { padding-top: 2rem; }
+.priceNote { margin-bottom: 0; }
+.empty { background: var(--panel); border: 1px solid var(--border); padding: 2rem; }
+.sources { border-top: 1px solid var(--border); margin-top: 4rem; padding-top: 3rem; }
+.sources ul { display: flex; flex-wrap: wrap; gap: 1.5rem; padding-left: 1rem; }
+.sources a { color: var(--signal-dark); font-weight: 750; }
+@media (max-width: 58rem) { .directory { grid-template-columns: repeat(2, 1fr); } .profileHero, .overview { grid-template-columns: 1fr; } }
+@media (max-width: 38rem) { .directory, .prosCons { grid-template-columns: 1fr; } .card { min-height: 20rem; } }
