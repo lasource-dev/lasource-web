@@ -12,6 +12,7 @@
 .comparatorHeading { align-items: end; display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
 .comparatorHeading h2, .methodology h2 { font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.04em; margin: 0; }
 .comparatorHeading > p { color: var(--muted); margin: 0; }
+.disclosure { border-left: 3px solid var(--signal); color: var(--muted); font-size: .85rem; line-height: 1.6; margin: 0 0 1.25rem; max-width: 48rem; padding-left: 1rem; }
 .filters { align-items: end; background: var(--panel); border: 1px solid var(--border); display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(9rem, 1fr)) auto auto; padding: 1.25rem; }
 .filters label { font-size: .82rem; font-weight: 750; }
 .filters select { background: white; border: 1px solid var(--border); color: var(--ink); display: block; margin-top: .45rem; padding: .7rem; width: 100%; }

@@ -25,15 +25,38 @@ const suggestedUses = (vram: number): GPUOffer['uses'] => {
 export default async function GPUResourcesPage() {
   const payload = await getApplicationPayload()
   const now = new Date().toISOString()
-  const result = await payload.find({
-    collection: 'gpu-prices',
-    depth: 0,
-    limit: 500,
-    overrideAccess: false,
-    pagination: false,
-    sort: 'price_per_gpu_hour_usd',
-    where: { and: [{ available: { equals: true } }, { expires_at: { greater_than: now } }] },
-  })
+  const [result, affiliateOffers] = await Promise.all([
+    payload.find({
+      collection: 'gpu-prices',
+      depth: 0,
+      limit: 500,
+      overrideAccess: false,
+      pagination: false,
+      sort: 'price_per_gpu_hour_usd',
+      where: { and: [{ available: { equals: true } }, { expires_at: { greater_than: now } }] },
+    }),
+    payload.find({
+      collection: 'affiliate-offers',
+      depth: 1,
+      limit: 100,
+      overrideAccess: false,
+      pagination: false,
+      where: {
+        and: [
+          { status: { equals: 'active' } },
+          { commercial_relationship: { equals: 'affiliate' } },
+          { resource_type: { in: ['cloud', 'hosting'] } },
+        ],
+      },
+    }),
+  ])
+  const affiliateSlugByProvider = new Map(
+    affiliateOffers.docs.flatMap((offer) =>
+      typeof offer.partner === 'object'
+        ? [[offer.partner.name.toLocaleLowerCase('fr-FR'), offer.slug] as const]
+        : [],
+    ),
+  )
   const liveOffers: GPUOffer[] = result.docs.map((price, index) => ({
     gpu: price.gpu_model,
     id: index + 1,
@@ -46,7 +69,12 @@ export default async function GPUResourcesPage() {
     uses: suggestedUses(price.vram_gb ?? 0),
     vram: price.vram_gb ?? 0,
   }))
-  const offers = liveOffers.length ? liveOffers : GPU_OFFERS
+  const offers = (liveOffers.length ? liveOffers : GPU_OFFERS).map((offer) => {
+    const affiliateSlug = affiliateSlugByProvider.get(offer.provider.toLocaleLowerCase('fr-FR'))
+    if (!affiliateSlug) return offer
+    const query = new URLSearchParams({ placement: 'gpu-comparator', ref: 'ressources-gpu', src: 'web' })
+    return { ...offer, affiliate: true, url: `/go/${affiliateSlug}?${query.toString()}` }
+  })
   const latestObservation = liveOffers.length
     ? result.docs.reduce((latest, price) => price.observed_at > latest ? price.observed_at : latest, result.docs[0]!.observed_at)
     : GPU_DATA_DATE

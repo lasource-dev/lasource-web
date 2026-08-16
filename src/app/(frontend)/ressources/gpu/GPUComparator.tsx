@@ -49,6 +49,14 @@ export function GPUComparator({ offers: sourceOffers }: { offers: GPUOffer[] }) 
         <p aria-live="polite"><strong>{offers.length}</strong> offre{offers.length > 1 ? 's' : ''} affichée{offers.length > 1 ? 's' : ''}</p>
       </div>
 
+      {sourceOffers.some((offer) => offer.affiliate) ? (
+        <p className={styles.disclosure}>
+          Certaines offres comportent un lien affilié, clairement signalé. LaSource peut recevoir
+          une commission sans surcoût pour vous. Cela ne modifie ni les prix affichés ni leur
+          classement.
+        </p>
+      ) : null}
+
       <form className={styles.filters} onSubmit={(event) => event.preventDefault()}>
         <label>Modèle GPU
           <select onChange={(event) => setGpu(event.target.value)} value={gpu}>
@@ -87,7 +95,17 @@ export function GPUComparator({ offers: sourceOffers }: { offers: GPUOffer[] }) 
                 <td><span className={styles.price}>{euro.format(price)}</span>{bestForModel ? <span className={styles.best}>Moins cher pour ce GPU</span> : null}</td>
                 <td><span className={`${styles.tag} ${styles[offer.pricing]}`}>{pricingLabels[offer.pricing]}</span></td>
                 <td>{offer.region}</td>
-                <td><a className={styles.cta} href={offer.url} rel="noopener noreferrer" target="_blank">Voir l’offre<span className="visually-hidden"> de {offer.provider} (nouvel onglet)</span></a></td>
+                <td>
+                  <a
+                    className={styles.cta}
+                    href={offer.url}
+                    rel={offer.affiliate ? 'sponsored noopener' : 'noopener noreferrer'}
+                    target="_blank"
+                  >
+                    Voir l’offre{offer.affiliate ? ' · Affilié' : ''}
+                    <span className="visually-hidden"> de {offer.provider} (nouvel onglet)</span>
+                  </a>
+                </td>
               </tr>
             })}
           </tbody>
