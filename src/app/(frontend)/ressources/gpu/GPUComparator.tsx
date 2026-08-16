@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Link from 'next/link'
 
 import { EUR_RATE, type GPUOffer } from './gpu-data'
 import styles from './gpu.module.css'
@@ -89,7 +90,7 @@ export function GPUComparator({ offers: sourceOffers }: { offers: GPUOffer[] }) 
               const bestForModel = offer.priceUsd === lowestByGpu.get(offer.gpu)
               const price = offer.priceUsd * EUR_RATE * (monthly ? 730 : 1)
               return <tr key={offer.id}>
-                <td><strong>{offer.provider}</strong></td>
+                <td><strong>{offer.providerSlug ? <Link href={`/ressources/gpu/fournisseurs/${offer.providerSlug}`}>{offer.provider}</Link> : offer.provider}</strong></td>
                 <td>{offer.gpu}</td>
                 <td>{offer.vram} Go</td>
                 <td><span className={styles.price}>{euro.format(price)}</span>{bestForModel ? <span className={styles.best}>Moins cher pour ce GPU</span> : null}</td>

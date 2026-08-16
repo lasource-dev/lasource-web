@@ -5,6 +5,7 @@ export type GPUOffer = {
   priceUsd: number
   pricing: 'on-demand' | 'reserved' | 'spot'
   provider: string
+  providerSlug?: string
   region: string
   reliability: 2 | 3 | 4 | 5
   url: string

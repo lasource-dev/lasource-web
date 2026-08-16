@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getApplicationPayload } from '../../../../lib/get-application-payload'
 import { GPUComparator } from './GPUComparator'
 import { EUR_RATE, GPU_DATA_DATE, GPU_OFFERS, type GPUOffer } from './gpu-data'
+import { getGPUProviderSlug } from './providers'
 import styles from './gpu.module.css'
 
 export const metadata: Metadata = {
@@ -70,10 +71,11 @@ export default async function GPUResourcesPage() {
     vram: price.vram_gb ?? 0,
   }))
   const offers = (liveOffers.length ? liveOffers : GPU_OFFERS).map((offer) => {
+    const providerSlug = getGPUProviderSlug(offer.provider)
     const affiliateSlug = affiliateSlugByProvider.get(offer.provider.toLocaleLowerCase('fr-FR'))
-    if (!affiliateSlug) return offer
+    if (!affiliateSlug) return { ...offer, providerSlug }
     const query = new URLSearchParams({ placement: 'gpu-comparator', ref: 'ressources-gpu', src: 'web' })
-    return { ...offer, affiliate: true, url: `/go/${affiliateSlug}?${query.toString()}` }
+    return { ...offer, affiliate: true, providerSlug, url: `/go/${affiliateSlug}?${query.toString()}` }
   })
   const latestObservation = liveOffers.length
     ? result.docs.reduce((latest, price) => price.observed_at > latest ? price.observed_at : latest, result.docs[0]!.observed_at)
@@ -97,6 +99,8 @@ export default async function GPUResourcesPage() {
       Les prix sont indicatifs, hors stockage, trafic, taxes et frais annexes. Vérifiez le tarif final avant toute location.
     </aside>
 
+    <p><Link href="/ressources/gpu/fournisseurs">Découvrir les fiches détaillées des fournisseurs GPU cloud →</Link></p>
+
     <GPUComparator offers={offers} />
 
     <section aria-labelledby="methodologie" className={styles.methodology}>
@@ -104,7 +108,7 @@ export default async function GPUResourcesPage() {
       <div>
         <p>Les prix sources sont exprimés en dollars et convertis avec un taux de démonstration de 1 USD = {EUR_RATE.toLocaleString('fr-FR')} EUR. L’estimation mensuelle correspond à 730 heures continues.</p>
         <p>Le badge « Moins cher » compare uniquement des offres utilisant le même modèle de GPU. L’indication ne constitue pas une recommandation : disponibilité, processeur, mémoire système, stockage, bande passante et conditions d’interruption peuvent changer le coût réel.</p>
-        <p>Les liens de cette version ne sont pas affiliés. Toute future relation commerciale sera signalée conformément à notre <Link href="/politique-affiliation">politique d’affiliation</Link>.</p>
+        <p>Certains liens peuvent être affiliés et sont alors signalés sans modifier le classement des offres. Consultez notre <Link href="/politique-affiliation">politique d’affiliation</Link>.</p>
       </div>
     </section>
   </main>

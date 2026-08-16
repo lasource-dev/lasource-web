@@ -1,6 +1,7 @@
 import { getPayload } from 'payload'
 
 import { readServerEnvironment } from '../../lib/env'
+import { GPU_PROVIDERS } from '../(frontend)/ressources/gpu/providers'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -41,8 +42,11 @@ export async function GET() {
   ])
 
   const urls: { lastModified?: string; location: string }[] = [
-    ...['', '/a-propos', '/politique-affiliation', '/technologies', '/guides', '/tutoriels', '/ressources/gpu'].map((path) => ({
+    ...['', '/a-propos', '/politique-affiliation', '/technologies', '/guides', '/tutoriels', '/ressources/gpu', '/ressources/gpu/fournisseurs'].map((path) => ({
       location: `${serverURL}${path}`,
+    })),
+    ...GPU_PROVIDERS.map((provider) => ({
+      location: `${serverURL}/ressources/gpu/fournisseurs/${provider.slug}`,
     })),
     ...technologies.docs.map((technology) => ({
       lastModified: technology.updatedAt,
