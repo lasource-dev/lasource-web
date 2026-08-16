@@ -10,6 +10,7 @@ import { Relations } from './collections/Relations'
 import { AffiliatePartners } from './collections/AffiliatePartners'
 import { AffiliateOffers } from './collections/AffiliateOffers'
 import { AffiliateEvents } from './collections/AffiliateEvents'
+import { GPUPrices } from './collections/GPUPrices'
 import { readServerEnvironment } from './lib/env'
 
 const environment = readServerEnvironment()
@@ -28,6 +29,7 @@ export default buildConfig({
     AffiliatePartners,
     AffiliateOffers,
     AffiliateEvents,
+    GPUPrices,
   ],
   db: postgresAdapter({
     idType: 'uuid',

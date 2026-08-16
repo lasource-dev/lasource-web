@@ -1,0 +1,83 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+
+import { getApplicationPayload } from '../../../../lib/get-application-payload'
+import { GPUComparator } from './GPUComparator'
+import { EUR_RATE, GPU_DATA_DATE, GPU_OFFERS, type GPUOffer } from './gpu-data'
+import styles from './gpu.module.css'
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/ressources/gpu' },
+  description: 'Comparez des offres de location de GPU cloud par modèle, prix, région et cas d’usage.',
+  title: 'Comparateur de GPU cloud',
+}
+
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'UTC' })
+
+export const dynamic = 'force-dynamic'
+
+const suggestedUses = (vram: number): GPUOffer['uses'] => {
+  if (vram >= 80) return ['training', 'fine-tuning', 'inference']
+  if (vram >= 24) return ['fine-tuning', 'inference']
+  return ['inference']
+}
+
+export default async function GPUResourcesPage() {
+  const payload = await getApplicationPayload()
+  const now = new Date().toISOString()
+  const result = await payload.find({
+    collection: 'gpu-prices',
+    depth: 0,
+    limit: 500,
+    overrideAccess: false,
+    pagination: false,
+    sort: 'price_per_gpu_hour_usd',
+    where: { and: [{ available: { equals: true } }, { expires_at: { greater_than: now } }] },
+  })
+  const liveOffers: GPUOffer[] = result.docs.map((price, index) => ({
+    gpu: price.gpu_model,
+    id: index + 1,
+    priceUsd: price.price_per_gpu_hour_usd,
+    pricing: price.pricing_type,
+    provider: price.provider,
+    region: price.region,
+    reliability: 4,
+    url: price.source_url,
+    uses: suggestedUses(price.vram_gb ?? 0),
+    vram: price.vram_gb ?? 0,
+  }))
+  const offers = liveOffers.length ? liveOffers : GPU_OFFERS
+  const latestObservation = liveOffers.length
+    ? result.docs.reduce((latest, price) => price.observed_at > latest ? price.observed_at : latest, result.docs[0]!.observed_at)
+    : GPU_DATA_DATE
+  const providers = new Set(offers.map((offer) => offer.provider)).size
+
+  return <main className={styles.page} id="contenu">
+    <section className={styles.hero}>
+      <p className={styles.eyebrow}>Ressources GPU</p>
+      <h1>Trouver un GPU cloud adapté à votre projet</h1>
+      <p className={styles.lead}>Comparez les offres par matériel, cas d’usage, mode de tarification et région. Cette première version sert à valider les critères utiles avant l’automatisation des relevés.</p>
+      <dl className={styles.summary}>
+        <div><dt>Relevés</dt><dd>{offers.length}</dd></div>
+        <div><dt>Fournisseurs</dt><dd>{providers}</dd></div>
+        <div><dt>Dernier relevé</dt><dd>{dateFormatter.format(new Date(latestObservation))}</dd></div>
+      </dl>
+    </section>
+
+    <aside className={styles.notice}>
+      <strong>{liveOffers.length ? 'Prix issus des API fournisseurs.' : 'Données de démonstration.'}</strong>{' '}
+      Les prix sont indicatifs, hors stockage, trafic, taxes et frais annexes. Vérifiez le tarif final avant toute location.
+    </aside>
+
+    <GPUComparator offers={offers} />
+
+    <section aria-labelledby="methodologie" className={styles.methodology}>
+      <div><p className={styles.eyebrow}>Transparence</p><h2 id="methodologie">Comment lire ce comparateur</h2></div>
+      <div>
+        <p>Les prix sources sont exprimés en dollars et convertis avec un taux de démonstration de 1 USD = {EUR_RATE.toLocaleString('fr-FR')} EUR. L’estimation mensuelle correspond à 730 heures continues.</p>
+        <p>Le badge « Moins cher » compare uniquement des offres utilisant le même modèle de GPU. L’indication ne constitue pas une recommandation : disponibilité, processeur, mémoire système, stockage, bande passante et conditions d’interruption peuvent changer le coût réel.</p>
+        <p>Les liens de cette version ne sont pas affiliés. Toute future relation commerciale sera signalée conformément à notre <Link href="/politique-affiliation">politique d’affiliation</Link>.</p>
+      </div>
+    </section>
+  </main>
+}

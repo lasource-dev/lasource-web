@@ -76,6 +76,7 @@ export interface Config {
     'affiliate-partners': AffiliatePartner;
     'affiliate-offers': AffiliateOffer;
     'affiliate-events': AffiliateEvent;
+    'gpu-prices': GpuPrice;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -92,6 +93,7 @@ export interface Config {
     'affiliate-partners': AffiliatePartnersSelect<false> | AffiliatePartnersSelect<true>;
     'affiliate-offers': AffiliateOffersSelect<false> | AffiliateOffersSelect<true>;
     'affiliate-events': AffiliateEventsSelect<false> | AffiliateEventsSelect<true>;
+    'gpu-prices': GpuPricesSelect<false> | GpuPricesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -388,6 +390,30 @@ export interface AffiliateEvent {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gpu-prices".
+ */
+export interface GpuPrice {
+  id: string;
+  external_key: string;
+  source: 'azure' | 'runpod' | 'vast';
+  provider: string;
+  provider_sku: string;
+  gpu_model: string;
+  gpu_count: number;
+  vram_gb?: number | null;
+  region: string;
+  pricing_type: 'on-demand' | 'spot' | 'reserved';
+  price_per_gpu_hour_usd: number;
+  total_hourly_usd: number;
+  available: boolean;
+  source_url: string;
+  observed_at: string;
+  expires_at: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -445,6 +471,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'affiliate-events';
         value: string | AffiliateEvent;
+      } | null)
+    | ({
+        relationTo: 'gpu-prices';
+        value: string | GpuPrice;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -690,6 +720,29 @@ export interface AffiliateEventsSelect<T extends boolean = true> {
   channel?: T;
   placement?: T;
   occurred_at?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gpu-prices_select".
+ */
+export interface GpuPricesSelect<T extends boolean = true> {
+  external_key?: T;
+  source?: T;
+  provider?: T;
+  provider_sku?: T;
+  gpu_model?: T;
+  gpu_count?: T;
+  vram_gb?: T;
+  region?: T;
+  pricing_type?: T;
+  price_per_gpu_hour_usd?: T;
+  total_hourly_usd?: T;
+  available?: T;
+  source_url?: T;
+  observed_at?: T;
+  expires_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
