@@ -1,4 +1,5 @@
 export type GPUOffer = {
+  affiliate?: boolean
   gpu: string
   id: number
   priceUsd: number
