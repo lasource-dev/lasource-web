@@ -57,6 +57,7 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
             <Link href="/technologies">Technologies</Link>
             <Link href="/guides">Guides</Link>
             <Link href="/tutoriels">Tutoriels</Link>
+            <Link href="/ressources/gpu">GPU cloud</Link>
             <Link href="/a-propos">À propos</Link>
           </nav>
         </header>
@@ -71,6 +72,7 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
             <Link href="/technologies">Technologies</Link>
             <Link href="/guides">Guides</Link>
             <Link href="/tutoriels">Tutoriels</Link>
+            <Link href="/ressources/gpu">GPU cloud</Link>
             <Link href="/a-propos">À propos</Link>
             <Link href="/politique-affiliation">Affiliation</Link>
           </nav>

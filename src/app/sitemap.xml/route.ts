@@ -41,7 +41,7 @@ export async function GET() {
   ])
 
   const urls: { lastModified?: string; location: string }[] = [
-    ...['', '/a-propos', '/politique-affiliation', '/technologies', '/guides', '/tutoriels'].map((path) => ({
+    ...['', '/a-propos', '/politique-affiliation', '/technologies', '/guides', '/tutoriels', '/ressources/gpu'].map((path) => ({
       location: `${serverURL}${path}`,
     })),
     ...technologies.docs.map((technology) => ({

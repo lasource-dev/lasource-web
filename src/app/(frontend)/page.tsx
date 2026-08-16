@@ -19,7 +19,7 @@ const contentTypes = [
   ['Tutoriels', 'Réalisez pas à pas une tâche concrète.', '/tutoriels'],
   ['Comparatifs', 'Comparez plusieurs solutions à partir de critères clairs.', undefined],
   ['Mises à jour', 'Retrouvez les changements importants des technologies que vous utilisez.', undefined],
-  ['Ressources', 'Accédez aux documentations, dépôts et publications de référence.', undefined],
+  ['Ressources GPU', 'Comparez les offres de GPU cloud par matériel, prix et région.', '/ressources/gpu'],
 ] as const
 
 const formatDate = new Intl.DateTimeFormat('fr-FR', {
