@@ -1,7 +1,9 @@
 import type { Payload } from 'payload'
 
 import { azureConnector } from './azure'
+import { createGoogleCloudConnector } from './google-cloud'
 import { createRunPodConnector } from './runpod'
+import { createScalewayConnector } from './scaleway'
 import type { GPUPriceConnector, GPUPriceSource, NormalizedGPUPrice } from './types'
 import { createVastConnector } from './vast'
 
@@ -32,11 +34,14 @@ const persistenceData = (price: NormalizedGPUPrice) => ({
 })
 
 export function configuredGPUConnectors(environment: Record<string, string | undefined> = process.env): GPUPriceConnector[] {
-  return [
+  const connectors: GPUPriceConnector[] = [
     azureConnector,
     createRunPodConnector(environment.RUNPOD_API_KEY),
     createVastConnector(environment.VAST_API_KEY),
   ]
+  if (environment.GOOGLE_CLOUD_BILLING_API_KEY) connectors.push(createGoogleCloudConnector(environment.GOOGLE_CLOUD_BILLING_API_KEY))
+  if (environment.SCALEWAY_SECRET_KEY) connectors.push(createScalewayConnector(environment.SCALEWAY_SECRET_KEY))
+  return connectors
 }
 
 export async function syncGPUPrices(payload: Payload, connectors = configuredGPUConnectors()): Promise<SyncResult> {

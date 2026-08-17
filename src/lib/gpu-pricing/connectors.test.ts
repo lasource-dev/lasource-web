@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { normalizeAzureItem } from './azure'
+import { normalizeGoogleCloudSKU } from './google-cloud'
 import { normalizeRunPodGPU } from './runpod'
+import { normalizeScalewayServer } from './scaleway'
 import { configuredGPUConnectors } from './sync'
 import { normalizeVastOffer } from './vast'
 
@@ -76,8 +78,27 @@ describe('GPU pricing connectors', () => {
     }, observedAt)).toMatchObject({ gpuCount: 4, gpuModel: 'RTX 4090', pricePerGpuHourUsd: 0.3, vramGb: 24 })
   })
 
+  it('normalizes a Google Cloud GPU SKU', () => {
+    expect(normalizeGoogleCloudSKU({
+      category: { usageType: 'OnDemand' },
+      description: 'Nvidia Tesla A100 80GB GPU attached to Spot VMs',
+      geoTaxonomy: { regions: ['europe-west4'] },
+      pricingInfo: [{ pricingExpression: { tieredRates: [{ startUsageAmount: 0, unitPrice: { units: '2', nanos: 250_000_000 } }], usageUnit: 'h' } }],
+      skuId: 'google-sku',
+    }, observedAt)).toMatchObject({ gpuModel: 'A100 80GB', pricePerGpuHourUsd: 2.25, provider: 'Google Cloud' })
+  })
+
+  it('normalizes a Scaleway multi-GPU instance and converts its euro price', () => {
+    expect(normalizeScalewayServer('H100-2-80G', {
+      available: true,
+      gpu: 2,
+      gpu_info: { gpu_memory: 80_000_000_000, gpu_name: 'NVIDIA H100' },
+      hourly_price: { currency_code: 'EUR', units: '6', nanos: 880_000_000 },
+    }, 'fr-par-2', observedAt)).toMatchObject({ gpuCount: 2, pricePerGpuHourUsd: 4, provider: 'Scaleway', vramGb: 80 })
+  })
+
   it('enables every public pricing connector without requiring API keys', () => {
     expect(configuredGPUConnectors({}).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast'])
-    expect(configuredGPUConnectors({ RUNPOD_API_KEY: 'runpod', VAST_API_KEY: 'vast' }).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast'])
+    expect(configuredGPUConnectors({ GOOGLE_CLOUD_BILLING_API_KEY: 'google', RUNPOD_API_KEY: 'runpod', SCALEWAY_SECRET_KEY: 'scaleway', VAST_API_KEY: 'vast' }).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast', 'google-cloud', 'scaleway'])
   })
 })

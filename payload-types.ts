@@ -395,7 +395,7 @@ export interface AffiliateEvent {
 export interface GpuPrice {
   id: string;
   external_key: string;
-  source: 'azure' | 'runpod' | 'vast';
+  source: 'azure' | 'google-cloud' | 'runpod' | 'scaleway' | 'vast';
   provider: string;
   provider_sku: string;
   gpu_model: string;

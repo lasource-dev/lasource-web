@@ -1,4 +1,4 @@
-export const GPU_PRICE_SOURCES = ['azure', 'runpod', 'vast'] as const
+export const GPU_PRICE_SOURCES = ['azure', 'google-cloud', 'runpod', 'scaleway', 'vast'] as const
 export type GPUPriceSource = (typeof GPU_PRICE_SOURCES)[number]
 
 export type NormalizedGPUPrice = {

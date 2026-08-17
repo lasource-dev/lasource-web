@@ -23,7 +23,9 @@ export const GPUPrices: CollectionConfig = {
       index: true,
       options: [
         { label: 'Azure Retail Prices', value: 'azure' },
+        { label: 'Google Cloud Billing', value: 'google-cloud' },
         { label: 'RunPod', value: 'runpod' },
+        { label: 'Scaleway', value: 'scaleway' },
         { label: 'Vast.ai', value: 'vast' },
       ],
       required: true,
