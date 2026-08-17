@@ -35,13 +35,18 @@ export function normalizeVastOffer(offer: VastOffer, observedAt: string): Normal
   }
 }
 
-export function createVastConnector(apiKey: string): GPUPriceConnector {
+export function createVastConnector(apiKey?: string): GPUPriceConnector {
   return {
     source: 'vast',
     async fetchPrices(fetcher = fetch) {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'LaSource.dev GPU comparator',
+      }
+      if (apiKey) headers.Authorization = `Bearer ${apiKey}`
       const response = await fetcher(ENDPOINT, {
         body: JSON.stringify({ limit: 100, order: [['dph_total', 'asc']], rentable: { eq: true }, rented: { eq: false }, type: 'on-demand', verified: { eq: true } }),
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'User-Agent': 'LaSource.dev GPU comparator' },
+        headers,
         method: 'POST',
       })
       if (!response.ok) throw new Error(`Vast.ai pricing returned ${response.status}`)

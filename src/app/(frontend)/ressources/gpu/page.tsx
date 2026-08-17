@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import { getApplicationPayload } from '../../../../lib/get-application-payload'
 import { GPUComparator } from './GPUComparator'
-import { EUR_RATE, GPU_DATA_DATE, GPU_OFFERS, type GPUOffer } from './gpu-data'
+import { EUR_RATE, type GPUOffer } from './gpu-data'
 import { getGPUProviderSlug } from './providers'
 import styles from './gpu.module.css'
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'Comparateur de GPU cloud',
 }
 
-const dateFormatter = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'UTC' })
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/Paris' })
 
 export const dynamic = 'force-dynamic'
 
@@ -70,7 +70,7 @@ export default async function GPUResourcesPage() {
     uses: suggestedUses(price.vram_gb ?? 0),
     vram: price.vram_gb ?? 0,
   }))
-  const offers = (liveOffers.length ? liveOffers : GPU_OFFERS).map((offer) => {
+  const offers = liveOffers.map((offer) => {
     const providerSlug = getGPUProviderSlug(offer.provider)
     const affiliateSlug = affiliateSlugByProvider.get(offer.provider.toLocaleLowerCase('fr-FR'))
     if (!affiliateSlug) return { ...offer, providerSlug }
@@ -79,7 +79,7 @@ export default async function GPUResourcesPage() {
   })
   const latestObservation = liveOffers.length
     ? result.docs.reduce((latest, price) => price.observed_at > latest ? price.observed_at : latest, result.docs[0]!.observed_at)
-    : GPU_DATA_DATE
+    : null
   const providers = new Set(offers.map((offer) => offer.provider)).size
 
   return <main className={styles.page} id="contenu">
@@ -90,18 +90,18 @@ export default async function GPUResourcesPage() {
       <dl className={styles.summary}>
         <div><dt>Relevés</dt><dd>{offers.length}</dd></div>
         <div><dt>Fournisseurs</dt><dd>{providers}</dd></div>
-        <div><dt>Dernier relevé</dt><dd>{dateFormatter.format(new Date(latestObservation))}</dd></div>
+        <div><dt>Dernier relevé</dt><dd>{latestObservation ? dateFormatter.format(new Date(latestObservation)) : 'Indisponible'}</dd></div>
       </dl>
     </section>
 
     <aside className={styles.notice}>
-      <strong>{liveOffers.length ? 'Prix issus des API fournisseurs.' : 'Données de démonstration.'}</strong>{' '}
-      Les prix sont indicatifs, hors stockage, trafic, taxes et frais annexes. Vérifiez le tarif final avant toute location.
+      <strong>{latestObservation ? `Prix API relevés le ${dateFormatter.format(new Date(latestObservation))}.` : 'Aucun relevé API récent disponible.'}</strong>{' '}
+      Mise à jour quotidienne. Prix indicatifs hors stockage, trafic, taxes et frais annexes ; vérifiez le tarif final avant toute location.
     </aside>
 
     <p><Link href="/ressources/gpu/fournisseurs">Découvrir les fiches détaillées des fournisseurs GPU cloud →</Link></p>
 
-    <GPUComparator offers={offers} />
+    {offers.length ? <GPUComparator offers={offers} /> : <p className={styles.empty}>Les données de test ne sont plus affichées. Les offres réapparaîtront après le prochain relevé API réussi.</p>}
 
     <section aria-labelledby="methodologie" className={styles.methodology}>
       <div><p className={styles.eyebrow}>Transparence</p><h2 id="methodologie">Comment lire ce comparateur</h2></div>
