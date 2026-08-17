@@ -38,9 +38,10 @@ export function configuredGPUConnectors(environment: Record<string, string | und
     azureConnector,
     createRunPodConnector(environment.RUNPOD_API_KEY),
     createVastConnector(environment.VAST_API_KEY),
+    createScalewayConnector(environment.SCALEWAY_SECRET_KEY),
   ]
-  if (environment.GOOGLE_CLOUD_BILLING_API_KEY) connectors.push(createGoogleCloudConnector(environment.GOOGLE_CLOUD_BILLING_API_KEY))
-  if (environment.SCALEWAY_SECRET_KEY) connectors.push(createScalewayConnector(environment.SCALEWAY_SECRET_KEY))
+  const googleAPIKey = environment.GOOGLE_CLOUD_BILLING_API_KEY ?? environment.GOOGLE_CLOUD_API_KEY ?? environment.GOOGLE_API_KEY
+  if (googleAPIKey) connectors.push(createGoogleCloudConnector(googleAPIKey))
   return connectors
 }
 

@@ -98,7 +98,8 @@ describe('GPU pricing connectors', () => {
   })
 
   it('enables every public pricing connector without requiring API keys', () => {
-    expect(configuredGPUConnectors({}).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast'])
-    expect(configuredGPUConnectors({ GOOGLE_CLOUD_BILLING_API_KEY: 'google', RUNPOD_API_KEY: 'runpod', SCALEWAY_SECRET_KEY: 'scaleway', VAST_API_KEY: 'vast' }).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast', 'google-cloud', 'scaleway'])
+    expect(configuredGPUConnectors({}).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast', 'scaleway'])
+    expect(configuredGPUConnectors({ GOOGLE_CLOUD_BILLING_API_KEY: 'google', RUNPOD_API_KEY: 'runpod', SCALEWAY_SECRET_KEY: 'scaleway', VAST_API_KEY: 'vast' }).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast', 'scaleway', 'google-cloud'])
+    expect(configuredGPUConnectors({ GOOGLE_CLOUD_API_KEY: 'google' }).map(({ source }) => source)).toContain('google-cloud')
   })
 })

@@ -2,7 +2,7 @@ import type { GPUPriceConnector, NormalizedGPUPrice } from './types'
 
 const API = 'https://api.scaleway.com/instance/v1/zones'
 const SOURCE_URL = 'https://www.scaleway.com/en/pricing/gpu/'
-const ZONES = ['fr-par-1', 'fr-par-2', 'fr-par-3', 'nl-ams-1', 'nl-ams-2', 'nl-ams-3', 'pl-waw-1', 'pl-waw-2', 'it-mil-1', 'it-mil-2']
+const ZONES = ['fr-par-1', 'fr-par-2', 'fr-par-3', 'nl-ams-1', 'nl-ams-2', 'nl-ams-3', 'pl-waw-1', 'pl-waw-2', 'it-mil-1']
 const EUR_TO_USD = 1 / 0.86
 
 type Money = { currency_code?: string; nanos?: number; units?: string | number }
@@ -45,13 +45,15 @@ export function normalizeScalewayServer(name: string, server: ServerType, zone: 
   }
 }
 
-export function createScalewayConnector(secretKey: string): GPUPriceConnector {
+export function createScalewayConnector(secretKey?: string): GPUPriceConnector {
   return {
     source: 'scaleway',
     async fetchPrices(fetcher = fetch) {
       const observedAt = new Date().toISOString()
       const results = await Promise.all(ZONES.map(async (zone) => {
-        const response = await fetcher(`${API}/${zone}/products/servers`, { headers: { 'X-Auth-Token': secretKey } })
+        const headers = secretKey ? { 'X-Auth-Token': secretKey } : undefined
+        const response = await fetcher(`${API}/${zone}/products/servers`, { headers })
+        if (response.status === 404) return []
         if (!response.ok) throw new Error(`Scaleway pricing for ${zone} returned ${response.status}`)
         const body = await response.json() as ScalewayResponse
         return Object.entries(body.servers ?? {}).map(([name, server]) => normalizeScalewayServer(name, server, zone, observedAt)).filter((price): price is NormalizedGPUPrice => Boolean(price))
