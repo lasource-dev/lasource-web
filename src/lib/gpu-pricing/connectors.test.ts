@@ -76,8 +76,8 @@ describe('GPU pricing connectors', () => {
     }, observedAt)).toMatchObject({ gpuCount: 4, gpuModel: 'RTX 4090', pricePerGpuHourUsd: 0.3, vramGb: 24 })
   })
 
-  it('only enables authenticated connectors when their keys exist', () => {
-    expect(configuredGPUConnectors({}).map(({ source }) => source)).toEqual(['azure'])
+  it('enables every public pricing connector without requiring API keys', () => {
+    expect(configuredGPUConnectors({}).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast'])
     expect(configuredGPUConnectors({ RUNPOD_API_KEY: 'runpod', VAST_API_KEY: 'vast' }).map(({ source }) => source)).toEqual(['azure', 'runpod', 'vast'])
   })
 })

@@ -32,10 +32,11 @@ const persistenceData = (price: NormalizedGPUPrice) => ({
 })
 
 export function configuredGPUConnectors(environment: Record<string, string | undefined> = process.env): GPUPriceConnector[] {
-  const connectors: GPUPriceConnector[] = [azureConnector]
-  if (environment.RUNPOD_API_KEY) connectors.push(createRunPodConnector(environment.RUNPOD_API_KEY))
-  if (environment.VAST_API_KEY) connectors.push(createVastConnector(environment.VAST_API_KEY))
-  return connectors
+  return [
+    azureConnector,
+    createRunPodConnector(environment.RUNPOD_API_KEY),
+    createVastConnector(environment.VAST_API_KEY),
+  ]
 }
 
 export async function syncGPUPrices(payload: Payload, connectors = configuredGPUConnectors()): Promise<SyncResult> {

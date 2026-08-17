@@ -33,11 +33,12 @@ export function normalizeRunPodGPU(gpu: RunPodGPU, observedAt: string): Normaliz
   }
 }
 
-export function createRunPodConnector(apiKey: string): GPUPriceConnector {
+export function createRunPodConnector(apiKey?: string): GPUPriceConnector {
   return {
     source: 'runpod',
     async fetchPrices(fetcher = fetch) {
-      const response = await fetcher(`${ENDPOINT}?api_key=${encodeURIComponent(apiKey)}`, {
+      const endpoint = apiKey ? `${ENDPOINT}?api_key=${encodeURIComponent(apiKey)}` : ENDPOINT
+      const response = await fetcher(endpoint, {
         body: JSON.stringify({ query: '{ gpuTypes { id displayName memoryInGb lowestPrice(input: { gpuCount: 1 }) { stockStatus uninterruptablePrice } } }' }),
         headers: { 'Content-Type': 'application/json', 'User-Agent': 'LaSource.dev GPU comparator' },
         method: 'POST',

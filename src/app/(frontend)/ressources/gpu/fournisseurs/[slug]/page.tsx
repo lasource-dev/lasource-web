@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 
 import { getApplicationPayload } from '../../../../../../lib/get-application-payload'
 import { GPUComparator } from '../../GPUComparator'
-import { GPU_OFFERS, type GPUOffer } from '../../gpu-data'
+import { type GPUOffer } from '../../gpu-data'
 import { getGPUProvider, GPU_PROVIDERS } from '../../providers'
 import styles from '../../provider.module.css'
 
@@ -40,8 +40,7 @@ export default async function GPUProviderPage({ params }: Props) {
     return typeof partner === 'object' && provider.priceNames.some((name) => name.toLocaleLowerCase('fr-FR') === partner.name.toLocaleLowerCase('fr-FR'))
   })
   const liveOffers: GPUOffer[] = prices.docs.map((price, index) => ({ gpu: price.gpu_model, id: index + 1, priceUsd: price.price_per_gpu_hour_usd, pricing: price.pricing_type, provider: price.provider, providerSlug: provider.slug, region: price.region, reliability: 4, url: price.source_url, uses: suggestedUses(price.vram_gb ?? 0), vram: price.vram_gb ?? 0 }))
-  const demoOffers = GPU_OFFERS.filter((offer) => provider.priceNames.includes(offer.provider))
-  const offers = (liveOffers.length ? liveOffers : demoOffers).map((offer) => affiliate ? { ...offer, affiliate: true, providerSlug: provider.slug, url: `/go/${affiliate.slug}?${new URLSearchParams({ placement: 'gpu-provider-page', ref: provider.slug, src: 'web' })}` } : { ...offer, providerSlug: provider.slug })
+  const offers = liveOffers.map((offer) => affiliate ? { ...offer, affiliate: true, providerSlug: provider.slug, url: `/go/${affiliate.slug}?${new URLSearchParams({ placement: 'gpu-provider-page', ref: provider.slug, src: 'web' })}` } : { ...offer, providerSlug: provider.slug })
   const externalUrl = affiliate ? `/go/${affiliate.slug}?${new URLSearchParams({ placement: 'gpu-provider-hero', ref: provider.slug, src: 'web' })}` : provider.website
 
   return <main className={styles.page} id="contenu">
@@ -52,7 +51,7 @@ export default async function GPUProviderPage({ params }: Props) {
     </header>
     <section className={styles.overview}><div><p className={styles.eyebrow}>En bref</p><h2>Ce que propose {provider.name}</h2><p>{provider.description}</p></div><div className={styles.serviceList}>{provider.services.map((service) => <span key={service}>{service}</span>)}</div></section>
     <section className={styles.prosCons}><article><p className={styles.eyebrow}>Points forts</p><h2>Pourquoi le choisir</h2><ul>{provider.advantages.map((item) => <li key={item}>{item}</li>)}</ul></article><article><p className={styles.eyebrow}>À vérifier</p><h2>Points de vigilance</h2><ul>{provider.limitations.map((item) => <li key={item}>{item}</li>)}</ul></article></section>
-    <section className={styles.prices}><p className={styles.eyebrow}>Prix observés</p><h2>Tarifs GPU chez {provider.name}</h2><p className={styles.priceNote}>{liveOffers.length ? 'Tarifs issus des API fournisseurs et actuellement disponibles.' : offers.length ? 'Aucun relevé API actif pour ce fournisseur : tarifs indicatifs de notre jeu de démonstration.' : 'Aucun tarif exploitable n’est encore disponible dans notre base.'}</p>{offers.length ? <GPUComparator offers={offers} /> : <p className={styles.empty}>Les tarifs seront affichés ici dès que le connecteur de données sera disponible.</p>}</section>
+    <section className={styles.prices}><p className={styles.eyebrow}>Prix observés</p><h2>Tarifs GPU chez {provider.name}</h2><p className={styles.priceNote}>{liveOffers.length ? 'Tarifs récents issus directement des API fournisseurs.' : 'Aucun relevé API récent n’est disponible pour ce fournisseur.'}</p>{offers.length ? <GPUComparator offers={offers} /> : <p className={styles.empty}>Aucune donnée de test n’est affichée. Les tarifs apparaîtront dès qu’un connecteur réel sera disponible.</p>}</section>
     <footer className={styles.sources}><h2>Sources et transparence</h2><p>Informations éditoriales vérifiées à partir des pages officielles. Les effectifs clients ne sont indiqués que lorsqu’un chiffre public attribuable est disponible.</p><ul>{provider.sources.map((source) => <li key={source.url}><a href={source.url} rel="noopener noreferrer" target="_blank">{source.label}</a></li>)}</ul></footer>
   </main>
 }
