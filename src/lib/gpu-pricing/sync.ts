@@ -8,6 +8,7 @@ import type { GPUPriceConnector, GPUPriceSource, NormalizedGPUPrice } from './ty
 import { createVastConnector } from './vast'
 
 const EXPIRY_HOURS = 26
+const WRITE_CONCURRENCY = 10
 
 export type SyncResult = {
   errors: Array<{ message: string; source: GPUPriceSource }>
@@ -35,14 +36,23 @@ const persistenceData = (price: NormalizedGPUPrice) => ({
 
 export function configuredGPUConnectors(environment: Record<string, string | undefined> = process.env): GPUPriceConnector[] {
   const connectors: GPUPriceConnector[] = [
-    azureConnector,
     createRunPodConnector(environment.RUNPOD_API_KEY),
     createVastConnector(environment.VAST_API_KEY),
     createScalewayConnector(environment.SCALEWAY_SECRET_KEY),
   ]
   const googleAPIKey = environment.GOOGLE_CLOUD_BILLING_API_KEY ?? environment.GOOGLE_CLOUD_API_KEY ?? environment.GOOGLE_API_KEY
   if (googleAPIKey) connectors.push(createGoogleCloudConnector(googleAPIKey))
+  // Azure exposes hundreds of regional meters and is consequently the slowest
+  // source to persist. Keep it last so a platform timeout cannot starve every
+  // smaller provider during the same synchronization run.
+  connectors.push(azureConnector)
   return connectors
+}
+
+const chunks = <Value>(values: Value[], size: number): Value[][] => {
+  const result: Value[][] = []
+  for (let index = 0; index < values.length; index += size) result.push(values.slice(index, index + size))
+  return result
 }
 
 export async function syncGPUPrices(payload: Payload, connectors = configuredGPUConnectors()): Promise<SyncResult> {
@@ -60,14 +70,16 @@ export async function syncGPUPrices(payload: Payload, connectors = configuredGPU
         where: { source: { equals: connector.source } },
       })
       const ids = new Map(existing.docs.map((document) => [document.external_key, document.id]))
-      for (const price of prices) {
-        const id = ids.get(price.externalKey)
-        if (id) {
-          await payload.update({ collection: 'gpu-prices', id, data: persistenceData(price), overrideAccess: true })
-        } else {
-          await payload.create({ collection: 'gpu-prices', data: persistenceData(price), overrideAccess: true })
-        }
-        result.stored += 1
+      for (const batch of chunks(prices, WRITE_CONCURRENCY)) {
+        await Promise.all(batch.map(async (price) => {
+          const id = ids.get(price.externalKey)
+          if (id) {
+            await payload.update({ collection: 'gpu-prices', id, data: persistenceData(price), overrideAccess: true })
+          } else {
+            await payload.create({ collection: 'gpu-prices', data: persistenceData(price), overrideAccess: true })
+          }
+        }))
+        result.stored += batch.length
       }
       result.sources.push({ count: prices.length, source: connector.source })
     } catch (error) {
