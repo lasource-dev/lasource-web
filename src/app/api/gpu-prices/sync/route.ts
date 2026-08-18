@@ -21,5 +21,8 @@ export async function GET(request: NextRequest) {
   if (!authorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const payload = await getApplicationPayload()
   const result = await syncGPUPrices(payload)
+  if (result.errors.length) {
+    console.error('[gpu-prices] Synchronisation partielle', result.errors)
+  }
   return NextResponse.json(result, { status: result.errors.length ? 207 : 200 })
 }
