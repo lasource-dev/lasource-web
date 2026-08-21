@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { normalizeAzureItem } from './azure'
 import { normalizeGoogleCloudSKU } from './google-cloud'
 import { normalizeRunPodGPU } from './runpod'
-import { normalizeScalewayServer } from './scaleway'
+import { createScalewayConnector, normalizeScalewayServer } from './scaleway'
 import { configuredGPUConnectors } from './sync'
 import { normalizeVastOffer } from './vast'
 
@@ -95,6 +95,23 @@ describe('GPU pricing connectors', () => {
       gpu_info: { gpu_memory: 80_000_000_000, gpu_name: 'NVIDIA H100' },
       hourly_price: { currency_code: 'EUR', units: '6', nanos: 880_000_000 },
     }, 'fr-par-2', observedAt)).toMatchObject({ gpuCount: 2, pricePerGpuHourUsd: 4, provider: 'Scaleway', vramGb: 80 })
+  })
+
+  it('falls back to the public Scaleway catalogue when an optional token is rejected', async () => {
+    const fetcher = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      if (init?.headers) return new Response(null, { status: 401 })
+      return Response.json({
+        servers: {
+          'H100-1-80G': { gpu: 1, gpu_info: { gpu_memory: 80_000_000_000, gpu_name: 'H100-PCIe' }, hourly_price: 2.8665 },
+        },
+      })
+    })
+
+    const prices = await createScalewayConnector('rejected-token').fetchPrices(fetcher)
+
+    expect(prices).toHaveLength(9)
+    expect(prices[0]).toMatchObject({ gpuModel: 'H100-PCIe', provider: 'Scaleway' })
+    expect(fetcher).toHaveBeenCalledTimes(18)
   })
 
   it('enables every public pricing connector without requiring API keys', () => {

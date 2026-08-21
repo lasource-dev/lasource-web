@@ -52,7 +52,13 @@ export function createScalewayConnector(secretKey?: string): GPUPriceConnector {
       const observedAt = new Date().toISOString()
       const results = await Promise.all(ZONES.map(async (zone) => {
         const headers = secretKey ? { 'X-Auth-Token': secretKey } : undefined
-        const response = await fetcher(`${API}/${zone}/products/servers`, { headers })
+        const url = `${API}/${zone}/products/servers`
+        let response = await fetcher(url, { headers })
+        // The product catalogue is public. A stale or mistyped optional token
+        // must not make otherwise public GPU prices unavailable.
+        if (secretKey && (response.status === 401 || response.status === 403)) {
+          response = await fetcher(url)
+        }
         if (response.status === 404) return []
         if (!response.ok) throw new Error(`Scaleway pricing for ${zone} returned ${response.status}`)
         const body = await response.json() as ScalewayResponse
