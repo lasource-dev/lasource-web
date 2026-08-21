@@ -30,9 +30,10 @@ export default async function GPUProviderPage({ params }: Props) {
   if (!provider) notFound()
 
   const payload = await getApplicationPayload()
-  const now = new Date().toISOString()
+  const requestTime = new Date()
+  const freshnessThreshold = new Date(requestTime.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const [prices, affiliateOffers] = await Promise.all([
-    payload.find({ collection: 'gpu-prices', depth: 0, limit: 200, overrideAccess: false, pagination: false, sort: 'price_per_gpu_hour_usd', where: { and: [{ provider: { in: provider.priceNames } }, { available: { equals: true } }, { expires_at: { greater_than: now } }] } }),
+    payload.find({ collection: 'gpu-prices', depth: 0, limit: 200, overrideAccess: false, pagination: false, sort: 'price_per_gpu_hour_usd', where: { and: [{ provider: { in: provider.priceNames } }, { available: { equals: true } }, { observed_at: { greater_than: freshnessThreshold } }] } }),
     payload.find({ collection: 'affiliate-offers', depth: 1, limit: 20, overrideAccess: false, pagination: false, where: { and: [{ status: { equals: 'active' } }, { commercial_relationship: { equals: 'affiliate' } }, { resource_type: { in: ['cloud', 'hosting'] } }] } }),
   ])
   const affiliate = affiliateOffers.docs.find((offer) => {

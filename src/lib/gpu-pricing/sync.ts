@@ -7,7 +7,10 @@ import { createScalewayConnector } from './scaleway'
 import type { GPUPriceConnector, GPUPriceSource, NormalizedGPUPrice } from './types'
 import { createVastConnector } from './vast'
 
-const EXPIRY_HOURS = 26
+// Keep the last successful snapshot visible across a few failed daily runs.
+// The UI exposes the observation date, so a transient provider outage should
+// not make an entire catalogue disappear after only 26 hours.
+const EXPIRY_HOURS = 7 * 24
 const WRITE_CONCURRENCY = 10
 
 export type SyncResult = {

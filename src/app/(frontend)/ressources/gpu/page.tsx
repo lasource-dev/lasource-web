@@ -25,7 +25,8 @@ const suggestedUses = (vram: number): GPUOffer['uses'] => {
 
 export default async function GPUResourcesPage() {
   const payload = await getApplicationPayload()
-  const now = new Date().toISOString()
+  const requestTime = new Date()
+  const freshnessThreshold = new Date(requestTime.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const [result, affiliateOffers] = await Promise.all([
     payload.find({
       collection: 'gpu-prices',
@@ -34,7 +35,7 @@ export default async function GPUResourcesPage() {
       overrideAccess: false,
       pagination: false,
       sort: 'price_per_gpu_hour_usd',
-      where: { and: [{ available: { equals: true } }, { expires_at: { greater_than: now } }] },
+      where: { and: [{ available: { equals: true } }, { observed_at: { greater_than: freshnessThreshold } }] },
     }),
     payload.find({
       collection: 'affiliate-offers',
