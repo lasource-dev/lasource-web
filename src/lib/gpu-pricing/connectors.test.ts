@@ -92,7 +92,7 @@ describe('GPU pricing connectors', () => {
     expect(normalizeScalewayServer('H100-2-80G', {
       available: true,
       gpu: 2,
-      gpu_info: { gpu_memory: 80_000_000_000, gpu_name: 'NVIDIA H100' },
+      gpu_info: { gpu_memory: 80 * 1024 ** 3, gpu_name: 'NVIDIA H100' },
       hourly_price: { currency_code: 'EUR', units: '6', nanos: 880_000_000 },
     }, 'fr-par-2', observedAt)).toMatchObject({ gpuCount: 2, pricePerGpuHourUsd: 4, provider: 'Scaleway', vramGb: 80 })
   })

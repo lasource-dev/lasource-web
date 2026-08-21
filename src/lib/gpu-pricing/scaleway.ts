@@ -20,7 +20,7 @@ const amountInUsd = (value?: Money | number) => {
   return value?.currency_code === 'EUR' ? amount * EUR_TO_USD : amount
 }
 
-const vramGb = (memory?: number) => memory ? Math.round(memory / 1_000_000_000) : undefined
+const vramGb = (memory?: number) => memory ? Math.round(memory / (1024 ** 3)) : undefined
 
 export function normalizeScalewayServer(name: string, server: ServerType, zone: string, observedAt: string): NormalizedGPUPrice | null {
   const gpuCount = server.gpu ?? 0

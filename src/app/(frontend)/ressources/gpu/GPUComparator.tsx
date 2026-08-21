@@ -34,14 +34,27 @@ const geographicalZone = (region: string) => {
   return 'Autres régions'
 }
 
+const canonicalVRAM = (gpu: string, vram: number) => {
+  if (gpu === 'H100' && vram >= 75 && vram <= 88) return 80
+  if (gpu === 'H200' && vram >= 135 && vram <= 150) return 141
+  if (gpu === 'B300' && vram >= 285 && vram <= 312) return 288
+  if (gpu === 'L40S' && vram >= 46 && vram <= 53) return 48
+  if (gpu === 'L4' && vram >= 23 && vram <= 27) return 24
+  return Math.round(vram * 10) / 10
+}
+
 export function GPUComparator({ offers: sourceOffers }: { offers: GPUOffer[] }) {
   const [gpu, setGpu] = useState('all')
   const [use, setUse] = useState<'all' | Use>('all')
   const [pricing, setPricing] = useState<'all' | Pricing>('all')
   const [zone, setZone] = useState('all')
   const [monthly, setMonthly] = useState(false)
+  const [comparablesOnly, setComparablesOnly] = useState(true)
 
-  const enrichedOffers = useMemo(() => sourceOffers.map((offer) => ({ ...offer, canonicalGPU: canonicalGPU(offer.gpu), zone: geographicalZone(offer.region) })), [sourceOffers])
+  const enrichedOffers = useMemo(() => sourceOffers.map((offer) => {
+    const normalizedGPU = canonicalGPU(offer.gpu)
+    return { ...offer, canonicalGPU: normalizedGPU, canonicalVRAM: canonicalVRAM(normalizedGPU, offer.vram), zone: geographicalZone(offer.region) }
+  }), [sourceOffers])
   const gpuModels = useMemo(() => [...new Set(enrichedOffers.map((offer) => offer.canonicalGPU))].sort(), [enrichedOffers])
   const zones = useMemo(() => [...new Set(enrichedOffers.map((offer) => offer.zone))].sort(), [enrichedOffers])
   const providers = useMemo(() => [...new Set(sourceOffers.map((offer) => offer.provider))].sort((left, right) => {
@@ -62,16 +75,16 @@ export function GPUComparator({ offers: sourceOffers }: { offers: GPUOffer[] }) 
   ), [enrichedOffers, gpu, pricing, use, zone])
 
   const rows = useMemo(() => {
-    const grouped = new Map<string, { gpu: string; offers: Map<string, GPUOffer>; vram: number; zone: string }>()
+    const grouped = new Map<string, { gpu: string; offers: Map<string, GPUOffer>; vram: number }>()
     for (const offer of filteredOffers) {
-      const key = `${offer.canonicalGPU}|${offer.vram}|${offer.zone}`
-      const row = grouped.get(key) ?? { gpu: offer.canonicalGPU, offers: new Map(), vram: offer.vram, zone: offer.zone }
+      const key = `${offer.canonicalGPU}|${offer.canonicalVRAM}`
+      const row = grouped.get(key) ?? { gpu: offer.canonicalGPU, offers: new Map(), vram: offer.canonicalVRAM }
       const current = row.offers.get(offer.provider)
       if (!current || offer.priceUsd < current.priceUsd) row.offers.set(offer.provider, offer)
       grouped.set(key, row)
     }
-    return [...grouped.values()].sort((left, right) => left.gpu.localeCompare(right.gpu) || left.vram - right.vram || left.zone.localeCompare(right.zone))
-  }, [filteredOffers])
+    return [...grouped.values()].filter((row) => !comparablesOnly || row.offers.size >= 2).sort((left, right) => left.gpu.localeCompare(right.gpu) || left.vram - right.vram)
+  }, [comparablesOnly, filteredOffers])
 
   const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: monthly ? 0 : 2 })
   const resetFilters = () => { setGpu('all'); setUse('all'); setPricing('all'); setZone('all') }
@@ -85,13 +98,14 @@ export function GPUComparator({ offers: sourceOffers }: { offers: GPUOffer[] }) 
       <label>Zone<select onChange={(event) => setZone(event.target.value)} value={zone}><option value="all">Toutes les zones</option>{zones.map((item) => <option key={item}>{item}</option>)}</select></label>
       <label>Cas d’usage<select onChange={(event) => setUse(event.target.value as 'all' | Use)} value={use}><option value="all">Tous les usages</option>{Object.entries(useLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <label>Tarification<select onChange={(event) => setPricing(event.target.value as 'all' | Pricing)} value={pricing}><option value="all">Tous les types</option>{Object.entries(pricingLabels).map(([value, label]) => <option disabled={!pricingCounts[value as Pricing]} key={value} value={value}>{label} ({pricingCounts[value as Pricing]})</option>)}</select></label>
+      <label className={styles.checkbox}><input checked={comparablesOnly} onChange={(event) => setComparablesOnly(event.target.checked)} type="checkbox" /> 2 fournisseurs minimum</label>
       <label className={styles.checkbox}><input checked={monthly} onChange={(event) => setMonthly(event.target.checked)} type="checkbox" /> Coût mensuel 24/7 <span className={styles.help} title="Estimation pour 730 heures, soit un mois moyen utilisé sans interruption">?</span></label>
       {hasFilters ? <button className={styles.reset} onClick={resetFilters} type="button">Réinitialiser</button> : null}
     </form>
     <div className={styles.tableWrapper} tabIndex={0}><table className={styles.matrix}>
       <caption className="visually-hidden">Meilleur tarif disponible par configuration et fournisseur</caption>
-      <thead><tr><th>GPU</th><th>VRAM</th><th>Zone</th>{providers.map((provider) => <th key={provider}>{provider}</th>)}</tr></thead>
-      <tbody>{rows.map((row) => <tr key={`${row.gpu}-${row.vram}-${row.zone}`}><th scope="row">{row.gpu}</th><td>{row.vram.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} Go</td><td>{row.zone}</td>{providers.map((provider) => {
+      <thead><tr><th>GPU</th><th>VRAM</th>{providers.map((provider) => <th key={provider}>{provider}</th>)}</tr></thead>
+      <tbody>{rows.map((row) => <tr key={`${row.gpu}-${row.vram}`}><th scope="row">{row.gpu}</th><td>{row.vram.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} Go</td>{providers.map((provider) => {
         const offer = row.offers.get(provider)
         if (!offer) return <td className={styles.unavailable} key={provider}>—</td>
         const price = offer.priceUsd * EUR_RATE * (monthly ? 730 : 1)
@@ -99,6 +113,6 @@ export function GPUComparator({ offers: sourceOffers }: { offers: GPUOffer[] }) 
       })}</tr>)}</tbody>
     </table></div>
     {rows.length === 0 ? <div className={styles.empty}><p>Aucune offre ne correspond à ces critères.</p><button className={styles.reset} onClick={resetFilters} type="button">Réinitialiser les filtres</button></div> : null}
-    <p className={styles.matrixNote}>Chaque cellule présente le tarif le moins cher actuellement relevé pour ce fournisseur, cette configuration et cette zone. La région technique exacte reste indiquée dans la cellule.</p>
+    <p className={styles.matrixNote}>Chaque cellule présente le tarif le moins cher actuellement relevé pour ce fournisseur et cette configuration. Utilisez le filtre de zone pour comparer une géographie précise ; la région technique retenue reste indiquée dans chaque cellule.</p>
   </section>
 }
