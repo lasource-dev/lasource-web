@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { getApplicationPayload } from '../../../../lib/get-application-payload'
+import { GPU_PRICE_SOURCES } from '../../../../lib/gpu-pricing/types'
 import { GPUComparator } from './GPUComparator'
 import { EUR_RATE, type GPUOffer } from './gpu-data'
 import { getGPUProviderSlug } from './providers'
@@ -27,16 +28,16 @@ export default async function GPUResourcesPage() {
   const payload = await getApplicationPayload()
   const requestTime = new Date()
   const freshnessThreshold = new Date(requestTime.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
-  const [result, affiliateOffers] = await Promise.all([
-    payload.find({
+  const [sourceResults, affiliateOffers] = await Promise.all([
+    Promise.all(GPU_PRICE_SOURCES.map((source) => payload.find({
       collection: 'gpu-prices',
       depth: 0,
-      limit: 500,
+      limit: 100,
       overrideAccess: false,
       pagination: false,
       sort: 'price_per_gpu_hour_usd',
-      where: { and: [{ available: { equals: true } }, { observed_at: { greater_than: freshnessThreshold } }] },
-    }),
+      where: { and: [{ source: { equals: source } }, { available: { equals: true } }, { observed_at: { greater_than: freshnessThreshold } }] },
+    }))),
     payload.find({
       collection: 'affiliate-offers',
       depth: 1,
@@ -52,6 +53,9 @@ export default async function GPUResourcesPage() {
       },
     }),
   ])
+  const result = {
+    docs: sourceResults.flatMap(({ docs }) => docs).sort((left, right) => left.price_per_gpu_hour_usd - right.price_per_gpu_hour_usd),
+  }
   const affiliateSlugByProvider = new Map(
     affiliateOffers.docs.flatMap((offer) =>
       typeof offer.partner === 'object'
