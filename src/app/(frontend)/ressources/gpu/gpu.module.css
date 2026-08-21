@@ -13,16 +13,25 @@
 .comparatorHeading h2, .methodology h2 { font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.04em; margin: 0; }
 .comparatorHeading > p { color: var(--muted); margin: 0; }
 .disclosure { border-left: 3px solid var(--signal); color: var(--muted); font-size: .85rem; line-height: 1.6; margin: 0 0 1.25rem; max-width: 48rem; padding-left: 1rem; }
-.filters { align-items: end; background: var(--panel); border: 1px solid var(--border); display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(9rem, 1fr)) auto auto; padding: 1.25rem; }
+.filters { align-items: end; background: var(--panel); border: 1px solid var(--border); display: grid; gap: 1rem; grid-template-columns: repeat(4, minmax(9rem, 1fr)) auto auto; padding: 1.25rem; }
 .filters label { font-size: .82rem; font-weight: 750; }
 .filters select { background: white; border: 1px solid var(--border); color: var(--ink); display: block; margin-top: .45rem; padding: .7rem; width: 100%; }
 .checkbox { align-items: center; display: flex; gap: .45rem; min-height: 2.75rem; }
 .checkbox input { accent-color: var(--signal); height: 1rem; width: 1rem; }
+.help { align-items: center; border: 1px solid var(--muted); border-radius: 50%; color: var(--muted); cursor: help; display: inline-flex; font-size: .65rem; height: 1rem; justify-content: center; width: 1rem; }
+.reset { background: transparent; border: 1px solid var(--ink); color: var(--ink); cursor: pointer; font: inherit; font-size: .78rem; font-weight: 750; min-height: 2.75rem; padding: .65rem .8rem; }
 .tableWrapper { overflow-x: auto; }
 .tableWrapper:focus-visible { outline: 3px solid #d79b2b; outline-offset: 3px; }
 .tableWrapper table { border-collapse: collapse; font-size: .88rem; min-width: 62rem; width: 100%; }
 .tableWrapper th { color: var(--muted); font-size: .72rem; letter-spacing: .08em; padding: 1rem .75rem; text-align: left; text-transform: uppercase; }
 .tableWrapper td { background: var(--panel); border-bottom: 1px solid var(--border); padding: 1rem .75rem; vertical-align: middle; }
+.matrix { margin-top: 1rem; }
+.matrix th[scope="row"] { background: var(--panel); border-bottom: 1px solid var(--border); font-size: .95rem; padding: 1rem .75rem; text-align: left; white-space: nowrap; }
+.matrix .offerCell { min-width: 10rem; vertical-align: top; }
+.unavailable { color: var(--muted); text-align: center; }
+.region { color: var(--muted); display: block; font-size: .7rem; line-height: 1.35; margin-top: .5rem; max-width: 16ch; }
+.cellCta { color: var(--signal-dark); display: inline-block; font-size: .72rem; font-weight: 800; margin-top: .65rem; }
+.matrixNote { color: var(--muted); font-size: .8rem; line-height: 1.6; margin: 1rem 0 0; }
 .price { display: block; font-size: 1rem; font-variant-numeric: tabular-nums; font-weight: 800; white-space: nowrap; }
 .best { color: var(--signal-dark); display: block; font-size: .68rem; font-weight: 750; margin-top: .25rem; white-space: nowrap; }
 .tag { border: 1px solid; display: inline-block; font-size: .72rem; font-weight: 750; padding: .3rem .45rem; white-space: nowrap; }
@@ -32,8 +41,9 @@
 .cta { background: var(--signal); color: white; display: inline-block; font-weight: 750; padding: .65rem .8rem; text-decoration: none; white-space: nowrap; }
 .cta:hover { background: var(--signal-dark); }
 .empty { border: 1px solid var(--border); color: var(--muted); margin: 0; padding: 2rem; text-align: center; }
+.empty p { margin-top: 0; }
 .methodology { border-top: 1px solid var(--border); display: grid; gap: 3rem; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); padding: clamp(3rem, 7vw, 5rem) 0; }
 .methodology p { color: var(--muted); line-height: 1.7; margin: 0 0 1rem; }
 .methodology a { color: var(--signal-dark); font-weight: 750; }
-@media (max-width: 62rem) { .filters { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 62rem) { .filters { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 42rem) { .comparatorHeading, .methodology { align-items: start; flex-direction: column; grid-template-columns: 1fr; } .comparatorHeading { gap: 1rem; } .filters { grid-template-columns: 1fr; } .hero { padding-top: 3.5rem; } }
