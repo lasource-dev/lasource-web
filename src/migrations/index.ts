@@ -7,6 +7,7 @@ import * as migration_20260816_180000_gpu_prices from "./20260816_180000_gpu_pri
 import * as migration_20260817_160000_gpu_price_sources from "./20260817_160000_gpu_price_sources";
 import * as migration_20260824_171500_category_hierarchy from "./20260824_171500_category_hierarchy";
 import * as migration_20260824_174500_editorial_taxonomy from "./20260824_174500_editorial_taxonomy";
+import * as migration_20260824_181500_limit_editorial_tags from "./20260824_181500_limit_editorial_tags";
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20260824_174500_editorial_taxonomy.up,
     down: migration_20260824_174500_editorial_taxonomy.down,
     name: "20260824_174500_editorial_taxonomy",
+  },
+  {
+    up: migration_20260824_181500_limit_editorial_tags.up,
+    down: migration_20260824_181500_limit_editorial_tags.down,
+    name: "20260824_181500_limit_editorial_tags",
   },
 ];

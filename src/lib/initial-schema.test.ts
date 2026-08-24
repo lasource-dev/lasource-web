@@ -28,6 +28,7 @@ describe('initial PostgreSQL schema', () => {
       '20260817_160000_gpu_price_sources',
       '20260824_171500_category_hierarchy',
       '20260824_174500_editorial_taxonomy',
+      '20260824_181500_limit_editorial_tags',
     ])
   })
 
