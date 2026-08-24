@@ -8,13 +8,21 @@ export type ContentIndexItem = {
   title: string
 }
 
+export type ContentIndexFilter = {
+  active?: boolean
+  href: string
+  label: string
+}
+
 export function ContentIndex({
   description,
+  filters,
   items,
   search,
   title,
 }: {
   description: string
+  filters?: readonly ContentIndexFilter[]
   items: readonly ContentIndexItem[]
   search?: string
   title: string
@@ -27,19 +35,38 @@ export function ContentIndex({
         <p className={styles.lead}>{description}</p>
       </header>
       {search !== undefined && (
-        <form action="/technologies" className={styles.indexSearchForm} role="search">
-          <label htmlFor="index-technology-search">Rechercher une technologie</label>
-          <div>
-            <input
-              defaultValue={search}
-              id="index-technology-search"
-              name="q"
-              placeholder="Ex. React, PostgreSQL, OpenAI…"
-              type="search"
-            />
-            <button type="submit">Rechercher</button>
-          </div>
-        </form>
+        <div className={styles.indexSearchArea}>
+          <form action="/technologies" className={styles.indexSearchForm} role="search">
+            <label htmlFor="index-technology-search">Rechercher une technologie</label>
+            <div>
+              <input
+                defaultValue={search}
+                id="index-technology-search"
+                name="q"
+                placeholder="Ex. React, PostgreSQL, OpenAI…"
+                type="search"
+              />
+              <button type="submit">Rechercher</button>
+            </div>
+          </form>
+          {filters && filters.length > 0 && (
+            <nav aria-label="Filtrer les technologies par type" className={styles.indexFilters}>
+              <span>Type</span>
+              <div>
+                {filters.map((filter) => (
+                  <Link
+                    aria-current={filter.active ? 'page' : undefined}
+                    className={filter.active ? styles.activeFilter : undefined}
+                    href={filter.href}
+                    key={filter.href}
+                  >
+                    {filter.label}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          )}
+        </div>
       )}
       <section aria-label={`Liste des ${title.toLowerCase()}`} className={styles.publicationGrid}>
         {items.map((item) => (

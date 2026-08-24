@@ -108,7 +108,7 @@ export default async function HomePage() {
     : '/technologies'
 
   return (
-    <main className={styles.page} id="contenu">
+    <main className={`${styles.page} ${styles.homePage}`} id="contenu">
       <section className={styles.hero}>
         <p className={styles.eyebrow}>Web, intelligence artificielle et outils pour les développeurs</p>
         <h1>Comprendre les technologies du Web et de l’intelligence artificielle</h1>

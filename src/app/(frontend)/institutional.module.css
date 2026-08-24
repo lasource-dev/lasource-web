@@ -8,6 +8,10 @@
   padding: clamp(5rem, 12vw, 9rem) 0;
 }
 
+.homePage .hero {
+  padding: clamp(2.75rem, 6vw, 4.5rem) 0;
+}
+
 .eyebrow {
   color: var(--signal);
   font-size: 0.78rem;
@@ -120,6 +124,14 @@
 .comparisonSection {
   border-top: 1px solid var(--border);
   padding: clamp(3.5rem, 7vw, 6rem) 0;
+}
+
+.homePage .section,
+.homePage .splitSection,
+.homePage .recentSection,
+.homePage .newsletter,
+.homePage .comparisonSection {
+  padding: clamp(2.5rem, 4.5vw, 4rem) 0;
 }
 
 .publications {
@@ -342,14 +354,54 @@
 }
 
 .indexSearchForm {
+  margin: 0;
+  max-width: none;
+}
+
+.indexSearchArea {
   border-block: 1px solid var(--border);
   margin: 0 0 2rem;
-  max-width: none;
   padding: 1.5rem 0;
 }
 
 .indexSearchForm > div {
   max-width: 42rem;
+}
+
+.indexFilters {
+  align-items: baseline;
+  display: flex;
+  gap: 0.75rem 1rem;
+  margin-top: 1.25rem;
+}
+
+.indexFilters > span {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.indexFilters > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.indexFilters a {
+  border: 1px solid var(--border);
+  color: var(--signal-dark);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.45rem 0.7rem;
+  text-decoration: none;
+}
+
+.indexFilters a:hover,
+.indexFilters .activeFilter {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: white;
 }
 
 .emptyState {
