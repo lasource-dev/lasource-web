@@ -24,18 +24,23 @@ const contentTypes = [
 
 const journeys = [
   ['Choisir un LLM', 'Comparer Claude, GPT et Gemini selon les besoins de votre application.', '/guides/claude-gpt-gemini-quel-llm-choisir'],
-  ['Construire un pipeline RAG', 'Choisir les briques de recherche, d’indexation et de génération.', '/guides/bases-vectorielles-rag-chromadb-faiss-pgvector'],
-  ['Créer un agent IA', 'Comparer les principaux frameworks et leurs compromis.', '/guides/frameworks-agents-langchain-crewai-pydantic-ai-autogen'],
+  ['RAG : des bases aux architectures avancées', 'Concevoir un pipeline RAG, puis améliorer la recherche avec le re-ranking, l’expansion de requête et le routing.', '/guides/rag-avance-reranking-query-expansion-routing'],
+  ['Créer et orchestrer des agents IA', 'Comparer les frameworks d’agents et construire un agent typé avec des outils.', '/tutoriels/creer-agent-pydantic-ai-outils-types'],
   ['Déployer un modèle en local', 'Installer Ollama et choisir un modèle adapté à sa machine.', '/tutoriels/installer-configurer-ollama'],
   ['Model Context Protocol', 'Comprendre comment connecter un agent à des outils et des données.', '/guides/comprendre-model-context-protocol'],
   ['Comparer les GPU cloud', 'Comparer le matériel, les prix et les régions disponibles.', '/ressources/gpu'],
-] as const
-
-const upcomingThemes = [
-  ['Speech', 'Reconnaissance vocale, transcription et synthèse de la parole.'],
-  ['Image', 'Génération, édition, modèles et API d’images.'],
-  ['Observabilité', 'Tracer, évaluer et superviser les applications fondées sur les LLM.'],
-  ['RGPD', 'Concevoir et déployer des usages de l’IA respectueux des données personnelles.'],
+  ['Speech et agents vocaux', 'Comparer les services de transcription et de synthèse, puis construire des applications vocales.', '/guides/stt-francais-deepgram-assemblyai-whisper-comparatif'],
+  ['Génération d’images', 'Comparer les modèles et API d’images, maîtriser leurs coûts et les intégrer en production.', '/guides/flux-dall-e-midjourney-comparatif-generation-images'],
+  ['IA et RGPD', 'Déployer une IA conforme, choisir la résidence des données et sécuriser un pipeline RAG.', '/guides/deployer-ia-conforme-rgpd'],
+  ['Observabilité des LLM', 'Tracer, évaluer et superviser les applications LLM avec les principales plateformes.', '/guides/arize-phoenix-langfuse-langsmith-comparatif'],
+  ['Bases de données vectorielles', 'Comprendre la recherche vectorielle et mettre en œuvre Qdrant, Weaviate ou ChromaDB.', '/guides/qdrant-recherche-vectorielle-haute-performance'],
+  ['Assistants et agents de code', 'Choisir entre Claude Code, Cursor, Aider et Cline selon son workflow de développement.', '/guides/claude-code-cursor-aider-cline-comparatif'],
+  ['Modèles open-weight', 'Comparer Llama, Mistral, Gemma et Qwen, leurs licences et leurs performances.', '/guides/llama-mistral-gemma-qwen-panorama-2026'],
+  ['IA pour les entreprises', 'Cadrer un projet IA, éviter les erreurs fréquentes et construire un premier produit utile.', '/guides/7-erreurs-frequentes-projet-ia'],
+  ['Next.js et développement web', 'Structurer, authentifier et déployer une application Next.js moderne.', '/guides/nextjs-app-router-structurer-projet-2026'],
+  ['Automatisation', 'Comparer n8n, Make et Zapier, puis connecter des LLM à ses workflows.', '/guides/n8n-make-zapier-automatiser-comparatif'],
+  ['Données et embeddings', 'Choisir un modèle d’embeddings, préparer ses données et constituer un dataset métier.', '/guides/embeddings-comprendre-choisir-modele'],
+  ['Sécurité des applications LLM', 'Se protéger contre le prompt injection, l’exfiltration et les usages non prévus.', '/guides/securite-applications-llm-prompt-injection'],
 ] as const
 
 const formatDate = new Intl.DateTimeFormat('fr-FR', {
@@ -162,20 +167,6 @@ export default async function HomePage() {
           <strong>Comparateur GPU cloud</strong>
           <small>Comparer les offres et vérifier la compatibilité d’un modèle.</small>
         </Link>
-      </section>
-
-      <section aria-labelledby="prochains-themes" className={styles.section}>
-        <p className={styles.eyebrow}>Prochains dossiers</p>
-        <h2 id="prochains-themes">Speech, image, observabilité et RGPD</h2>
-        <div className={styles.upcomingThemes}>
-          {upcomingThemes.map(([title, description]) => (
-            <article key={title}>
-              <span>En préparation</span>
-              <h3>{title}</h3>
-              <p>{description}</p>
-            </article>
-          ))}
-        </div>
       </section>
 
       <section aria-labelledby="recent" className={styles.recentSection}>
