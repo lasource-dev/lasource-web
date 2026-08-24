@@ -61,9 +61,41 @@ export function assertValidPublishedTechnologyCategory(
   }
 }
 
-export function assertCategoryCanBecomeNonPublic(publishedTechnologyCount: number): void {
+export function assertCategoryCanBecomeNonPublic(
+  publishedTechnologyCount: number,
+  publishedChildCount = 0,
+): void {
   if (publishedTechnologyCount > 0) {
     throw new Error('A Category used by a published Technology cannot be archived or unpublished')
+  }
+  if (publishedChildCount > 0) {
+    throw new Error('A Category with published subcategories cannot be archived or unpublished')
+  }
+}
+
+export function assertValidCategoryParent({
+  categoryID,
+  childCount,
+  parent,
+  publishing,
+}: {
+  categoryID?: number | string | null
+  childCount: number
+  parent: Category | null
+  publishing: boolean
+}): void {
+  if (!parent) throw new Error('The parent Category does not exist')
+  if (categoryID != null && parent.id === categoryID) {
+    throw new Error('A Category cannot be its own parent')
+  }
+  if (parent.parent_category) {
+    throw new Error('Category taxonomy supports a maximum of two levels')
+  }
+  if (childCount > 0) {
+    throw new Error('A Category with subcategories cannot become a subcategory')
+  }
+  if (publishing && !isPublishedCategory(parent)) {
+    throw new Error('A published subcategory requires a published, active parent Category')
   }
 }
 

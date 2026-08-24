@@ -7,6 +7,7 @@ import type {
 import type { Category } from '../../payload-types'
 import {
   assertCategoryCanBecomeNonPublic,
+  assertValidCategoryParent,
   CATEGORY_INDEX_POLICY,
   prepareCategoryData,
   validateSlug,
@@ -45,7 +46,56 @@ const preventInvalidatingPublishedTechnologies: CollectionBeforeChangeHook<Categ
     },
   })
 
-  assertCategoryCanBecomeNonPublic(references.totalDocs)
+  const children = await req.payload.count({
+    collection: 'categories',
+    overrideAccess: true,
+    where: {
+      and: [
+        { parent_category: { equals: originalDoc.id } },
+        { editorial_status: { equals: 'published' } },
+        { _status: { equals: 'published' } },
+      ],
+    },
+  })
+
+  assertCategoryCanBecomeNonPublic(references.totalDocs, children.totalDocs)
+
+  return data
+}
+
+const validateParentCategory: CollectionBeforeChangeHook<Category> = async ({
+  data,
+  originalDoc,
+  req,
+}) => {
+  const parentValue = data.parent_category ?? originalDoc?.parent_category
+  const parentID = typeof parentValue === 'object' && parentValue !== null ? parentValue.id : parentValue
+  if (!parentID) return data
+
+  const [parent, children] = await Promise.all([
+    req.payload.findByID({
+      collection: 'categories',
+      depth: 0,
+      id: parentID,
+      overrideAccess: true,
+    }),
+    originalDoc?.id
+      ? req.payload.count({
+          collection: 'categories',
+          overrideAccess: true,
+          where: { parent_category: { equals: originalDoc.id } },
+        })
+      : Promise.resolve({ totalDocs: 0 }),
+  ])
+
+  assertValidCategoryParent({
+    categoryID: originalDoc?.id,
+    childCount: children.totalDocs,
+    parent,
+    publishing:
+      (data.editorial_status ?? originalDoc?.editorial_status) === 'published' &&
+      data.archived !== true,
+  })
 
   return data
 }
@@ -70,7 +120,7 @@ export const Categories: CollectionConfig = {
   },
   disableDuplicate: true,
   hooks: {
-    beforeChange: [preventInvalidatingPublishedTechnologies],
+    beforeChange: [validateParentCategory, preventInvalidatingPublishedTechnologies],
     beforeValidate: [synchronizeEditorialStatus, prepareCategory],
   },
   labels: { plural: 'Catégories', singular: 'Catégorie' },
@@ -104,6 +154,16 @@ export const Categories: CollectionConfig = {
               name: 'aliases',
               type: 'array',
               fields: [{ name: 'alias', type: 'text', maxLength: 120, required: true }],
+            },
+            {
+              name: 'parent_category',
+              type: 'relationship',
+              admin: {
+                description: 'Catégorie parente facultative. Deux niveaux maximum.',
+              },
+              filterOptions: { parent_category: { exists: false } },
+              index: true,
+              relationTo: 'categories',
             },
           ],
         },

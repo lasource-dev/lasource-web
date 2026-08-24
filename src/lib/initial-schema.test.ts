@@ -26,6 +26,7 @@ describe('initial PostgreSQL schema', () => {
       '20260812_105458_affiliate_recommendations',
       '20260816_180000_gpu_prices',
       '20260817_160000_gpu_price_sources',
+      '20260824_171500_category_hierarchy',
     ])
   })
 

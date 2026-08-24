@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { Category } from '../../../payload-types'
 import {
   assertCategoryCanBecomeNonPublic,
+  assertValidCategoryParent,
   assertValidPublishedTechnologyCategory,
   CATEGORY_INDEX_POLICY,
   isPublishedCategory,
@@ -101,6 +102,33 @@ describe('Category domain', () => {
       'A Category used by a published Technology cannot be archived or unpublished',
     )
     expect(() => assertCategoryCanBecomeNonPublic(0)).not.toThrow()
+    expect(() => assertCategoryCanBecomeNonPublic(0, 1)).toThrow(
+      'A Category with published subcategories cannot be archived or unpublished',
+    )
+  })
+
+  it('limite la taxonomie à deux niveaux et exige un parent public', () => {
+    const parent = category({ _status: 'published', editorial_status: 'published' })
+    expect(() =>
+      assertValidCategoryParent({ categoryID: 'child', childCount: 0, parent, publishing: true }),
+    ).not.toThrow()
+    expect(() =>
+      assertValidCategoryParent({ categoryID: parent.id, childCount: 0, parent, publishing: true }),
+    ).toThrow('A Category cannot be its own parent')
+    expect(() =>
+      assertValidCategoryParent({
+        categoryID: 'child',
+        childCount: 0,
+        parent: category({ parent_category: parent }),
+        publishing: false,
+      }),
+    ).toThrow('maximum of two levels')
+    expect(() =>
+      assertValidCategoryParent({ categoryID: 'child', childCount: 1, parent, publishing: false }),
+    ).toThrow('cannot become a subcategory')
+    expect(() =>
+      assertValidCategoryParent({ categoryID: 'child', childCount: 0, parent: category(), publishing: true }),
+    ).toThrow('requires a published')
   })
 
   it('déclare seulement les index Category utiles', () => {

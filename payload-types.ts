@@ -179,6 +179,10 @@ export interface Category {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Catégorie parente facultative. Deux niveaux maximum.
+   */
+  parent_category?: (string | null) | Category;
   short_description: string;
   long_description?: string | null;
   editorial_status: 'draft' | 'published';
@@ -557,6 +561,7 @@ export interface CategoriesSelect<T extends boolean = true> {
         alias?: T;
         id?: T;
       };
+  parent_category?: T;
   short_description?: T;
   long_description?: T;
   editorial_status?: T;

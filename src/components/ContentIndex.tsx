@@ -14,15 +14,21 @@ export type ContentIndexFilter = {
   label: string
 }
 
+export type ContentIndexFilterGroup = {
+  ariaLabel: string
+  filters: readonly ContentIndexFilter[]
+  label: string
+}
+
 export function ContentIndex({
   description,
-  filters,
+  filterGroups,
   items,
   search,
   title,
 }: {
   description: string
-  filters?: readonly ContentIndexFilter[]
+  filterGroups?: readonly ContentIndexFilterGroup[]
   items: readonly ContentIndexItem[]
   search?: string
   title: string
@@ -49,11 +55,11 @@ export function ContentIndex({
               <button type="submit">Rechercher</button>
             </div>
           </form>
-          {filters && filters.length > 0 && (
-            <nav aria-label="Filtrer les technologies par type" className={styles.indexFilters}>
-              <span>Type</span>
+          {filterGroups?.map((group) => (
+            <nav aria-label={group.ariaLabel} className={styles.indexFilters} key={group.label}>
+              <span>{group.label}</span>
               <div>
-                {filters.map((filter) => (
+                {group.filters.map((filter) => (
                   <Link
                     aria-current={filter.active ? 'page' : undefined}
                     className={filter.active ? styles.activeFilter : undefined}
@@ -65,7 +71,7 @@ export function ContentIndex({
                 ))}
               </div>
             </nav>
-          )}
+          ))}
         </div>
       )}
       <section aria-label={`Liste des ${title.toLowerCase()}`} className={styles.publicationGrid}>
