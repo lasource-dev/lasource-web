@@ -5,20 +5,29 @@ const IA_PARENT_SLUG = 'intelligence-artificielle'
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
     ALTER TABLE "categories" ADD COLUMN "parent_category_id" uuid;
+  `)
+  await db.execute(sql`
     ALTER TABLE "_categories_v" ADD COLUMN "version_parent_category_id" uuid;
-
+  `)
+  await db.execute(sql`
     ALTER TABLE "categories"
       ADD CONSTRAINT "categories_parent_category_id_categories_id_fk"
       FOREIGN KEY ("parent_category_id") REFERENCES "public"."categories"("id")
       ON DELETE set null ON UPDATE no action;
+  `)
+  await db.execute(sql`
     ALTER TABLE "_categories_v"
       ADD CONSTRAINT "_categories_v_version_parent_category_id_categories_id_fk"
       FOREIGN KEY ("version_parent_category_id") REFERENCES "public"."categories"("id")
       ON DELETE set null ON UPDATE no action;
-
+  `)
+  await db.execute(sql`
     CREATE INDEX "categories_parent_category_idx" ON "categories" USING btree ("parent_category_id");
+  `)
+  await db.execute(sql`
     CREATE INDEX "_categories_v_version_parent_category_idx" ON "_categories_v" USING btree ("version_parent_category_id");
-
+  `)
+  await db.execute(sql`
     INSERT INTO "categories" (
       "slug", "canonical_name", "short_description", "parent_category_id",
       "editorial_status", "archived", "meta_title", "meta_description", "_status"
@@ -39,7 +48,8 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     ON CONFLICT ("slug") DO UPDATE SET
       "parent_category_id" = EXCLUDED."parent_category_id",
       "updated_at" = now();
-
+  `)
+  await db.execute(sql`
     UPDATE "technologies" technology
     SET "category_id" = category.id, "updated_at" = now()
     FROM "categories" category
@@ -92,16 +102,28 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
     WHERE technology.category_id = child.id
       AND child.parent_category_id = parent.id
       AND parent.slug = ${IA_PARENT_SLUG};
-
+  `)
+  await db.execute(sql`
     DELETE FROM "categories" WHERE "parent_category_id" = (
       SELECT id FROM "categories" WHERE slug = ${IA_PARENT_SLUG}
     );
-
+  `)
+  await db.execute(sql`
     DROP INDEX IF EXISTS "_categories_v_version_parent_category_idx";
+  `)
+  await db.execute(sql`
     DROP INDEX IF EXISTS "categories_parent_category_idx";
+  `)
+  await db.execute(sql`
     ALTER TABLE "_categories_v" DROP CONSTRAINT IF EXISTS "_categories_v_version_parent_category_id_categories_id_fk";
+  `)
+  await db.execute(sql`
     ALTER TABLE "categories" DROP CONSTRAINT IF EXISTS "categories_parent_category_id_categories_id_fk";
+  `)
+  await db.execute(sql`
     ALTER TABLE "_categories_v" DROP COLUMN IF EXISTS "version_parent_category_id";
+  `)
+  await db.execute(sql`
     ALTER TABLE "categories" DROP COLUMN IF EXISTS "parent_category_id";
   `)
 }
