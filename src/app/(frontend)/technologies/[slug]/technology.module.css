@@ -97,6 +97,29 @@
   padding: 1rem;
 }
 
+.content table {
+  border-collapse: collapse;
+  display: block;
+  margin: 1.5rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: normal;
+}
+
+.content th,
+.content td {
+  border: 1px solid #d0d5dd;
+  min-width: 10rem;
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.content th {
+  background: #f2f4f7;
+  font-weight: 700;
+}
+
 .details {
   border-block: 1px solid #d0d5dd;
   display: grid;

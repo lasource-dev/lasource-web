@@ -33,4 +33,19 @@ describe('MarkdownContent', () => {
     expect(markup).toContain('<p>Une introduction.</p>')
     expect(markup).toContain('<h2>À apprendre</h2>')
   })
+
+  it('rend le gras et les tableaux Markdown', () => {
+    const markup = renderToStaticMarkup(
+      createElement(MarkdownContent, {
+        source:
+          'En août, **Cursor** mise sur l’éditeur.\n\n| Outil | Positionnement | Offre |\n|---|---|---|\n| **Claude Code** | Agent terminal | Abonnement |\n| Cursor | Éditeur IA | Gratuité limitée |',
+      }),
+    )
+
+    expect(markup).toContain('<strong>Cursor</strong>')
+    expect(markup).toContain('<table><thead><tr><th>Outil</th><th>Positionnement</th><th>Offre</th></tr></thead>')
+    expect(markup).toContain('<td><strong>Claude Code</strong></td>')
+    expect(markup).toContain('<td>Gratuité limitée</td>')
+    expect(markup).not.toContain('|---|')
+  })
 })

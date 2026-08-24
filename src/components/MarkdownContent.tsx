@@ -6,7 +6,7 @@ type MarkdownContentProps = {
 }
 
 function inline(source: string): ReactNode[] {
-  const parts = source.split(/(`[^`]+`|\[[^\]]+\]\([^)]+\))/g)
+  const parts = source.split(/(`[^`]+`|\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*)/g)
   return parts.map((part, index) => {
     const code = part.match(/^`([^`]+)`$/)
     if (code) return <code key={index}>{code[1]}</code>
@@ -14,8 +14,22 @@ function inline(source: string): ReactNode[] {
     const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/)
     if (link) return <a href={link[2]} key={index}>{link[1]}</a>
 
+    const strong = part.match(/^\*\*([^*]+)\*\*$/)
+    if (strong) return <strong key={index}>{inline(strong[1])}</strong>
+
     return part
   })
+}
+
+const tableSeparator = /^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$/
+
+function tableCells(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map((cell) => cell.trim())
 }
 
 export function MarkdownContent({ skipLeadingTitle = false, source }: MarkdownContentProps) {
@@ -48,6 +62,37 @@ export function MarkdownContent({ skipLeadingTitle = false, source }: MarkdownCo
         <pre key={blocks.length}>
           <code className={language ? `language-${language}` : undefined}>{code.join('\n')}</code>
         </pre>,
+      )
+      continue
+    }
+
+    if (
+      line.includes('|') &&
+      index + 1 < lines.length &&
+      tableSeparator.test(lines[index + 1])
+    ) {
+      const headers = tableCells(line)
+      const rows: string[][] = []
+      index += 2
+      while (index < lines.length && lines[index].trim() && lines[index].includes('|')) {
+        rows.push(tableCells(lines[index]))
+        index += 1
+      }
+      blocks.push(
+        <table key={blocks.length}>
+          <thead>
+            <tr>{headers.map((header, cellIndex) => <th key={cellIndex}>{inline(header)}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {headers.map((_, cellIndex) => (
+                  <td key={cellIndex}>{inline(row[cellIndex] ?? '')}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>,
       )
       continue
     }
@@ -95,6 +140,7 @@ export function MarkdownContent({ skipLeadingTitle = false, source }: MarkdownCo
       index < lines.length &&
       lines[index].trim() &&
       !/^(#{2,6})\s+|^```|^[-*]\s+|^\d+\.\s+/.test(lines[index])
+      && !(lines[index].includes('|') && index + 1 < lines.length && tableSeparator.test(lines[index + 1]))
     ) {
       paragraph.push(lines[index])
       index += 1
