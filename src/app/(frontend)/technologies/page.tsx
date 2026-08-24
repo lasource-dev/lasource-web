@@ -6,6 +6,7 @@ import type { Category, Technology } from '../../../../payload-types'
 
 const additionalTechnologyTypes: Record<string, readonly string[]> = {
   css: ['frontend'],
+  html: ['frontend'],
 }
 
 const relationshipID = (value: Category['parent_category']) =>
