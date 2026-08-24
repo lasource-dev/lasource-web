@@ -3,6 +3,15 @@ import type { Metadata } from 'next'
 import { ContentIndex } from '../../../components/ContentIndex'
 import { getApplicationPayload } from '../../../lib/get-application-payload'
 
+const additionalTechnologyTypes: Record<string, readonly string[]> = {
+  css: ['frontend'],
+}
+
+const technologyTypeSlugs = (technology: { category?: null | number | string | { slug?: null | string }; slug: string }) => {
+  const primaryType = typeof technology.category === 'object' ? technology.category?.slug : undefined
+  return [primaryType, ...(additionalTechnologyTypes[technology.slug] ?? [])].filter(Boolean)
+}
+
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   alternates: { canonical: '/technologies' },
@@ -36,10 +45,9 @@ export default async function TechnologiesIndexPage({
       ],
     },
   })
-  const selectedCategory = categories.docs.find((category) => category.slug === type)
-  const technologies = await payload.find({
+  const allTechnologies = await payload.find({
     collection: 'technologies',
-    depth: 0,
+    depth: 1,
     limit: 1000,
     overrideAccess: false,
     pagination: false,
@@ -48,24 +56,31 @@ export default async function TechnologiesIndexPage({
       and: [
         { editorial_status: { equals: 'published' } },
         { _status: { equals: 'published' } },
-        ...(search ? [{ canonical_name: { contains: search } }] : []),
-        ...(selectedCategory ? [{ category: { equals: selectedCategory.id } }] : []),
       ],
     },
   })
+  const representedTypeSlugs = new Set(allTechnologies.docs.flatMap(technologyTypeSlugs))
+  const representedCategories = categories.docs.filter((category) => representedTypeSlugs.has(category.slug))
+  const selectedCategory = representedCategories.find((category) => category.slug === type)
+  const normalizedSearch = search.toLocaleLowerCase('fr')
+  const technologies = allTechnologies.docs.filter(
+    (technology) =>
+      (!normalizedSearch || technology.canonical_name.toLocaleLowerCase('fr').includes(normalizedSearch)) &&
+      (!selectedCategory || technologyTypeSlugs(technology).includes(selectedCategory.slug)),
+  )
 
   return (
     <ContentIndex
       description="Comprenez le rôle, les usages, les limites et l’écosystème des principales technologies du Web."
       filters={[
         { active: !selectedCategory, href: '/technologies', label: 'Tous' },
-        ...categories.docs.map((category) => ({
+        ...representedCategories.map((category) => ({
           active: category.id === selectedCategory?.id,
           href: `/technologies?type=${encodeURIComponent(category.slug)}`,
           label: category.canonical_name,
         })),
       ]}
-      items={technologies.docs.map((technology) => ({
+      items={technologies.map((technology) => ({
         description: technology.short_description,
         href: `/technologies/${technology.slug}`,
         title: technology.canonical_name,
