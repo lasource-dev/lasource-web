@@ -23,6 +23,7 @@ const contentTypes = [
 ] as const
 
 const journeys = [
+  ['Choisir un LLM', 'Comparer Claude, GPT et Gemini selon les besoins de votre application.', '/guides/claude-gpt-gemini-quel-llm-choisir'],
   ['Construire un pipeline RAG', 'Choisir les briques de recherche, d’indexation et de génération.', '/guides/bases-vectorielles-rag-chromadb-faiss-pgvector'],
   ['Créer un agent IA', 'Comparer les principaux frameworks et leurs compromis.', '/guides/frameworks-agents-langchain-crewai-pydantic-ai-autogen'],
   ['Déployer un modèle en local', 'Installer Ollama et choisir un modèle adapté à sa machine.', '/tutoriels/installer-configurer-ollama'],
@@ -138,7 +139,7 @@ export default async function HomePage() {
 
       <section aria-labelledby="parcours" className={styles.section}>
         <p className={styles.eyebrow}>Explorer par thème</p>
-        <h2 id="parcours">Partez de votre problème, pas du format</h2>
+        <h2 id="parcours">Quel est votre besoin&nbsp;?</h2>
         <div className={styles.journeyGrid}>
           {journeys.map(([title, description, href]) => (
             <article className={styles.journeyCard} key={title}>

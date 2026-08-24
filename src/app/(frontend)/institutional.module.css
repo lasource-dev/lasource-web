@@ -233,7 +233,6 @@
 
 .journeyGrid { display: grid; gap: 1rem; grid-template-columns: repeat(6, minmax(0, 1fr)); margin-top: 2.5rem; }
 .journeyCard { background: var(--panel); border: 1px solid var(--border); display: flex; flex-direction: column; grid-column: span 2; min-height: 14rem; padding: 1.5rem; }
-.journeyCard:nth-child(4), .journeyCard:nth-child(5) { grid-column: span 3; }
 .journeyCard h3, .upcomingThemes h3 { font-size: 1.25rem; line-height: 1.3; margin: 0; }
 .journeyCard h3 a { text-decoration-color: var(--border); text-underline-offset: 0.2em; }
 .journeyCard p, .upcomingThemes p, .comparisonSection p, .comparatorCard small { color: var(--muted); line-height: 1.65; }
@@ -429,7 +428,7 @@
   }
 
   .journeyGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .journeyCard, .journeyCard:nth-child(4), .journeyCard:nth-child(5) { grid-column: span 1; }
+  .journeyCard { grid-column: span 1; }
   .upcomingThemes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .disabledAction {
