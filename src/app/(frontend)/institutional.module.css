@@ -116,7 +116,8 @@
 .section,
 .splitSection,
 .recentSection,
-.newsletter {
+.newsletter,
+.comparisonSection {
   border-top: 1px solid var(--border);
   padding: clamp(3.5rem, 7vw, 6rem) 0;
 }
@@ -222,12 +223,40 @@
 .section h2,
 .splitSection h2,
 .recentSection h2,
-.newsletter h2 {
+.newsletter h2,
+.comparisonSection h2 {
   font-size: clamp(2rem, 4vw, 3.5rem);
   letter-spacing: -0.04em;
   line-height: 1.05;
   margin: 0;
 }
+
+.journeyGrid { display: grid; gap: 1rem; grid-template-columns: repeat(6, minmax(0, 1fr)); margin-top: 2.5rem; }
+.journeyCard { background: var(--panel); border: 1px solid var(--border); display: flex; flex-direction: column; grid-column: span 2; min-height: 14rem; padding: 1.5rem; }
+.journeyCard:nth-child(4), .journeyCard:nth-child(5) { grid-column: span 3; }
+.journeyCard h3, .upcomingThemes h3 { font-size: 1.25rem; line-height: 1.3; margin: 0; }
+.journeyCard h3 a { text-decoration-color: var(--border); text-underline-offset: 0.2em; }
+.journeyCard p, .upcomingThemes p, .comparisonSection p, .comparatorCard small { color: var(--muted); line-height: 1.65; }
+.cardLink { color: var(--signal-dark); font-weight: 750; margin-top: auto; padding-top: 1rem; text-underline-offset: 0.2em; }
+
+.comparisonSection { align-items: stretch; display: grid; gap: 3rem; grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.8fr); }
+.comparisonSection > div > p:last-child { font-size: 1.05rem; margin: 1.25rem 0 0; max-width: 40rem; }
+.comparatorCard { background: var(--ink); color: white; display: flex; flex-direction: column; justify-content: end; min-height: 15rem; padding: 1.75rem; text-decoration: none; }
+.comparatorCard span, .upcomingThemes span, .resultType { color: #87c9b5; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.comparatorCard strong { font-size: 1.6rem; letter-spacing: -0.03em; margin-top: 0.75rem; }
+.comparatorCard small { color: #d8ddd8; font-size: 0.95rem; margin-top: 0.5rem; }
+
+.upcomingThemes { display: grid; gap: 1px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 2.5rem; }
+.upcomingThemes article { border: 1px dashed var(--border); margin: -1px 0 0 -1px; min-height: 12rem; padding: 1.5rem; }
+.upcomingThemes span { color: var(--signal); display: block; margin-bottom: 1rem; }
+
+.searchResults { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.searchResult { border-top: 1px solid var(--border); padding: 1.5rem 0; }
+.searchResult h2 { font-size: 1.35rem; line-height: 1.3; margin: 0.5rem 0 0; }
+.searchResult h2 a { text-decoration-color: var(--border); text-underline-offset: 0.2em; }
+.searchResult > p:last-child { color: var(--muted); line-height: 1.65; margin: 0.75rem 0 0; }
+.resultType { color: var(--signal); margin: 0; }
+.resultSummary { color: var(--muted); font-weight: 700; margin: 0 0 1.5rem; }
 
 .splitSection,
 .recentSection,
@@ -394,9 +423,14 @@
   .splitSection,
   .recentSection,
   .newsletter,
+  .comparisonSection,
   .articleSection {
     grid-template-columns: 1fr;
   }
+
+  .journeyGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .journeyCard, .journeyCard:nth-child(4), .journeyCard:nth-child(5) { grid-column: span 1; }
+  .upcomingThemes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .disabledAction {
     justify-self: start;
@@ -422,4 +456,6 @@
   .publicationGrid {
     grid-template-columns: 1fr;
   }
+
+  .journeyGrid, .upcomingThemes, .searchResults { grid-template-columns: 1fr; }
 }

@@ -7,8 +7,8 @@ import styles from './institutional.module.css'
 export const metadata: Metadata = {
   alternates: { canonical: '/' },
   description:
-    'Des fiches, guides et tutoriels clairs pour comprendre les technologies du Web et de l’intelligence artificielle.',
-  title: 'Comprendre les technologies du Web et de l’intelligence artificielle',
+    'Le guide technique francophone de l’IA : comparateurs de prix, guides de déploiement et tutoriels sur les LLM, agents et modèles open source.',
+  title: 'Guides, comparateurs et tutoriels pour construire avec l’IA',
 }
 
 export const dynamic = 'force-dynamic'
@@ -20,6 +20,21 @@ const contentTypes = [
   ['Comparatifs', 'Comparez plusieurs solutions à partir de critères clairs.', undefined],
   ['Mises à jour', 'Retrouvez les changements importants des technologies que vous utilisez.', undefined],
   ['Ressources GPU', 'Comparez les offres de GPU cloud par matériel, prix et région.', '/ressources/gpu'],
+] as const
+
+const journeys = [
+  ['Construire un pipeline RAG', 'Choisir les briques de recherche, d’indexation et de génération.', '/guides/bases-vectorielles-rag-chromadb-faiss-pgvector'],
+  ['Créer un agent IA', 'Comparer les principaux frameworks et leurs compromis.', '/guides/frameworks-agents-langchain-crewai-pydantic-ai-autogen'],
+  ['Déployer un modèle en local', 'Installer Ollama et choisir un modèle adapté à sa machine.', '/tutoriels/installer-configurer-ollama'],
+  ['Model Context Protocol', 'Comprendre comment connecter un agent à des outils et des données.', '/guides/comprendre-model-context-protocol'],
+  ['Comparer les GPU cloud', 'Comparer le matériel, les prix et les régions disponibles.', '/ressources/gpu'],
+] as const
+
+const upcomingThemes = [
+  ['Speech', 'Reconnaissance vocale, transcription et synthèse de la parole.'],
+  ['Image', 'Génération, édition, modèles et API d’images.'],
+  ['Observabilité', 'Tracer, évaluer et superviser les applications fondées sur les LLM.'],
+  ['RGPD', 'Concevoir et déployer des usages de l’IA respectueux des données personnelles.'],
 ] as const
 
 const formatDate = new Intl.DateTimeFormat('fr-FR', {
@@ -99,13 +114,13 @@ export default async function HomePage() {
         <p className={styles.scope}>
           Langages, frameworks, outils, protocoles, intelligence artificielle et plateformes cloud.
         </p>
-        <form action="/technologies" className={styles.searchForm} role="search">
-          <label htmlFor="technology-search">Quelle technologie souhaitez-vous comprendre ?</label>
+        <form action="/recherche" className={styles.searchForm} role="search">
+          <label htmlFor="technology-search">Que souhaitez-vous construire ou comprendre ?</label>
           <div>
             <input
               id="technology-search"
               name="q"
-              placeholder="Ex. React, PostgreSQL, OpenAI…"
+              placeholder="Ex. RAG, speech, monitoring, RGPD…"
               type="search"
             />
             <button type="submit">Rechercher</button>
@@ -118,6 +133,47 @@ export default async function HomePage() {
           <Link className={styles.secondaryAction} href="/a-propos">
             Découvrir notre démarche
           </Link>
+        </div>
+      </section>
+
+      <section aria-labelledby="parcours" className={styles.section}>
+        <p className={styles.eyebrow}>Explorer par thème</p>
+        <h2 id="parcours">Partez de votre problème, pas du format</h2>
+        <div className={styles.journeyGrid}>
+          {journeys.map(([title, description, href]) => (
+            <article className={styles.journeyCard} key={title}>
+              <h3><Link href={href}>{title}</Link></h3>
+              <p>{description}</p>
+              <Link className={styles.cardLink} href={href}>Commencer <span aria-hidden="true">→</span></Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="comparateurs" className={styles.comparisonSection}>
+        <div>
+          <p className={styles.eyebrow}>Comparer les services IA</p>
+          <h2 id="comparateurs">Décidez à partir de critères concrets</h2>
+          <p>Prix, matériel, région et contraintes de déploiement réunis dans des outils indépendants.</p>
+        </div>
+        <Link className={styles.comparatorCard} href="/ressources/gpu">
+          <span>Disponible</span>
+          <strong>Comparateur GPU cloud</strong>
+          <small>Comparer les offres et vérifier la compatibilité d’un modèle.</small>
+        </Link>
+      </section>
+
+      <section aria-labelledby="prochains-themes" className={styles.section}>
+        <p className={styles.eyebrow}>Prochains dossiers</p>
+        <h2 id="prochains-themes">Speech, image, observabilité et RGPD</h2>
+        <div className={styles.upcomingThemes}>
+          {upcomingThemes.map(([title, description]) => (
+            <article key={title}>
+              <span>En préparation</span>
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </article>
+          ))}
         </div>
       </section>
 
