@@ -40,21 +40,23 @@ export function ContentIndex({
         <h1>{title}</h1>
         <p className={styles.lead}>{description}</p>
       </header>
-      {search !== undefined && (
+      {(search !== undefined || (filterGroups && filterGroups.length > 0)) && (
         <div className={styles.indexSearchArea}>
-          <form action="/technologies" className={styles.indexSearchForm} role="search">
-            <label htmlFor="index-technology-search">Rechercher une technologie</label>
-            <div>
-              <input
-                defaultValue={search}
-                id="index-technology-search"
-                name="q"
-                placeholder="Ex. React, PostgreSQL, OpenAI…"
-                type="search"
-              />
-              <button type="submit">Rechercher</button>
-            </div>
-          </form>
+          {search !== undefined && (
+            <form action="/technologies" className={styles.indexSearchForm} role="search">
+              <label htmlFor="index-technology-search">Rechercher une technologie</label>
+              <div>
+                <input
+                  defaultValue={search}
+                  id="index-technology-search"
+                  name="q"
+                  placeholder="Ex. React, PostgreSQL, OpenAI…"
+                  type="search"
+                />
+                <button type="submit">Rechercher</button>
+              </div>
+            </form>
+          )}
           {filterGroups?.map((group) => (
             <nav aria-label={group.ariaLabel} className={styles.indexFilters} key={group.label}>
               <span>{group.label}</span>
