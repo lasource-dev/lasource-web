@@ -8,6 +8,7 @@ import { MarkdownContent } from './MarkdownContent'
 import { StructuredData } from './StructuredData'
 import { EditorialStatus } from './EditorialStatus'
 import { AffiliateSections } from './AffiliateSections'
+import { EditorialInsights } from './EditorialInsights'
 import type { EditorialContentType } from '../lib/editorial-content-public'
 import { loadPublishedEditorialContent } from '../lib/editorial-content-public'
 import { readServerEnvironment } from '../lib/env'
@@ -89,6 +90,20 @@ export async function EditorialContentPage({ slug, type }: EditorialContentPageP
     : { docs: [] }
   const relatedContents = relatedResult.docs.filter((item) => item.id !== content.id).slice(0, 4)
   const affiliateSections = await loadAffiliateSections(payload, content)
+  const insightResult = await payload.find({
+    collection: 'editorial-insights',
+    depth: 0,
+    limit: 20,
+    overrideAccess: false,
+    pagination: false,
+    sort: '-engagement_score',
+    where: {
+      and: [
+        { article: { equals: content.id } },
+        { status: { in: ['accepted', 'integrated'] } },
+      ],
+    },
+  })
   const categories = populatedCategories(content)
   const technologies = populatedTechnologies(content)
 
@@ -172,6 +187,7 @@ export async function EditorialContentPage({ slug, type }: EditorialContentPageP
       <article className={styles.content}>
         <MarkdownContent skipLeadingTitle source={content.body_markdown} />
       </article>
+      <EditorialInsights insights={insightResult.docs} />
       <AffiliateSections contentSlug={content.slug} sections={affiliateSections} />
       {relatedContents.length ? (
         <section aria-labelledby="related-content" className={styles.related}>
