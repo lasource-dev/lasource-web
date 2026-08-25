@@ -1,9 +1,57 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadHandler } from 'payload'
 
 import { EDITORIAL_STATUSES } from './technology/domain'
 import { REVIEW_STATUSES } from './editorial/review'
 import { validateSlug } from './technology/domain'
 import { editorialWriteAccess, synchronizeEditorialStatus } from './editorial/automation-access'
+import { isAdminUser, isAutomationUser } from './editorial/automation-access'
+import {
+  collectEditorialInsights,
+  type EnrichmentPlatform,
+} from '../lib/editorial-enrichment/collect'
+
+const collectInsights: PayloadHandler = async (req) => {
+  if (!isAdminUser(req.user) && !isAutomationUser(req.user)) {
+    return Response.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  const id = String(req.routeParams?.id ?? '')
+  if (!id) return Response.json({ error: 'Article id is required' }, { status: 400 })
+
+  let body: { platforms?: EnrichmentPlatform[]; query?: string } = {}
+  try {
+    body = req.json ? ((await req.json()) as typeof body) : {}
+  } catch {
+    // An empty request body uses the article title and both MVP connectors.
+  }
+
+  const allowedPlatforms = new Set<EnrichmentPlatform>(['stack_exchange', 'github'])
+  const platforms = body.platforms ?? ['stack_exchange', 'github']
+  if (platforms.length === 0 || platforms.some((platform) => !allowedPlatforms.has(platform))) {
+    return Response.json({ error: 'Invalid enrichment platform' }, { status: 400 })
+  }
+
+  try {
+    const article = await req.payload.findByID({
+      collection: 'editorial-contents',
+      depth: 1,
+      id,
+      overrideAccess: false,
+      req,
+    })
+    const result = await collectEditorialInsights(req.payload, {
+      article,
+      githubToken: process.env.GITHUB_TOKEN,
+      platforms,
+      query: body.query,
+      req,
+    })
+    return Response.json(result, { status: 201 })
+  } catch (error) {
+    req.payload.logger.error({ err: error, msg: 'Editorial insight collection failed' })
+    return Response.json({ error: 'Editorial insight collection failed' }, { status: 502 })
+  }
+}
 
 export const EditorialContents: CollectionConfig = {
   slug: 'editorial-contents',
@@ -23,6 +71,7 @@ export const EditorialContents: CollectionConfig = {
           },
   },
   disableDuplicate: true,
+  endpoints: [{ handler: collectInsights, method: 'post', path: '/:id/collect-insights' }],
   hooks: { beforeValidate: [synchronizeEditorialStatus] },
   versions: {
     drafts: { autosave: false, schedulePublish: false },

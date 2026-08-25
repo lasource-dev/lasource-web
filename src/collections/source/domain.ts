@@ -7,6 +7,8 @@ export const SOURCE_TYPES = [
   'official_blog',
   'video',
   'scientific_publication',
+  'stack_exchange',
+  'community_discussion',
 ] as const
 
 export const SOURCE_EDITORIAL_STATUSES = ['draft', 'published'] as const
