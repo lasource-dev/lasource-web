@@ -72,6 +72,7 @@ export interface Config {
     sources: Source;
     technologies: Technology;
     'editorial-contents': EditorialContent;
+    'editorial-insights': EditorialInsight;
     relations: Relation;
     'affiliate-partners': AffiliatePartner;
     'affiliate-offers': AffiliateOffer;
@@ -89,6 +90,7 @@ export interface Config {
     sources: SourcesSelect<false> | SourcesSelect<true>;
     technologies: TechnologiesSelect<false> | TechnologiesSelect<true>;
     'editorial-contents': EditorialContentsSelect<false> | EditorialContentsSelect<true>;
+    'editorial-insights': EditorialInsightsSelect<false> | EditorialInsightsSelect<true>;
     relations: RelationsSelect<false> | RelationsSelect<true>;
     'affiliate-partners': AffiliatePartnersSelect<false> | AffiliatePartnersSelect<true>;
     'affiliate-offers': AffiliateOffersSelect<false> | AffiliateOffersSelect<true>;
@@ -207,7 +209,15 @@ export interface Source {
    * URL canonique normalisée, sans paramètres de suivi.
    */
   url: string;
-  type: 'documentation' | 'github' | 'rfc' | 'official_blog' | 'video' | 'scientific_publication';
+  type:
+    | 'documentation'
+    | 'github'
+    | 'rfc'
+    | 'official_blog'
+    | 'video'
+    | 'scientific_publication'
+    | 'stack_exchange'
+    | 'community_discussion';
   title: string;
   author?: string | null;
   published_at?: string | null;
@@ -360,6 +370,44 @@ export interface AffiliatePartner {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "editorial-insights".
+ */
+export interface EditorialInsight {
+  id: string;
+  title: string;
+  article: string | EditorialContent;
+  platform: 'stack_exchange' | 'github';
+  type: 'field_experience' | 'pitfall' | 'opinion' | 'benchmark' | 'technical_fact';
+  status: 'candidate' | 'accepted' | 'rejected' | 'integrated';
+  source_url: string;
+  source_author?: string | null;
+  /**
+   * Passage justificatif interne. Ne pas publier automatiquement.
+   */
+  source_excerpt: string;
+  /**
+   * Suggestion facultative de l'automatisation, à contrôler intégralement.
+   */
+  proposed_rewrite?: string | null;
+  rewritten_text?: string | null;
+  /**
+   * Obligatoire avant l'acceptation.
+   */
+  source?: (string | null) | Source;
+  placement?: ('field_note' | 'warning' | 'diverging_view' | 'inline_note') | null;
+  technology_context?: string | null;
+  engagement_score?: number | null;
+  corroboration_count: number;
+  collected_at: string;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
+  rejection_reason?: string | null;
+  collector_version?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "relations".
  */
 export interface Relation {
@@ -459,6 +507,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'editorial-contents';
         value: string | EditorialContent;
+      } | null)
+    | ({
+        relationTo: 'editorial-insights';
+        value: string | EditorialInsight;
       } | null)
     | ({
         relationTo: 'relations';
@@ -658,6 +710,34 @@ export interface EditorialContentsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "editorial-insights_select".
+ */
+export interface EditorialInsightsSelect<T extends boolean = true> {
+  title?: T;
+  article?: T;
+  platform?: T;
+  type?: T;
+  status?: T;
+  source_url?: T;
+  source_author?: T;
+  source_excerpt?: T;
+  proposed_rewrite?: T;
+  rewritten_text?: T;
+  source?: T;
+  placement?: T;
+  technology_context?: T;
+  engagement_score?: T;
+  corroboration_count?: T;
+  collected_at?: T;
+  reviewed_at?: T;
+  reviewed_by?: T;
+  rejection_reason?: T;
+  collector_version?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -70,7 +70,7 @@ const preventInvalidatingPublishedTechnologies: CollectionBeforeChangeHook<Sourc
 }
 
 const preventDeletingReferencedSource: CollectionBeforeDeleteHook = async ({ id, req }) => {
-  const [technologyReferences, relationReferences] = await Promise.all([
+  const [technologyReferences, relationReferences, editorialReferences, insightReferences] = await Promise.all([
     req.payload.count({
       collection: 'technologies',
       overrideAccess: true,
@@ -81,9 +81,22 @@ const preventDeletingReferencedSource: CollectionBeforeDeleteHook = async ({ id,
       overrideAccess: true,
       where: { source_ids: { contains: id } },
     }),
+    req.payload.count({
+      collection: 'editorial-contents',
+      overrideAccess: true,
+      where: { source_ids: { contains: id } },
+    }),
+    req.payload.count({
+      collection: 'editorial-insights',
+      overrideAccess: true,
+      where: { source: { equals: id } },
+    }),
   ])
   assertResourceCanBeDeleted(
-    technologyReferences.totalDocs + relationReferences.totalDocs,
+    technologyReferences.totalDocs +
+      relationReferences.totalDocs +
+      editorialReferences.totalDocs +
+      insightReferences.totalDocs,
     'Source',
   )
 }

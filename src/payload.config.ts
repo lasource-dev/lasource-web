@@ -5,6 +5,7 @@ import { Users } from './collections/Users'
 import { Categories } from './collections/Categories'
 import { Technologies } from './collections/Technologies'
 import { EditorialContents } from './collections/EditorialContents'
+import { EditorialInsights } from './collections/EditorialInsights'
 import { Sources } from './collections/Sources'
 import { Relations } from './collections/Relations'
 import { AffiliatePartners } from './collections/AffiliatePartners'
@@ -25,6 +26,7 @@ export default buildConfig({
     Sources,
     Technologies,
     EditorialContents,
+    EditorialInsights,
     Relations,
     AffiliatePartners,
     AffiliateOffers,

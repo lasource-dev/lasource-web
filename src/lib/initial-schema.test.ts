@@ -29,6 +29,7 @@ describe('initial PostgreSQL schema', () => {
       '20260824_171500_category_hierarchy',
       '20260824_174500_editorial_taxonomy',
       '20260824_181500_limit_editorial_tags',
+      '20260825_085941_editorial_insights_mvp',
     ])
   })
 

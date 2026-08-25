@@ -147,3 +147,23 @@ src/
 | `npm run seed` | charge les données minimales de démonstration sans suppression |
 | `npm run import:legacy-content -- <dossier>` | migre volontairement un ancien corpus avec `ALLOW_LEGACY_CONTENT_IMPORT=true` |
 | `npm run payload -- migrate` | applique les migrations PostgreSQL en attente |
+
+## Enrichissement éditorial
+
+Un administrateur ou le compte d'automatisation peut collecter des contributions candidates
+pour un brouillon avec l'endpoint Payload suivant :
+
+```http
+POST /api/editorial-contents/:id/collect-insights
+Content-Type: application/json
+
+{
+  "platforms": ["stack_exchange", "github"],
+  "query": "pgvector index hnsw production"
+}
+```
+
+Le corps est facultatif : par défaut, les deux connecteurs utilisent le titre et les technologies
+de l'article. Les résultats sont dédupliqués par article et URL, puis enregistrés dans
+`editorial-insights` avec le statut `candidate`. Une automatisation ne peut ni accepter ni intégrer
+un insight. `GITHUB_TOKEN` est facultatif, mais recommandé pour bénéficier de quotas supérieurs.
