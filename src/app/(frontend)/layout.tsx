@@ -63,10 +63,13 @@ export default function FrontendLayout({ children }: Readonly<{ children: ReactN
         </header>
         {children}
         <footer className="site-footer">
-          <p>
-            Des fiches, guides et tutoriels clairs pour comprendre les technologies du Web et de
-            l’intelligence artificielle.
-          </p>
+          <div className="footer-copy">
+            <p>
+              Des fiches, guides et tutoriels clairs pour comprendre les technologies du Web et de
+              l’intelligence artificielle.
+            </p>
+            <p className="footer-copyright">© 2026 LaSource.dev. Tous droits réservés.</p>
+          </div>
           <nav aria-label="Navigation de pied de page">
             <Link href="/">Accueil</Link>
             <Link href="/technologies">Technologies</Link>

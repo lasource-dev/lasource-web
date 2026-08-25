@@ -123,6 +123,15 @@ button:focus-visible {
   max-width: 40rem;
 }
 
+.footer-copy {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.site-footer .footer-copyright {
+  font-size: 0.85rem;
+}
+
 @media (max-width: 42rem) {
   .site-header,
   .site-footer {
