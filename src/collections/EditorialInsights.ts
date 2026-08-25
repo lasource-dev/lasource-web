@@ -27,7 +27,10 @@ export const EditorialInsights: CollectionConfig = {
   },
   access: {
     create: ({ req }) => isAdminUser(req.user) || isAutomationUser(req.user),
-    read: ({ req }) => Boolean(req.user),
+    read: ({ req }) =>
+      req.user
+        ? true
+        : { status: { in: ['accepted', 'integrated'] } },
     update: ({ req }) =>
       isAutomationUser(req.user) ? { status: { equals: 'candidate' } } : isAdminUser(req.user),
     delete: ({ req }) => isAdminUser(req.user),
@@ -80,7 +83,7 @@ export const EditorialInsights: CollectionConfig = {
     {
       name: 'source',
       type: 'relationship',
-      admin: { description: "Obligatoire avant l'acceptation." },
+      admin: { description: 'Facultatif : le lien source_url suffit pour la publication.' },
       relationTo: 'sources',
     },
     {

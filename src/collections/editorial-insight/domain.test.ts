@@ -16,15 +16,12 @@ describe('editorial insight review', () => {
     })
   })
 
-  it('requires an attributed rewrite for accepted insights', () => {
-    expect(() => validateInsightReview({ status: 'accepted' })).toThrow(/rewritten_text/)
+  it('requires a publishable text for accepted insights', () => {
+    expect(() => validateInsightReview({ status: 'accepted' })).toThrow(/rewritten or proposed/)
     expect(() =>
       validateInsightReview({
         status: 'accepted',
-        rewritten_text: 'Un retour reformulé.',
-        source: 'source-id',
-        reviewed_by: 'Alexandre',
-        reviewed_at: '2026-08-25T10:00:00.000Z',
+        proposed_rewrite: 'Un retour reformulé.',
       }),
     ).not.toThrow()
   })

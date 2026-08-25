@@ -21,23 +21,15 @@ export type InsightStatus = (typeof INSIGHT_STATUSES)[number]
 
 type ReviewableInsight = {
   status?: InsightStatus | null
+  proposed_rewrite?: string | null
   rewritten_text?: string | null
-  source?: unknown
-  reviewed_by?: string | null
-  reviewed_at?: string | null
   rejection_reason?: string | null
 }
 
 export function validateInsightReview(data: ReviewableInsight): void {
   if (data.status === 'accepted' || data.status === 'integrated') {
-    if (!data.rewritten_text?.trim()) {
-      throw new Error('rewritten_text is required to accept an editorial insight')
-    }
-    if (!data.source) {
-      throw new Error('source is required to accept an editorial insight')
-    }
-    if (!data.reviewed_by?.trim() || !data.reviewed_at) {
-      throw new Error('reviewed_by and reviewed_at are required to accept an editorial insight')
+    if (!data.rewritten_text?.trim() && !data.proposed_rewrite?.trim()) {
+      throw new Error('A rewritten or proposed text is required to accept an editorial insight')
     }
   }
 
