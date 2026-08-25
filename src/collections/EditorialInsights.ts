@@ -21,6 +21,11 @@ const prepareInsight: CollectionBeforeValidateHook = ({ data, originalDoc, req }
 export const EditorialInsights: CollectionConfig = {
   slug: 'editorial-insights',
   admin: {
+    components: {
+      beforeListTable: [
+        '/src/components/admin/BulkAcceptEditorialInsights#BulkAcceptEditorialInsights',
+      ],
+    },
     defaultColumns: ['article', 'platform', 'type', 'status', 'collected_at'],
     group: 'Contenus',
     useAsTitle: 'title',
