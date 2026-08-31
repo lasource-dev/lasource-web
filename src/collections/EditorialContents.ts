@@ -5,6 +5,7 @@ import { REVIEW_STATUSES } from './editorial/review'
 import { validateSlug } from './technology/domain'
 import { editorialWriteAccess, synchronizeEditorialStatus } from './editorial/automation-access'
 import { isAdminUser, isAutomationUser } from './editorial/automation-access'
+import { saveAutomationDraft } from './editorial/automation-draft'
 import {
   collectEditorialInsights,
   type EnrichmentPlatform,
@@ -71,7 +72,10 @@ export const EditorialContents: CollectionConfig = {
           },
   },
   disableDuplicate: true,
-  endpoints: [{ handler: collectInsights, method: 'post', path: '/:id/collect-insights' }],
+  endpoints: [
+    { handler: collectInsights, method: 'post', path: '/:id/collect-insights' },
+    { handler: saveAutomationDraft, method: 'patch', path: '/:id/automation-draft' },
+  ],
   hooks: { beforeValidate: [synchronizeEditorialStatus] },
   versions: {
     drafts: { autosave: false, schedulePublish: false },
