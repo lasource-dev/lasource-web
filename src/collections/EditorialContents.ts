@@ -56,6 +56,11 @@ const collectInsights: PayloadHandler = async (req) => {
 export const EditorialContents: CollectionConfig = {
   slug: 'editorial-contents',
   admin: {
+    components: {
+      beforeListTable: [
+        '/src/components/admin/BulkValidateEditorialContents#BulkValidateEditorialContents',
+      ],
+    },
     defaultColumns: ['title', 'content_type', 'editorial_status', 'review_status', 'updatedAt'],
     group: 'Contenus',
     useAsTitle: 'title',

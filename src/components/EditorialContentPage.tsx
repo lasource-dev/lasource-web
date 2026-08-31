@@ -173,12 +173,14 @@ export async function EditorialContentPage({ slug, type }: EditorialContentPageP
           <dt>Niveau</dt>
           <dd>{LEVEL_LABELS[content.level]}</dd>
         </div>
-        {content.published_at ? (
-          <div className={styles.detail}>
-            <dt>Publié le</dt>
-            <dd>{formatDate(content.published_at)}</dd>
-          </div>
-        ) : null}
+        <div className={styles.detail}>
+          <dt>Publié le</dt>
+          <dd>{formatDate(content.published_at ?? content.createdAt)}</dd>
+        </div>
+        <div className={styles.detail}>
+          <dt>Dernière relecture</dt>
+          <dd>{content.reviewed_at ? formatDate(content.reviewed_at) : 'Relecture en attente'}</dd>
+        </div>
         <div className={styles.detail}>
           <dt>Prochaine vérification</dt>
           <dd>{formatDate(content.next_review_at)}</dd>
